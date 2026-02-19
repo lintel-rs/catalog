@@ -1,8 +1,9 @@
-## <!-- $schema: ../../../../schemas/claude-agent.json -->
+## <!-- $schema: ../../../../schemas/claude-code/agent.json -->
 
 name: test-runner
 description: Runs tests and reports results. Use after writing or modifying code.
-color: green
+tools: Bash, Read, Grep, Glob
+maxTurns: 10
 
 ---
 

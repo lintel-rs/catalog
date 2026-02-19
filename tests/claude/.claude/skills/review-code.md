@@ -1,4 +1,4 @@
-## <!-- $schema: ../../../../schemas/claude-skill.json -->
+## <!-- $schema: ../../../../schemas/claude-code/skill.json -->
 
 name: review-code
 description: Reviews code for quality, correctness, and adherence to best practices.

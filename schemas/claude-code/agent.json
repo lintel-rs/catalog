@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude Code Agent",
+  "description": "Frontmatter schema for Claude Code custom subagent definitions (.claude/agents/*.md). Agents are autonomous workers that Claude can delegate tasks to, each with their own tools, permissions, and system prompts. See https://docs.anthropic.com/en/docs/claude-code/sub-agents",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique identifier for the agent using lowercase letters and hyphens (kebab-case). This name is used to reference the agent when spawning it via the Task tool and must be unique within scope.",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "examples": ["code-reviewer", "db-reader", "test-runner"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Describes when and how Claude should delegate to this subagent. Claude uses this to decide which agent to spawn for a given task. Include concrete examples of tasks this agent handles for better triggering accuracy. Include the word 'proactively' if you want Claude to invoke it automatically.",
+      "examples": [
+        "Expert code review specialist. Proactively reviews code for quality, security, and maintainability.",
+        "Runs tests and reports results. Use after writing or modifying code.",
+        "Execute read-only database queries. Use when analyzing data or generating reports."
+      ]
+    },
+    "tools": {
+      "description": "Tools the agent can use. Allowlist approach — if omitted, the agent inherits all available tools from the parent session. Built-in tools: Read (read files), Write (create/overwrite files), Edit (modify files), Bash (run shell commands), Glob (find files by pattern), Grep (search file contents), WebFetch (fetch URLs), WebSearch (search the web), Task (spawn subagents). Use Task(agent_type) syntax to restrict which subagents can be spawned (e.g. 'Task(worker, researcher)' only allows those two). Include Task alone to allow any subagent, or omit Task entirely to block all subagent spawning. MCP tool names follow the pattern mcp__<server>__<tool>.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Comma-separated list of tool names."
+        },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of tool names."
+        }
+      ],
+      "examples": [
+        "Read, Grep, Glob, Bash",
+        "Read, Grep, Glob, Task(worker, researcher)",
+        ["Read", "Grep", "Glob", "Bash"]
+      ]
+    },
+    "disallowedTools": {
+      "description": "Tools to deny from the agent. Denylist approach — these are removed from either the inherited tool set or the explicit tools list. Useful when you want the agent to have most tools but need to block specific capabilities (e.g. deny Write and Edit for a read-only reviewer). Can be combined with the tools field: tools defines the base set, disallowedTools subtracts from it.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Comma-separated list of tool names to deny."
+        },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of tool names to deny."
+        }
+      ],
+      "examples": ["Write, Edit", "Bash", ["Write", "Edit"]]
+    },
+    "model": {
+      "type": "string",
+      "description": "Which Claude model the agent should use. 'opus' is the most capable model for complex reasoning tasks, 'sonnet' is balanced between capability and speed, 'haiku' is the fastest and cheapest for simple tasks. Use 'inherit' to match the parent session's model. Defaults to inherit if omitted.",
+      "enum": ["opus", "sonnet", "haiku", "inherit"],
+      "examples": ["sonnet", "inherit"]
+    },
+    "permissionMode": {
+      "type": "string",
+      "description": "Controls how the agent handles tool permission prompts. 'default' shows normal permission prompts to the user. 'acceptEdits' auto-approves file edit operations (Write, Edit) without prompting. 'dontAsk' auto-approves most tool uses without prompting. 'bypassPermissions' skips all permission checks entirely — use with extreme caution. 'plan' puts the agent in plan mode where it can only read and explore, requiring approval before any implementation. Note: a child agent cannot escalate beyond the parent's permission mode (e.g. if the parent uses 'default', the child cannot use 'bypassPermissions').",
+      "enum": [
+        "default",
+        "acceptEdits",
+        "dontAsk",
+        "bypassPermissions",
+        "plan"
+      ],
+      "examples": ["default", "plan"]
+    },
+    "maxTurns": {
+      "type": "integer",
+      "description": "Maximum number of agentic turns (API round-trips) before the subagent automatically stops and returns its results to the parent. Each turn is one request-response cycle where the agent may call tools and receive results. Use this to prevent runaway agents from consuming excessive resources or getting stuck in loops. If omitted, the agent runs until it decides to stop on its own.",
+      "minimum": 1,
+      "examples": [10, 20, 50]
+    },
+    "skills": {
+      "description": "Skills to preload into the subagent's context at startup. The full skill content (not just the description) is injected into the agent's system prompt before it begins working, giving it immediate access to specialized knowledge, coding conventions, or workflow instructions. Agents do not inherit skills from their parent session — every skill the agent needs must be listed explicitly here.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Single skill name."
+        },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of skill names."
+        }
+      ],
+      "examples": [
+        ["api-conventions", "error-handling-patterns"],
+        "code-review-checklist"
+      ]
+    },
+    "mcpServers": {
+      "type": "object",
+      "description": "MCP (Model Context Protocol) servers available to this subagent. Each key is a server name and the value is either a string reference to a server already configured in the project's .mcp.json file, or an inline server definition with full transport configuration. Referenced servers are looked up by name from the existing MCP configuration. Inline definitions launch a new server process with the specified command, arguments, and environment. Environment values support ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths.",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "Reference to an already-configured MCP server by name."
+          },
+          {
+            "$ref": "#/$defs/McpServerConfig",
+            "description": "Inline MCP server definition."
+          }
+        ]
+      },
+      "examples": [
+        { "github": "github", "slack": "slack" },
+        {
+          "custom-db": {
+            "command": "python",
+            "args": ["/path/to/mcp-server.py"],
+            "env": { "DB_URL": "postgresql://localhost:5432" }
+          }
+        }
+      ]
+    },
+    "hooks": {
+      "$ref": "#/$defs/Hooks",
+      "description": "Lifecycle hooks scoped to this subagent. Hooks defined here only fire for this specific agent's actions. Stop hooks automatically convert to SubagentStop. Each key is an event name and its value is an array of matcher groups. See https://docs.anthropic.com/en/docs/claude-code/hooks"
+    },
+    "memory": {
+      "type": "string",
+      "description": "Enables persistent memory for the agent across sessions. 'user' stores at ~/.claude/agent-memory/<name>/, 'project' stores at .claude/agent-memory/<name>/, 'local' stores at .claude/agent-memory-local/<name>/. Automatically enables Read/Write/Edit tools for the memory directory.",
+      "enum": ["user", "project", "local"],
+      "examples": ["project", "user"]
+    }
+  },
+  "required": ["name", "description"],
+  "additionalProperties": false,
+  "$defs": {
+    "McpServerConfig": {
+      "type": "object",
+      "description": "Inline MCP server definition with transport configuration.",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Executable to run for the MCP server.",
+          "examples": ["python", "node", "npx"]
+        },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Arguments to pass to the command.",
+          "examples": [["/path/to/server.py"], ["--port", "3000"]]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Environment variables for the server process.",
+          "examples": [{ "DB_URL": "postgresql://localhost:5432" }]
+        },
+        "cwd": {
+          "type": "string",
+          "description": "Working directory for the server process.",
+          "examples": ["/path/to/project"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Connection timeout in milliseconds.",
+          "examples": [30000]
+        }
+      },
+      "required": ["command"]
+    },
+    "Hooks": {
+      "type": "object",
+      "description": "Map of event names to arrays of matcher groups. Each matcher group optionally filters by a regex pattern and contains an array of hook handlers that execute when the event fires.",
+      "properties": {
+        "SessionStart": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a session starts. Matcher filters by session source: 'startup' (new session), 'resume' (resuming previous session), 'clear' (after /clear), 'compact' (after context compaction). Command hooks have access to $CLAUDE_ENV_FILE for persisting environment variables across the session."
+        },
+        "UserPromptSubmit": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when the user submits a prompt, before Claude processes it. No matcher support — always fires on every user message. Hooks can block the prompt (preventing Claude from seeing it) or modify it before processing."
+        },
+        "PreToolUse": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. 'Bash', 'Edit|Write', 'mcp__.*'). Hooks can block the tool call (exit code 2 or {ok: false}), modify its input via hookSpecificOutput.updatedInput, auto-allow/deny permission via hookSpecificOutput.permissionDecision ('allow', 'deny', 'ask'), or inject additional context via hookSpecificOutput.additionalContext."
+        },
+        "PermissionRequest": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a tool requests user permission before executing. Matcher filters by tool name. Hooks can auto-allow or deny the permission via hookSpecificOutput.decision.behavior ('allow' or 'deny'), optionally modifying the tool input via decision.updatedInput or updating permissions via decision.updatedPermissions. If denied, decision.message is shown to the user."
+        },
+        "PostToolUse": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires after a tool executes successfully. Matcher filters by tool name. Hooks can inject additional context for Claude via hookSpecificOutput.additionalContext (e.g. lint results after a file write) or replace MCP tool output via hookSpecificOutput.updatedMCPToolOutput. Supports async hooks that run in the background without blocking."
+        },
+        "PostToolUseFailure": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires after a tool execution fails. Matcher filters by tool name. Hooks can inject additional context to help Claude understand and recover from the failure. Supports async hooks."
+        },
+        "Notification": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires on notifications. Matcher filters by type: 'permission_prompt', 'idle_prompt', 'auth_success', 'elicitation_dialog'."
+        },
+        "SubagentStart": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a subagent is spawned. Matcher filters by agent type."
+        },
+        "SubagentStop": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a subagent stops. Matcher filters by agent type."
+        },
+        "Stop": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when the agent's turn ends and it is about to return control. No matcher support — always fires. In agent frontmatter, Stop hooks automatically convert to SubagentStop hooks scoped to this agent. Hooks can force the agent to continue working by returning {continue: false} with a reason."
+        },
+        "TeammateIdle": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a teammate goes idle. No matcher support — always fires."
+        },
+        "TaskCompleted": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a task is marked completed. No matcher support — always fires."
+        },
+        "PreCompact": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires before context compaction. Matcher filters by trigger type: 'manual', 'auto'."
+        },
+        "SessionEnd": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a session ends. Matcher filters by exit reason: 'clear', 'logout', 'prompt_input_exit', 'bypass_permissions_disabled', 'other'."
+        }
+      },
+      "additionalProperties": false
+    },
+    "MatcherGroupArray": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/MatcherGroup" }
+    },
+    "MatcherGroup": {
+      "type": "object",
+      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If matcher is omitted, the hooks fire on every occurrence of the event.",
+      "properties": {
+        "matcher": {
+          "type": "string",
+          "description": "Regex pattern to filter when this group's hooks fire. Use '|' for OR (e.g. 'Edit|Write'), '.*' for wildcards (e.g. 'mcp__.*'). MCP tools follow the pattern mcp__<server>__<tool>. Omit to match all.",
+          "examples": ["Bash", "Edit|Write", "mcp__.*"]
+        },
+        "hooks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/HookHandler" }
+        }
+      },
+      "required": ["hooks"]
+    },
+    "HookHandler": {
+      "oneOf": [
+        { "$ref": "#/$defs/CommandHook" },
+        { "$ref": "#/$defs/PromptHook" },
+        { "$ref": "#/$defs/AgentHook" }
+      ]
+    },
+    "CommandHook": {
+      "type": "object",
+      "description": "Runs a shell command or script synchronously (or async if configured). The command receives hook context as JSON on stdin, including session_id, transcript_path, cwd, permission_mode, hook_event_name, and event-specific fields. Exit code 0 means success — stdout is parsed as JSON and can contain fields like 'continue' (boolean), 'stopReason' (string), 'systemMessage' (string), and event-specific 'hookSpecificOutput'. Exit code 2 is a blocking error — stderr is fed to Claude as an error message. Any other exit code is a non-blocking error logged in verbose mode.",
+      "properties": {
+        "type": { "const": "command" },
+        "command": {
+          "type": "string",
+          "description": "Shell command or script path to execute. The command runs in the project's working directory. Use $CLAUDE_PROJECT_DIR to reference the project root (always quote it: \"$CLAUDE_PROJECT_DIR\"/path) and ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths. The command has access to environment variables including $CLAUDE_ENV_FILE (SessionStart only, for persisting env vars).",
+          "examples": [
+            "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate.sh",
+            "./scripts/lint-check.sh"
+          ]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 600,
+          "examples": [10, 30, 120]
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs.",
+          "examples": ["Validating command...", "Running lint check..."]
+        },
+        "async": {
+          "type": "boolean",
+          "description": "Run in background without blocking. Only supported for PostToolUse and PostToolUseFailure events.",
+          "default": false
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove. Primarily useful in skills.",
+          "default": false
+        }
+      },
+      "required": ["type", "command"],
+      "additionalProperties": false
+    },
+    "PromptHook": {
+      "type": "object",
+      "description": "Evaluates a single-turn LLM prompt to make a pass/fail decision. A small, fast model receives the prompt and must respond with a JSON object: {ok: true} to allow the action, or {ok: false, reason: 'explanation'} to block it with feedback. Unlike agent hooks, prompt hooks cannot use tools — they make a decision based solely on the information in the prompt. Best for quick validation checks like safety screening or format verification.",
+      "properties": {
+        "type": { "const": "prompt" },
+        "prompt": {
+          "type": "string",
+          "description": "The evaluation prompt sent to the LLM. Use $ARGUMENTS to interpolate the hook's full input context as a JSON string, which includes session_id, cwd, tool_name (for tool events), tool_input, and other event-specific fields. Write the prompt to elicit a clear pass/fail judgment.",
+          "examples": [
+            "Is this Bash command safe to run? Review for destructive operations: $ARGUMENTS",
+            "Does this file edit follow our coding standards? $ARGUMENTS"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "description": "Model for evaluation. Defaults to a fast model for low latency.",
+          "examples": ["haiku"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 30
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs.",
+          "examples": ["Evaluating safety..."]
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove.",
+          "default": false
+        }
+      },
+      "required": ["type", "prompt"],
+      "additionalProperties": false
+    },
+    "AgentHook": {
+      "type": "object",
+      "description": "Runs a multi-turn LLM agent that can use tools (Read, Grep, Glob, Bash, etc.) to gather additional context before making a decision. Unlike prompt hooks, agent hooks can explore the codebase, read files, and run commands to verify conditions before responding. The agent must ultimately respond with {ok: true} to allow the action, or {ok: false, reason: 'explanation'} to block it. Best for complex validations that require reading project files or checking external state.",
+      "properties": {
+        "type": { "const": "agent" },
+        "prompt": {
+          "type": "string",
+          "description": "The verification prompt sent to the agent. Use $ARGUMENTS to interpolate the hook's full input context as a JSON string. The agent can then use tools to investigate further before making its decision. Write the prompt to clearly describe what conditions to verify.",
+          "examples": [
+            "Verify this MCP write operation is valid and won't cause data loss: $ARGUMENTS"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "description": "Model for the agent. Defaults to a fast model.",
+          "examples": ["sonnet"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 60
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs.",
+          "examples": ["Verifying operation..."]
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove.",
+          "default": false
+        }
+      },
+      "required": ["type", "prompt"],
+      "additionalProperties": false
+    }
+  }
+}

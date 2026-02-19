@@ -1,15 +1,9 @@
-## <!-- $schema: ../../../../schemas/claude-command.json -->
+## <!-- $schema: ../../../../schemas/claude-code/command.json -->
 
 description: Deploy the application to the specified environment.
-allowed-tools:
-
-- Bash
-- Read
-  arguments:
-- name: environment
-  description: Target environment (staging or production)
-  required: true
+allowed-tools: Bash, Read
+argument-hint: "[environment]"
 
 ---
 
-Deploy the application to the $ARGUMENTS.environment environment.
+Deploy the application to the $ARGUMENTS environment.

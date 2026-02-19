@@ -1,8 +1,8 @@
-## <!-- $schema: ../../../../schemas/claude-agent.json -->
+## <!-- $schema: ../../../../schemas/claude-code/agent.json -->
 
 name: researcher
 description: Researches codebases and answers questions about architecture and implementation details.
-color: blue
+tools: Read, Grep, Glob
 model: sonnet
 
 ---

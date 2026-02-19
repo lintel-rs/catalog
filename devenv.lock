@@ -17,10 +17,10 @@
     "devenv": {
       "locked": {
         "dir": "src/modules",
-        "lastModified": 1771511143,
+        "lastModified": 1771513566,
         "owner": "cachix",
         "repo": "devenv",
-        "rev": "dee5b8d70b82c2e940278c7f3411a6523ff6120b",
+        "rev": "f4f0ed5fd101831651abd7a249cc62eb464f249c",
         "type": "github"
       },
       "original": {
@@ -110,10 +110,10 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1771511944,
+        "lastModified": 1771517016,
         "owner": "lintel-rs",
         "repo": "lintel",
-        "rev": "25e8b0848fc02bd5ecbe5b59f3da55c409586530",
+        "rev": "160251baabb41317ed83de650a10a3f815e7fe1c",
         "type": "github"
       },
       "original": {

@@ -5,13 +5,13 @@
     {
       "name": "Claude Code Agent",
       "description": "Claude Code agent definition frontmatter",
-      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-agent.json",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-code/agent.json",
       "fileMatch": ["**/.claude/agents/*.md", ".claude/agents/*.md"]
     },
     {
       "name": "Claude Code Skill",
       "description": "Claude Code skill definition frontmatter",
-      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-skill.json",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-code/skill.json",
       "fileMatch": [
         "**/skills/*/SKILL.md",
         "**/skills/*.md",
@@ -21,7 +21,7 @@
     {
       "name": "Claude Code Command",
       "description": "Claude Code slash command definition frontmatter",
-      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-command.json",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-code/command.json",
       "fileMatch": [
         "**/.claude/commands/*.md",
         ".claude/commands/*.md",
