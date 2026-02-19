@@ -14,7 +14,7 @@ To add additional catalogs, use `registries` in `lintel.toml`:
 registries = ["github:my-org/my-schemas"]
 ```
 
-The `github:org/repo` shorthand resolves to `https://raw.githubusercontent.com/org/repo/main/catalog.json`.
+The `github:org/repo` shorthand resolves to `https://raw.githubusercontent.com/org/repo/master/catalog.json`.
 
 ## Catalog format
 
@@ -28,7 +28,7 @@ The catalog follows the [SchemaStore catalog format](https://json.schemastore.or
     {
       "name": "My Schema",
       "description": "Description of the schema",
-      "url": "https://raw.githubusercontent.com/org/repo/main/schemas/my-schema.json",
+      "url": "https://raw.githubusercontent.com/org/repo/master/schemas/my-schema.json",
       "fileMatch": ["**/*.my-ext"]
     }
   ]
