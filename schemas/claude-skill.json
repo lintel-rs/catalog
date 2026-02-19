@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Skill identifier"
+    },
+    "description": {
+      "type": "string",
+      "description": "When and how to use this skill"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version"
+    },
+    "model": {
+      "type": "string",
+      "description": "Claude model to use",
+      "enum": ["opus", "sonnet", "haiku"]
+    },
+    "allowed-tools": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Tools this skill is allowed to use"
+    },
+    "tools": {
+      "type": "string",
+      "description": "Comma-separated list of allowed tools (alternative to allowed-tools)"
+    }
+  },
+  "required": ["name", "description"],
+  "additionalProperties": false
+}

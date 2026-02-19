@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Agent identifier"
+    },
+    "description": {
+      "type": "string",
+      "description": "When and how to use this agent, with examples"
+    },
+    "color": {
+      "type": "string",
+      "description": "UI color for the agent",
+      "enum": [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "cyan",
+        "blue",
+        "purple",
+        "magenta"
+      ]
+    },
+    "model": {
+      "type": "string",
+      "description": "Claude model to use",
+      "enum": ["opus", "sonnet", "haiku"]
+    }
+  },
+  "required": ["name", "description"],
+  "additionalProperties": false
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/schema-catalog.json",
+  "version": 1,
+  "schemas": [
+    {
+      "name": "Claude Code Agent",
+      "description": "Claude Code agent definition frontmatter",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/main/schemas/claude-agent.json",
+      "fileMatch": ["**/.claude/agents/*.md", ".claude/agents/*.md"]
+    },
+    {
+      "name": "Claude Code Skill",
+      "description": "Claude Code skill definition frontmatter",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/main/schemas/claude-skill.json",
+      "fileMatch": [
+        "**/skills/*/SKILL.md",
+        "**/skills/*.md",
+        ".claude/skills/*.md"
+      ]
+    },
+    {
+      "name": "Claude Code Command",
+      "description": "Claude Code slash command definition frontmatter",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/main/schemas/claude-command.json",
+      "fileMatch": [
+        "**/.claude/commands/*.md",
+        ".claude/commands/*.md",
+        "**/commands/*.md"
+      ]
+    },
+    {
+      "name": "Cargo.toml",
+      "description": "Rust Cargo manifest file",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/main/schemas/cargo-toml.json",
+      "fileMatch": ["Cargo.toml", "**/Cargo.toml"]
+    },
+    {
+      "name": "devenv.yaml",
+      "description": "devenv configuration file",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/main/schemas/devenv.json",
+      "fileMatch": ["devenv.yaml", "**/devenv.yaml"]
+    }
+  ]
+}

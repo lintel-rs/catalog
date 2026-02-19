@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Command identifier (slash command name)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Command description and usage examples"
+    },
+    "model": {
+      "type": "string",
+      "description": "Claude model to use",
+      "enum": ["opus", "sonnet", "haiku"]
+    },
+    "allowed-tools": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Tools this command is allowed to use"
+    },
+    "arguments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Argument name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Argument description"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the argument is required"
+          }
+        },
+        "required": ["name", "description"]
+      },
+      "description": "Command arguments"
+    }
+  },
+  "required": ["description"],
+  "additionalProperties": false
+}
