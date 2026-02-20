@@ -1,0 +1,666 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude Code Marketplace",
+  "description": "Schema for Claude Code marketplace catalog (.claude-plugin/marketplace.json). Marketplaces distribute plugins to teams and communities, providing centralized discovery, version tracking, and automatic updates. Each marketplace lists plugins with their sources (local paths, GitHub repos, git URLs, npm packages, or pip packages). See https://code.claude.com/docs/en/plugin-marketplaces",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Marketplace identifier (kebab-case, no spaces). This is public-facing — users see it when installing plugins (e.g. '/plugin install my-tool@your-marketplace'). Reserved names include: claude-code-marketplace, claude-code-plugins, claude-plugins-official, anthropic-marketplace, anthropic-plugins, agent-skills, life-sciences.",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "examples": ["acme-tools", "company-tools", "my-plugins"]
+    },
+    "owner": {
+      "$ref": "#/$defs/Owner",
+      "description": "Marketplace maintainer information."
+    },
+    "plugins": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PluginEntry" },
+      "description": "List of available plugins in this marketplace."
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata",
+      "description": "Optional marketplace metadata."
+    }
+  },
+  "required": ["name", "owner", "plugins"],
+  "$defs": {
+    "Owner": {
+      "type": "object",
+      "description": "Marketplace maintainer information.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the maintainer or team.",
+          "examples": ["DevTools Team", "Jane Doe"]
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email for the maintainer.",
+          "examples": ["devtools@example.com"]
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "Metadata": {
+      "type": "object",
+      "description": "Optional marketplace metadata.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Brief marketplace description.",
+          "examples": ["Internal tools for the DevOps team"]
+        },
+        "version": {
+          "type": "string",
+          "description": "Marketplace catalog version.",
+          "examples": ["1.0.0"]
+        },
+        "pluginRoot": {
+          "type": "string",
+          "description": "Base directory prepended to relative plugin source paths. For example, setting this to './plugins' lets you write 'source': 'formatter' instead of 'source': './plugins/formatter'.",
+          "examples": ["./plugins"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "PluginEntry": {
+      "type": "object",
+      "description": "A plugin listed in the marketplace. Includes marketplace-specific fields (source, category, tags, strict) plus any field from the plugin manifest schema (description, version, author, commands, hooks, etc.).",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Plugin identifier (kebab-case, no spaces). This is public-facing — users see it when installing (e.g. '/plugin install my-plugin@marketplace').",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "examples": ["code-formatter", "deployment-tools", "review-plugin"]
+        },
+        "source": {
+          "$ref": "#/$defs/PluginSource",
+          "description": "Where to fetch the plugin from. Can be a relative path within the marketplace repo (starting with './') or an object specifying a remote source (GitHub, git URL, npm, or pip)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief plugin description.",
+          "examples": ["Automatic code formatting on save"]
+        },
+        "version": {
+          "type": "string",
+          "description": "Plugin version. If the plugin also has a version in its plugin.json, the plugin.json version takes priority. For relative-path plugins, set the version here. For remote plugins, set it in plugin.json.",
+          "examples": ["1.0.0", "2.1.0"]
+        },
+        "author": {
+          "$ref": "#/$defs/Author",
+          "description": "Plugin author information."
+        },
+        "homepage": {
+          "type": "string",
+          "description": "Plugin homepage or documentation URL.",
+          "examples": ["https://docs.example.com/plugins/my-tool"]
+        },
+        "repository": {
+          "type": "string",
+          "description": "Source code repository URL.",
+          "examples": ["https://github.com/company/my-plugin"]
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier.",
+          "examples": ["MIT", "Apache-2.0"]
+        },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for plugin discovery and categorization.",
+          "examples": [["enterprise", "workflow", "automation"]]
+        },
+        "category": {
+          "type": "string",
+          "description": "Plugin category for organization.",
+          "examples": ["productivity", "code-quality", "deployment"]
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for searchability.",
+          "examples": [["lint", "format", "style"]]
+        },
+        "strict": {
+          "type": "boolean",
+          "description": "Controls whether plugin.json is the authority for component definitions. When true (default), plugin.json is authoritative and the marketplace entry can supplement it. When false, the marketplace entry is the entire definition — if the plugin also has a plugin.json that declares components, that's a conflict and the plugin fails to load.",
+          "default": true
+        },
+        "commands": {
+          "$ref": "#/$defs/PathOrPaths",
+          "description": "Custom paths to command files or directories, relative to the plugin root."
+        },
+        "agents": {
+          "$ref": "#/$defs/PathOrPaths",
+          "description": "Custom paths to agent files, relative to the plugin root."
+        },
+        "skills": {
+          "$ref": "#/$defs/PathOrPaths",
+          "description": "Custom paths to skill directories, relative to the plugin root."
+        },
+        "hooks": {
+          "description": "Hook configuration — either paths to JSON config files or inline hook definitions.",
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to a hooks JSON config file."
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Array of paths to hooks JSON config files."
+            },
+            {
+              "$ref": "#/$defs/Hooks",
+              "description": "Inline hook definitions."
+            }
+          ]
+        },
+        "mcpServers": {
+          "description": "MCP server configuration — either paths to JSON config files or inline server definitions.",
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to an MCP config JSON file."
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Array of paths to MCP config JSON files."
+            },
+            {
+              "type": "object",
+              "description": "Inline MCP server definitions.",
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Reference to an already-configured MCP server by name."
+                  },
+                  {
+                    "$ref": "#/$defs/McpServerConfig",
+                    "description": "Inline MCP server definition."
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "outputStyles": {
+          "$ref": "#/$defs/PathOrPaths",
+          "description": "Custom paths to output style files or directories."
+        },
+        "lspServers": {
+          "description": "LSP server configuration — either paths to JSON config files or inline server definitions.",
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Path to an LSP config JSON file."
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Array of paths to LSP config JSON files."
+            },
+            {
+              "type": "object",
+              "description": "Inline LSP server definitions.",
+              "additionalProperties": {
+                "$ref": "#/$defs/LspServerConfig"
+              }
+            }
+          ]
+        }
+      },
+      "required": ["name", "source"],
+      "additionalProperties": false
+    },
+    "PluginSource": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Relative path within the marketplace repo. Must start with './'.",
+          "examples": ["./plugins/my-plugin"]
+        },
+        { "$ref": "#/$defs/GitHubSource" },
+        { "$ref": "#/$defs/UrlSource" },
+        { "$ref": "#/$defs/NpmSource" },
+        { "$ref": "#/$defs/PipSource" }
+      ]
+    },
+    "GitHubSource": {
+      "type": "object",
+      "description": "Fetch the plugin from a GitHub repository.",
+      "properties": {
+        "source": {
+          "const": "github"
+        },
+        "repo": {
+          "type": "string",
+          "description": "GitHub repository in owner/repo format.",
+          "pattern": "^[^/]+/[^/]+$",
+          "examples": ["owner/plugin-repo", "company/enterprise-plugin"]
+        },
+        "ref": {
+          "type": "string",
+          "description": "Git branch or tag. Defaults to the repository's default branch.",
+          "examples": ["main", "v2.0.0", "stable"]
+        },
+        "sha": {
+          "type": "string",
+          "description": "Full 40-character git commit SHA to pin to an exact version.",
+          "pattern": "^[0-9a-f]{40}$",
+          "examples": ["a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"]
+        }
+      },
+      "required": ["source", "repo"],
+      "additionalProperties": false
+    },
+    "UrlSource": {
+      "type": "object",
+      "description": "Fetch the plugin from a git URL.",
+      "properties": {
+        "source": {
+          "const": "url"
+        },
+        "url": {
+          "type": "string",
+          "description": "Full git repository URL (must end with .git).",
+          "pattern": "\\.git$",
+          "examples": ["https://gitlab.com/team/plugin.git"]
+        },
+        "ref": {
+          "type": "string",
+          "description": "Git branch or tag. Defaults to the repository's default branch.",
+          "examples": ["main", "v1.0.0"]
+        },
+        "sha": {
+          "type": "string",
+          "description": "Full 40-character git commit SHA to pin to an exact version.",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      },
+      "required": ["source", "url"],
+      "additionalProperties": false
+    },
+    "NpmSource": {
+      "type": "object",
+      "description": "Install the plugin from an npm registry.",
+      "properties": {
+        "source": {
+          "const": "npm"
+        },
+        "package": {
+          "type": "string",
+          "description": "npm package name.",
+          "examples": ["@company/mcp-server", "my-claude-plugin"]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version range or exact version.",
+          "examples": ["1.0.0", "^2.0.0"]
+        },
+        "registry": {
+          "type": "string",
+          "description": "Custom npm registry URL.",
+          "examples": ["https://npm.company.com"]
+        }
+      },
+      "required": ["source", "package"],
+      "additionalProperties": false
+    },
+    "PipSource": {
+      "type": "object",
+      "description": "Install the plugin via pip.",
+      "properties": {
+        "source": {
+          "const": "pip"
+        },
+        "package": {
+          "type": "string",
+          "description": "Python package name.",
+          "examples": ["my-claude-plugin"]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version specifier.",
+          "examples": ["1.0.0", ">=2.0"]
+        },
+        "registry": {
+          "type": "string",
+          "description": "Custom PyPI registry URL.",
+          "examples": ["https://pypi.company.com/simple"]
+        }
+      },
+      "required": ["source", "package"],
+      "additionalProperties": false
+    },
+    "Author": {
+      "type": "object",
+      "description": "Author information.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Author's display name.",
+          "examples": ["Dev Team"]
+        },
+        "email": {
+          "type": "string",
+          "description": "Author's email address.",
+          "examples": ["dev@company.com"]
+        },
+        "url": {
+          "type": "string",
+          "description": "Author's website or profile URL.",
+          "examples": ["https://github.com/author"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "PathOrPaths": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A single relative path starting with './'."
+        },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of relative paths, each starting with './'."
+        }
+      ]
+    },
+    "McpServerConfig": {
+      "type": "object",
+      "description": "Inline MCP server definition with transport configuration.",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Executable to run for the MCP server. Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths.",
+          "examples": ["python", "node", "npx"]
+        },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Arguments to pass to the command.",
+          "examples": [["/path/to/server.py"], ["--port", "3000"]]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Environment variables for the server process. Values support ${CLAUDE_PLUGIN_ROOT}.",
+          "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
+        },
+        "cwd": {
+          "type": "string",
+          "description": "Working directory for the server process.",
+          "examples": ["${CLAUDE_PLUGIN_ROOT}"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Connection timeout in milliseconds.",
+          "examples": [30000]
+        }
+      },
+      "required": ["command"]
+    },
+    "LspServerConfig": {
+      "type": "object",
+      "description": "LSP server configuration for a language.",
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "The LSP binary to execute (must be in PATH).",
+          "examples": ["gopls", "typescript-language-server", "rust-analyzer"]
+        },
+        "extensionToLanguage": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Maps file extensions to language identifiers.",
+          "examples": [
+            { ".go": "go" },
+            { ".ts": "typescript", ".tsx": "typescriptreact" }
+          ]
+        },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Command-line arguments for the LSP server.",
+          "examples": [["serve"], ["--stdio"]]
+        },
+        "transport": {
+          "type": "string",
+          "description": "Communication transport.",
+          "enum": ["stdio", "socket"],
+          "default": "stdio"
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Environment variables to set when starting the server."
+        },
+        "initializationOptions": {
+          "type": "object",
+          "description": "Options passed to the server during initialization."
+        },
+        "settings": {
+          "type": "object",
+          "description": "Settings passed via workspace/didChangeConfiguration."
+        },
+        "workspaceFolder": {
+          "type": "string",
+          "description": "Workspace folder path for the server."
+        },
+        "startupTimeout": {
+          "type": "number",
+          "description": "Max time to wait for server startup in milliseconds."
+        },
+        "shutdownTimeout": {
+          "type": "number",
+          "description": "Max time to wait for graceful shutdown in milliseconds."
+        },
+        "restartOnCrash": {
+          "type": "boolean",
+          "description": "Whether to automatically restart the server if it crashes."
+        },
+        "maxRestarts": {
+          "type": "number",
+          "description": "Maximum number of restart attempts before giving up."
+        }
+      },
+      "required": ["command", "extensionToLanguage"]
+    },
+    "Hooks": {
+      "type": "object",
+      "description": "Map of event names to arrays of matcher groups. Each matcher group optionally filters by a regex pattern and contains an array of hook handlers that execute when the event fires.",
+      "properties": {
+        "SessionStart": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a session starts. Matcher filters by session source: 'startup', 'resume', 'clear', 'compact'."
+        },
+        "UserPromptSubmit": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when the user submits a prompt, before Claude processes it."
+        },
+        "PreToolUse": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. 'Bash', 'Edit|Write', 'mcp__.*')."
+        },
+        "PermissionRequest": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a tool requests user permission before executing. Matcher filters by tool name."
+        },
+        "PostToolUse": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires after a tool executes successfully. Matcher filters by tool name."
+        },
+        "PostToolUseFailure": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires after a tool execution fails. Matcher filters by tool name."
+        },
+        "Notification": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires on notifications. Matcher filters by type."
+        },
+        "SubagentStart": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a subagent is spawned. Matcher filters by agent type."
+        },
+        "SubagentStop": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a subagent stops. Matcher filters by agent type."
+        },
+        "Stop": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when Claude's turn ends."
+        },
+        "TeammateIdle": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a teammate goes idle."
+        },
+        "TaskCompleted": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a task is marked completed."
+        },
+        "PreCompact": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires before context compaction. Matcher filters by trigger type: 'manual', 'auto'."
+        },
+        "SessionEnd": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a session ends. Matcher filters by exit reason."
+        }
+      },
+      "additionalProperties": false
+    },
+    "MatcherGroupArray": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/MatcherGroup" }
+    },
+    "MatcherGroup": {
+      "type": "object",
+      "description": "A matcher group pairs an optional regex filter with an array of hook handlers.",
+      "properties": {
+        "matcher": {
+          "type": "string",
+          "description": "Regex pattern to filter when this group's hooks fire.",
+          "examples": ["Bash", "Edit|Write", "mcp__.*"]
+        },
+        "hooks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/HookHandler" }
+        }
+      },
+      "required": ["hooks"]
+    },
+    "HookHandler": {
+      "oneOf": [
+        { "$ref": "#/$defs/CommandHook" },
+        { "$ref": "#/$defs/PromptHook" },
+        { "$ref": "#/$defs/AgentHook" }
+      ]
+    },
+    "CommandHook": {
+      "type": "object",
+      "description": "Runs a shell command or script. Exit code 0 is success, exit code 2 is a blocking error, any other code is a non-blocking error.",
+      "properties": {
+        "type": { "const": "command" },
+        "command": {
+          "type": "string",
+          "description": "Shell command or script path to execute. Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths.",
+          "examples": ["${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 600
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs."
+        },
+        "async": {
+          "type": "boolean",
+          "description": "Run in background without blocking. Only for PostToolUse/PostToolUseFailure.",
+          "default": false
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove.",
+          "default": false
+        }
+      },
+      "required": ["type", "command"],
+      "additionalProperties": false
+    },
+    "PromptHook": {
+      "type": "object",
+      "description": "Evaluates a single-turn LLM prompt to make a pass/fail decision. Must respond with {ok: true} or {ok: false, reason: 'explanation'}.",
+      "properties": {
+        "type": { "const": "prompt" },
+        "prompt": {
+          "type": "string",
+          "description": "The evaluation prompt. Use $ARGUMENTS to interpolate hook context."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model for evaluation. Defaults to a fast model.",
+          "examples": ["haiku"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 30
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs."
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove.",
+          "default": false
+        }
+      },
+      "required": ["type", "prompt"],
+      "additionalProperties": false
+    },
+    "AgentHook": {
+      "type": "object",
+      "description": "Runs a multi-turn LLM agent with tool access. Must respond with {ok: true} or {ok: false, reason: 'explanation'}.",
+      "properties": {
+        "type": { "const": "agent" },
+        "prompt": {
+          "type": "string",
+          "description": "The verification prompt. Use $ARGUMENTS to interpolate hook context."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model for the agent. Defaults to a fast model.",
+          "examples": ["sonnet"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 60
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Spinner message while the hook runs."
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove.",
+          "default": false
+        }
+      },
+      "required": ["type", "prompt"],
+      "additionalProperties": false
+    }
+  }
+}

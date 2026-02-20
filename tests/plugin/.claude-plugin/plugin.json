@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../schemas/claude-code/plugin.json",
+  "name": "example-plugin",
+  "version": "1.0.0",
+  "description": "An example plugin for testing schema validation",
+  "author": {
+    "name": "Test Author",
+    "email": "test@example.com",
+    "url": "https://github.com/test"
+  },
+  "homepage": "https://example.com/plugin",
+  "repository": "https://github.com/test/example-plugin",
+  "license": "MIT",
+  "keywords": ["testing", "example"],
+  "commands": ["./custom/commands/special.md"],
+  "agents": "./custom/agents/",
+  "skills": "./custom/skills/",
+  "hooks": "./config/hooks.json",
+  "mcpServers": "./mcp-config.json",
+  "outputStyles": "./styles/",
+  "lspServers": "./.lsp.json"
+}

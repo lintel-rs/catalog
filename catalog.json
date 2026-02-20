@@ -29,10 +29,22 @@
       ]
     },
     {
-      "name": "Cargo.toml",
-      "description": "Rust Cargo manifest file",
-      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/cargo-toml.json",
-      "fileMatch": ["Cargo.toml", "**/Cargo.toml"]
+      "name": "Claude Code Plugin",
+      "description": "Claude Code plugin manifest",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-code/plugin.json",
+      "fileMatch": [
+        "**/.claude-plugin/plugin.json",
+        ".claude-plugin/plugin.json"
+      ]
+    },
+    {
+      "name": "Claude Code Marketplace",
+      "description": "Claude Code plugin marketplace catalog",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/claude-code/marketplace.json",
+      "fileMatch": [
+        "**/.claude-plugin/marketplace.json",
+        ".claude-plugin/marketplace.json"
+      ]
     },
     {
       "name": "devenv.yaml",

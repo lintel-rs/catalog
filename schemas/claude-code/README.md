@@ -6,11 +6,13 @@ These schemas validate the YAML frontmatter in your `.claude/` markdown files, c
 
 ## Schemas
 
-| Schema                       | File patterns                              | Docs                                                                    |
-| ---------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
-| [agent.json](agent.json)     | `.claude/agents/*.md`                      | [Sub-agents](https://docs.anthropic.com/en/docs/claude-code/sub-agents) |
-| [skill.json](skill.json)     | `.claude/skills/*.md`, `skills/*/SKILL.md` | [Skills](https://docs.anthropic.com/en/docs/claude-code/skills)         |
-| [command.json](command.json) | `.claude/commands/*.md`                    | [Skills](https://docs.anthropic.com/en/docs/claude-code/skills)         |
+| Schema                               | File patterns                              | Docs                                                                       |
+| ------------------------------------ | ------------------------------------------ | -------------------------------------------------------------------------- |
+| [agent.json](agent.json)             | `.claude/agents/*.md`                      | [Sub-agents](https://docs.anthropic.com/en/docs/claude-code/sub-agents)    |
+| [skill.json](skill.json)             | `.claude/skills/*.md`, `skills/*/SKILL.md` | [Skills](https://docs.anthropic.com/en/docs/claude-code/skills)            |
+| [command.json](command.json)         | `.claude/commands/*.md`                    | [Skills](https://docs.anthropic.com/en/docs/claude-code/skills)            |
+| [plugin.json](plugin.json)           | `.claude-plugin/plugin.json`               | [Plugins reference](https://code.claude.com/docs/en/plugins-reference)     |
+| [marketplace.json](marketplace.json) | `.claude-plugin/marketplace.json`          | [Plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces) |
 
 ## Validate with Lintel
 

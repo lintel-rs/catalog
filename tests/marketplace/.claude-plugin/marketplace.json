@@ -1,0 +1,94 @@
+{
+  "$schema": "../../../schemas/claude-code/marketplace.json",
+  "name": "example-marketplace",
+  "owner": {
+    "name": "Test Team",
+    "email": "team@example.com"
+  },
+  "metadata": {
+    "description": "An example marketplace for testing schema validation",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "local-plugin",
+      "source": "./plugins/local-plugin",
+      "description": "A plugin sourced from a local path",
+      "version": "1.0.0",
+      "author": {
+        "name": "Test Author"
+      },
+      "license": "MIT",
+      "keywords": ["testing"],
+      "category": "testing",
+      "tags": ["test", "example"]
+    },
+    {
+      "name": "github-plugin",
+      "source": {
+        "source": "github",
+        "repo": "owner/plugin-repo",
+        "ref": "v2.0.0"
+      },
+      "description": "A plugin sourced from GitHub"
+    },
+    {
+      "name": "git-plugin",
+      "source": {
+        "source": "url",
+        "url": "https://gitlab.com/team/plugin.git",
+        "ref": "main"
+      },
+      "description": "A plugin sourced from a git URL"
+    },
+    {
+      "name": "npm-plugin",
+      "source": {
+        "source": "npm",
+        "package": "@company/claude-plugin",
+        "version": "1.0.0"
+      },
+      "description": "A plugin sourced from npm"
+    },
+    {
+      "name": "advanced-plugin",
+      "source": "./plugins/advanced-plugin",
+      "description": "A plugin with inline hooks and MCP servers",
+      "strict": false,
+      "commands": ["./commands/core/", "./commands/extra/deploy.md"],
+      "agents": "./agents/",
+      "hooks": {
+        "PostToolUse": [
+          {
+            "matcher": "Write|Edit",
+            "hooks": [
+              {
+                "type": "command",
+                "command": "${CLAUDE_PLUGIN_ROOT}/scripts/format.sh"
+              }
+            ]
+          }
+        ]
+      },
+      "mcpServers": {
+        "plugin-db": {
+          "command": "${CLAUDE_PLUGIN_ROOT}/servers/db-server",
+          "args": ["--config", "${CLAUDE_PLUGIN_ROOT}/config.json"],
+          "env": {
+            "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data"
+          }
+        }
+      },
+      "lspServers": {
+        "go": {
+          "command": "gopls",
+          "args": ["serve"],
+          "extensionToLanguage": {
+            ".go": "go"
+          }
+        }
+      }
+    }
+  ]
+}
