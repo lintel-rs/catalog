@@ -1,0 +1,16 @@
+[catalog]
+base_url = "https://raw.githubusercontent.com/lintel-rs/catalog/master/"
+
+[groups.claude-code]
+agent = { name = "Claude Code Agent", description = "Claude Code agent definition frontmatter", file-match = ["**/.claude/agents/*.md", ".claude/agents/*.md"] }
+skill = { name = "Claude Code Skill", description = "Claude Code skill definition frontmatter", file-match = ["**/skills/*/SKILL.md", "**/skills/*.md", ".claude/skills/*.md"] }
+command = { name = "Claude Code Command", description = "Claude Code slash command definition frontmatter", file-match = ["**/.claude/commands/*.md", ".claude/commands/*.md", "**/commands/*.md"] }
+plugin = { name = "Claude Code Plugin", description = "Claude Code plugin manifest", file-match = ["**/.claude-plugin/plugin.json", ".claude-plugin/plugin.json"] }
+marketplace = { name = "Claude Code Marketplace", description = "Claude Code plugin marketplace catalog", file-match = ["**/.claude-plugin/marketplace.json", ".claude-plugin/marketplace.json"] }
+
+[groups.devenv]
+devenv = { url = "https://devenv.sh/devenv.schema.json", name = "devenv.yaml", description = "devenv configuration file", file-match = ["devenv.yaml", "**/devenv.yaml"] }
+
+[sources.schemastore]
+url = "https://www.schemastore.org/api/json/catalog.json"
+organize = { github = ["**.github**"] }
