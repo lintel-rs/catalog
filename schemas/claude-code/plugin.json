@@ -1,18 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Plugin",
-  "description": "Schema for Claude Code plugin manifest (.claude-plugin/plugin.json). Plugins extend Claude Code with reusable skills, agents, hooks, MCP servers, and LSP servers that can be shared across projects and teams. The manifest defines plugin metadata and optionally declares custom component paths. Components in default locations (commands/, agents/, skills/, hooks/hooks.json, .mcp.json, .lsp.json) are auto-discovered even without a manifest. See https://code.claude.com/docs/en/plugins-reference",
+  "description": "Schema for [Claude Code plugin](https://code.claude.com/docs/en/plugins) manifest (`.claude-plugin/plugin.json`). Plugins extend Claude Code with reusable skills, agents, hooks, MCP servers, and LSP servers that can be shared across projects and teams via [marketplaces](https://code.claude.com/docs/en/plugin-marketplaces). The manifest defines plugin metadata and optionally declares custom component paths. Components in default locations (`commands/`, `agents/`, `skills/`, `hooks/hooks.json`, `.mcp.json`, `.lsp.json`) are auto-discovered even without a manifest. The manifest is optional — if omitted, the directory name becomes the plugin name. See [plugin manifest schema](https://code.claude.com/docs/en/plugins-reference#plugin-manifest-schema) for the complete reference.",
   "type": "object",
   "properties": {
     "name": {
       "type": "string",
-      "description": "Unique identifier for the plugin using lowercase letters, numbers, and hyphens (kebab-case, no spaces). This name namespaces all plugin components — skills appear as /plugin-name:skill-name, agents as plugin-name:agent-name, etc. If the manifest is omitted entirely, the directory name is used instead.",
+      "description": "Unique identifier for the plugin (kebab-case, no spaces). This name **namespaces all plugin components** — skills appear as `/plugin-name:skill-name`, agents as `plugin-name:agent-name`, etc. Users see this in install commands (e.g. `/plugin install my-plugin@marketplace`). If the manifest is omitted entirely, the directory name is used instead.",
       "pattern": "^[a-z0-9][a-z0-9-]*$",
       "examples": ["deployment-tools", "code-quality", "my-first-plugin"]
     },
     "version": {
       "type": "string",
-      "description": "Semantic version (MAJOR.MINOR.PATCH). Used to determine when to update installed plugins — if you change code without bumping the version, existing users won't see updates due to caching. If also set in a marketplace entry, the plugin.json version takes priority. Start at 1.0.0 for first stable release.",
+      "description": "Semantic version (`MAJOR.MINOR.PATCH`). Claude Code uses this to detect updates — if you change code without bumping the version, existing users **won't see updates** due to [caching](https://code.claude.com/docs/en/plugins-reference#plugin-caching-and-file-resolution). If also set in a marketplace entry, the `plugin.json` version takes priority. Use pre-release versions like `2.0.0-beta.1` for testing. See [version management](https://code.claude.com/docs/en/plugins-reference#version-management).",
       "examples": ["1.0.0", "2.1.0", "1.0.0-beta.1"]
     },
     "description": {
@@ -40,7 +40,7 @@
     },
     "license": {
       "type": "string",
-      "description": "SPDX license identifier.",
+      "description": "[SPDX license identifier](https://spdx.org/licenses/).",
       "examples": ["MIT", "Apache-2.0", "ISC"]
     },
     "keywords": {
@@ -54,7 +54,7 @@
     },
     "commands": {
       "$ref": "#/$defs/PathOrPaths",
-      "description": "Additional command file or directory paths, relative to the plugin root starting with './'. These supplement the default commands/ directory — they don't replace it. Paths should point to .md files or directories containing .md files.",
+      "description": "Additional command file or directory paths, relative to the plugin root starting with `./`. These **supplement** the default `commands/` directory — they don't replace it. Paths should point to `.md` files or directories containing `.md` files. See [path behavior rules](https://code.claude.com/docs/en/plugins-reference#path-behavior-rules).",
       "examples": [
         "./custom/commands/special.md",
         ["./specialized/deploy.md", "./utilities/batch-process.md"]
@@ -62,7 +62,7 @@
     },
     "agents": {
       "$ref": "#/$defs/PathOrPaths",
-      "description": "Additional agent file or directory paths, relative to the plugin root starting with './'. These supplement the default agents/ directory.",
+      "description": "Additional agent file or directory paths, relative to the plugin root starting with `./`. These **supplement** the default `agents/` directory.",
       "examples": [
         "./custom/agents/",
         ["./custom-agents/reviewer.md", "./custom-agents/tester.md"]
@@ -70,11 +70,11 @@
     },
     "skills": {
       "$ref": "#/$defs/PathOrPaths",
-      "description": "Additional skill directory paths, relative to the plugin root starting with './'. These supplement the default skills/ directory. Paths should point to directories containing SKILL.md files.",
+      "description": "Additional [skill](https://code.claude.com/docs/en/skills) directory paths, relative to the plugin root starting with `./`. These **supplement** the default `skills/` directory. Paths should point to directories containing `SKILL.md` files.",
       "examples": ["./custom/skills/"]
     },
     "hooks": {
-      "description": "Hook configuration — either paths to JSON config files or inline hook definitions. Custom paths supplement hooks/hooks.json (the default location). Inline definitions map event names to arrays of matcher groups. See https://code.claude.com/docs/en/hooks",
+      "description": "[Hook](https://code.claude.com/docs/en/hooks) configuration — either paths to JSON config files or inline hook definitions. Custom paths **supplement** `hooks/hooks.json` (the default location). Inline definitions map event names to arrays of matcher groups.",
       "oneOf": [
         {
           "type": "string",
@@ -96,7 +96,7 @@
       ]
     },
     "mcpServers": {
-      "description": "MCP server configuration — either paths to JSON config files or inline server definitions. Custom paths supplement .mcp.json (the default location). Inline definitions map server names to their transport configuration. MCP servers start automatically when the plugin is enabled. See https://code.claude.com/docs/en/mcp",
+      "description": "[MCP server](https://code.claude.com/docs/en/mcp) configuration — either paths to JSON config files or inline server definitions. Custom paths **supplement** `.mcp.json` (the default location). Inline definitions map server names to their transport configuration. MCP servers start automatically when the plugin is enabled. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
       "oneOf": [
         {
           "type": "string",
@@ -109,7 +109,7 @@
         },
         {
           "type": "object",
-          "description": "Inline MCP server definitions. Each key is a server name and the value is either a string reference to an already-configured server or a full server configuration object.",
+          "description": "Inline MCP server definitions. Each key is a server name.",
           "additionalProperties": {
             "oneOf": [
               {
@@ -136,11 +136,11 @@
     },
     "outputStyles": {
       "$ref": "#/$defs/PathOrPaths",
-      "description": "Additional output style files or directories, relative to the plugin root starting with './'.",
+      "description": "Additional output style files or directories, relative to the plugin root starting with `./`.",
       "examples": ["./styles/"]
     },
     "lspServers": {
-      "description": "LSP server configuration — either paths to JSON config files or inline server definitions. Custom paths supplement .lsp.json (the default location). Inline definitions map language names to their server configuration, providing Claude with real-time code intelligence (diagnostics, go to definition, find references). Users must install the language server binary separately. See https://code.claude.com/docs/en/plugins-reference#lsp-servers",
+      "description": "[LSP server](https://code.claude.com/docs/en/plugins-reference#lsp-servers) configuration — either paths to JSON config files or inline server definitions. Custom paths **supplement** `.lsp.json` (the default location). LSP integration provides real-time code intelligence: diagnostics, go to definition, find references, and hover information. Users must install the language server binary separately.",
       "oneOf": [
         {
           "type": "string",
@@ -153,7 +153,7 @@
         },
         {
           "type": "object",
-          "description": "Inline LSP server definitions. Each key is a language name and the value is a server configuration object.",
+          "description": "Inline LSP server definitions. Each key is a language name.",
           "additionalProperties": {
             "$ref": "#/$defs/LspServerConfig"
           }
@@ -199,23 +199,28 @@
       "oneOf": [
         {
           "type": "string",
-          "description": "A single relative path starting with './'."
+          "description": "A single relative path starting with `./`."
         },
         {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Array of relative paths, each starting with './'."
+          "description": "Array of relative paths, each starting with `./`."
         }
       ]
     },
     "McpServerConfig": {
       "type": "object",
-      "description": "Inline MCP server definition with transport configuration.",
+      "description": "[MCP server](https://code.claude.com/docs/en/mcp) configuration for a stdio-based server process. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
       "properties": {
         "command": {
           "type": "string",
-          "description": "Executable to run for the MCP server. Use ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths.",
-          "examples": ["python", "node", "npx"]
+          "description": "Executable to run for the MCP server. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+          "examples": [
+            "python",
+            "node",
+            "npx",
+            "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
+          ]
         },
         "args": {
           "type": "array",
@@ -226,7 +231,7 @@
         "env": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "Environment variables for the server process. Values support ${CLAUDE_PLUGIN_ROOT}.",
+          "description": "Environment variables for the server process. Values support `${CLAUDE_PLUGIN_ROOT}`.",
           "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
         },
         "cwd": {
@@ -244,17 +249,22 @@
     },
     "LspServerConfig": {
       "type": "object",
-      "description": "LSP server configuration for a language. The language server binary must be installed separately on the user's machine.",
+      "description": "[LSP server](https://code.claude.com/docs/en/plugins-reference#lsp-servers) configuration for a language. The language server binary must be installed separately on the user's machine. See [available LSP plugins](https://code.claude.com/docs/en/plugins-reference#lsp-servers) for pre-built options.",
       "properties": {
         "command": {
           "type": "string",
-          "description": "The LSP binary to execute (must be in PATH).",
-          "examples": ["gopls", "typescript-language-server", "rust-analyzer"]
+          "description": "The LSP binary to execute (must be in `PATH`).",
+          "examples": [
+            "gopls",
+            "typescript-language-server",
+            "rust-analyzer",
+            "pyright"
+          ]
         },
         "extensionToLanguage": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "Maps file extensions to language identifiers.",
+          "description": "Maps file extensions to [language identifiers](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentItem).",
           "examples": [
             { ".go": "go" },
             { ".ts": "typescript", ".tsx": "typescriptreact" }
@@ -268,7 +278,7 @@
         },
         "transport": {
           "type": "string",
-          "description": "Communication transport.",
+          "description": "Communication transport protocol.",
           "enum": ["stdio", "socket"],
           "default": "stdio"
         },
@@ -279,11 +289,11 @@
         },
         "initializationOptions": {
           "type": "object",
-          "description": "Options passed to the server during initialization."
+          "description": "Options passed to the server during [initialization](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize)."
         },
         "settings": {
           "type": "object",
-          "description": "Settings passed via workspace/didChangeConfiguration."
+          "description": "Settings passed via [`workspace/didChangeConfiguration`](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_didChangeConfiguration)."
         },
         "workspaceFolder": {
           "type": "string",
@@ -312,35 +322,35 @@
     },
     "Hooks": {
       "type": "object",
-      "description": "Map of event names to arrays of matcher groups. Each matcher group optionally filters by a regex pattern and contains an array of hook handlers that execute when the event fires.",
+      "description": "Map of [hook event](https://code.claude.com/docs/en/hooks#hook-events) names to arrays of matcher groups.",
       "properties": {
         "SessionStart": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session starts. Matcher filters by session source: 'startup' (new session), 'resume' (resuming previous session), 'clear' (after /clear), 'compact' (after context compaction). Command hooks have access to $CLAUDE_ENV_FILE for persisting environment variables across the session."
+          "description": "Fires when a session starts. Matcher filters by source: `startup`, `resume`, `clear`, `compact`."
         },
         "UserPromptSubmit": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when the user submits a prompt, before Claude processes it. No matcher support — always fires on every user message. Hooks can block the prompt (preventing Claude from seeing it) or modify it before processing."
+          "description": "Fires when the user submits a prompt. **No matcher support**."
         },
         "PreToolUse": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. 'Bash', 'Edit|Write', 'mcp__.*'). Hooks can block the tool call (exit code 2 or {ok: false}), modify its input via hookSpecificOutput.updatedInput, auto-allow/deny permission via hookSpecificOutput.permissionDecision ('allow', 'deny', 'ask'), or inject additional context via hookSpecificOutput.additionalContext."
+          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. `Bash`, `Edit|Write`, `mcp__.*`)."
         },
         "PermissionRequest": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a tool requests user permission before executing. Matcher filters by tool name. Hooks can auto-allow or deny the permission via hookSpecificOutput.decision.behavior ('allow' or 'deny'), optionally modifying the tool input via decision.updatedInput or updating permissions via decision.updatedPermissions. If denied, decision.message is shown to the user."
+          "description": "Fires when a tool requests user permission. Matcher filters by tool name."
         },
         "PostToolUse": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool executes successfully. Matcher filters by tool name. Hooks can inject additional context for Claude via hookSpecificOutput.additionalContext (e.g. lint results after a file write) or replace MCP tool output via hookSpecificOutput.updatedMCPToolOutput. Supports async hooks that run in the background without blocking."
+          "description": "Fires after a tool executes successfully. Matcher filters by tool name."
         },
         "PostToolUseFailure": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool execution fails. Matcher filters by tool name. Hooks can inject additional context to help Claude understand and recover from the failure. Supports async hooks."
+          "description": "Fires after a tool execution fails. Matcher filters by tool name."
         },
         "Notification": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires on notifications. Matcher filters by type: 'permission_prompt', 'idle_prompt', 'auth_success', 'elicitation_dialog'."
+          "description": "Fires on notifications. Matcher filters by type: `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`."
         },
         "SubagentStart": {
           "$ref": "#/$defs/MatcherGroupArray",
@@ -352,23 +362,27 @@
         },
         "Stop": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when Claude's turn ends and it is about to stop. No matcher support — always fires. Hooks can force Claude to continue working by returning {continue: false} with a reason."
+          "description": "Fires when Claude's turn ends. **No matcher support**."
         },
         "TeammateIdle": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a teammate goes idle. No matcher support — always fires."
+          "description": "Fires when a teammate goes idle. **No matcher support**."
         },
         "TaskCompleted": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a task is marked completed. No matcher support — always fires."
+          "description": "Fires when a task is marked completed. **No matcher support**."
+        },
+        "ConfigChange": {
+          "$ref": "#/$defs/MatcherGroupArray",
+          "description": "Fires when a configuration file changes during a session. Matcher filters by source: `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`."
         },
         "PreCompact": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before context compaction. Matcher filters by trigger type: 'manual', 'auto'."
+          "description": "Fires before context compaction. Matcher filters by trigger: `manual`, `auto`."
         },
         "SessionEnd": {
           "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session ends. Matcher filters by exit reason: 'clear', 'logout', 'prompt_input_exit', 'bypass_permissions_disabled', 'other'."
+          "description": "Fires when a session ends. Matcher filters by exit reason."
         }
       },
       "additionalProperties": false
@@ -379,11 +393,11 @@
     },
     "MatcherGroup": {
       "type": "object",
-      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If matcher is omitted, the hooks fire on every occurrence of the event.",
+      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If `matcher` is omitted, hooks fire on every occurrence. See [matcher patterns](https://code.claude.com/docs/en/hooks#matcher-patterns).",
       "properties": {
         "matcher": {
           "type": "string",
-          "description": "Regex pattern to filter when this group's hooks fire. Use '|' for OR (e.g. 'Edit|Write'), '.*' for wildcards (e.g. 'mcp__.*'). MCP tools follow the pattern mcp__<server>__<tool>. Omit to match all.",
+          "description": "Regex pattern to filter when hooks fire. Use `|` for OR, `.*` for wildcards. MCP tools: `mcp__<server>__<tool>`.",
           "examples": ["Bash", "Edit|Write", "mcp__.*"]
         },
         "hooks": {
@@ -402,31 +416,26 @@
     },
     "CommandHook": {
       "type": "object",
-      "description": "Runs a shell command or script synchronously (or async if configured). The command receives hook context as JSON on stdin, including session_id, transcript_path, cwd, permission_mode, hook_event_name, and event-specific fields. Exit code 0 means success — stdout is parsed as JSON and can contain fields like 'continue' (boolean), 'stopReason' (string), 'systemMessage' (string), and event-specific 'hookSpecificOutput'. Exit code 2 is a blocking error — stderr is fed to Claude as an error message. Any other exit code is a non-blocking error logged in verbose mode.",
+      "description": "Runs a shell command or script. Receives [hook context as JSON on stdin](https://code.claude.com/docs/en/hooks#common-input-fields). **Exit 0**: success. **Exit 2**: blocking error. **Other**: non-blocking error.",
       "properties": {
         "type": { "const": "command" },
         "command": {
           "type": "string",
-          "description": "Shell command or script path to execute. The command runs in the project's working directory. Use $CLAUDE_PROJECT_DIR for the project root (always quote it: \"$CLAUDE_PROJECT_DIR\"/path) and ${CLAUDE_PLUGIN_ROOT} for plugin-relative paths.",
-          "examples": [
-            "${CLAUDE_PLUGIN_ROOT}/scripts/format-code.sh",
-            "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate.sh"
-          ]
+          "description": "Shell command or script path. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+          "examples": ["${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh"]
         },
         "timeout": {
           "type": "number",
           "description": "Max execution time in seconds.",
-          "default": 600,
-          "examples": [10, 30, 120]
+          "default": 600
         },
         "statusMessage": {
           "type": "string",
-          "description": "Spinner message while the hook runs.",
-          "examples": ["Formatting code...", "Running lint check..."]
+          "description": "Custom spinner message while the hook runs."
         },
         "async": {
           "type": "boolean",
-          "description": "Run in background without blocking. Only supported for PostToolUse and PostToolUseFailure events.",
+          "description": "Run in background. Only for `PostToolUse`/`PostToolUseFailure`.",
           "default": false
         },
         "once": {
@@ -440,20 +449,16 @@
     },
     "PromptHook": {
       "type": "object",
-      "description": "Evaluates a single-turn LLM prompt to make a pass/fail decision. A small, fast model receives the prompt and must respond with {ok: true} to allow the action, or {ok: false, reason: 'explanation'} to block it. Cannot use tools — decides based solely on the prompt content. Best for quick validation checks like safety screening or format verification.",
+      "description": "Evaluates a single-turn LLM [prompt-based hook](https://code.claude.com/docs/en/hooks#prompt-based-hooks). Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Cannot use tools.",
       "properties": {
         "type": { "const": "prompt" },
         "prompt": {
           "type": "string",
-          "description": "The evaluation prompt sent to the LLM. Use $ARGUMENTS to interpolate the hook's full input context as JSON, including session_id, cwd, tool_name, tool_input, and other event-specific fields.",
-          "examples": [
-            "Is this Bash command safe to run? Review for destructive operations: $ARGUMENTS",
-            "Does this file edit follow our coding standards? $ARGUMENTS"
-          ]
+          "description": "Evaluation prompt. Use `$ARGUMENTS` for hook input context."
         },
         "model": {
           "type": "string",
-          "description": "Model for evaluation. Defaults to a fast model for low latency.",
+          "description": "Model for evaluation. Defaults to a fast model.",
           "examples": ["haiku"]
         },
         "timeout": {
@@ -463,8 +468,7 @@
         },
         "statusMessage": {
           "type": "string",
-          "description": "Spinner message while the hook runs.",
-          "examples": ["Evaluating safety..."]
+          "description": "Custom spinner message while the hook runs."
         },
         "once": {
           "type": "boolean",
@@ -477,15 +481,12 @@
     },
     "AgentHook": {
       "type": "object",
-      "description": "Runs a multi-turn LLM agent that can use tools (Read, Grep, Glob, Bash, etc.) to gather additional context before making a decision. Unlike prompt hooks, agent hooks can explore the codebase and run commands to verify conditions. Must respond with {ok: true} or {ok: false, reason: 'explanation'}. Best for complex validations requiring file reads or external checks.",
+      "description": "Runs a multi-turn LLM [agent-based hook](https://code.claude.com/docs/en/hooks#agent-based-hooks) with tool access. Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Can explore the codebase to verify conditions.",
       "properties": {
         "type": { "const": "agent" },
         "prompt": {
           "type": "string",
-          "description": "The verification prompt sent to the agent. Use $ARGUMENTS to interpolate the hook's full input context as JSON. The agent can then use tools to investigate further before deciding.",
-          "examples": [
-            "Verify this MCP write operation is valid and won't cause data loss: $ARGUMENTS"
-          ]
+          "description": "Verification prompt. Use `$ARGUMENTS` for hook input context."
         },
         "model": {
           "type": "string",
@@ -499,8 +500,7 @@
         },
         "statusMessage": {
           "type": "string",
-          "description": "Spinner message while the hook runs.",
-          "examples": ["Verifying operation..."]
+          "description": "Custom spinner message while the hook runs."
         },
         "once": {
           "type": "boolean",
