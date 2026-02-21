@@ -1,16 +1,56 @@
 [catalog]
-base_url = "https://raw.githubusercontent.com/lintel-rs/catalog/master/"
+title = "Lintel default schema catalog"
+
+[target.default]
+type = "dir"
+dir = ".lintel-output/default"
+base_url = "https://catalog.lintel.tools/"
+github.cname = "catalog.lintel.tools"
 
 [groups.claude-code]
-agent = { name = "Claude Code Agent", description = "Claude Code agent definition frontmatter", file-match = ["**/.claude/agents/*.md", ".claude/agents/*.md"] }
-skill = { name = "Claude Code Skill", description = "Claude Code skill definition frontmatter", file-match = ["**/skills/*/SKILL.md", "**/skills/*.md", ".claude/skills/*.md"] }
-command = { name = "Claude Code Command", description = "Claude Code slash command definition frontmatter", file-match = ["**/.claude/commands/*.md", ".claude/commands/*.md", "**/commands/*.md"] }
-plugin = { name = "Claude Code Plugin", description = "Claude Code plugin manifest", file-match = ["**/.claude-plugin/plugin.json", ".claude-plugin/plugin.json"] }
-marketplace = { name = "Claude Code Marketplace", description = "Claude Code plugin marketplace catalog", file-match = ["**/.claude-plugin/marketplace.json", ".claude-plugin/marketplace.json"] }
+name = "Claude Code"
+description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
+
+[groups.claude-code.schemas]
+agent = { name = "Claude Code Agent", description = "Claude Code agent definition frontmatter", file-match = [
+  "**/.claude/agents/*.md",
+  ".claude/agents/*.md",
+] }
+skill = { name = "Claude Code Skill", description = "Claude Code skill definition frontmatter", file-match = [
+  "**/skills/*/SKILL.md",
+  "**/skills/*.md",
+  ".claude/skills/*.md",
+] }
+command = { name = "Claude Code Command", description = "Claude Code slash command definition frontmatter", file-match = [
+  "**/.claude/commands/*.md",
+  ".claude/commands/*.md",
+  "**/commands/*.md",
+] }
+plugin = { name = "Claude Code Plugin", description = "Claude Code plugin manifest", file-match = [
+  "**/.claude-plugin/plugin.json",
+  ".claude-plugin/plugin.json",
+] }
+marketplace = { name = "Claude Code Marketplace", description = "Claude Code plugin marketplace catalog", file-match = [
+  "**/.claude-plugin/marketplace.json",
+  ".claude-plugin/marketplace.json",
+] }
 
 [groups.devenv]
-devenv = { url = "https://devenv.sh/devenv.schema.json", name = "devenv.yaml", description = "devenv configuration file", file-match = ["devenv.yaml", "**/devenv.yaml"] }
+name = "devenv"
+description = "Nix-based development environment configuration"
+
+[groups.devenv.schemas]
+devenv = { url = "https://devenv.sh/devenv.schema.json", name = "devenv.yaml", description = "devenv configuration file", file-match = [
+  "devenv.yaml",
+  "**/devenv.yaml",
+] }
+
+[groups.github]
+name = "GitHub"
+description = "GitHub Actions workflows, Dependabot, issue templates, and other GitHub configuration files"
 
 [sources.schemastore]
 url = "https://www.schemastore.org/api/json/catalog.json"
-organize = { github = ["**.github**"] }
+
+[sources.schemastore.organize.github]
+match = ["**.github**"]

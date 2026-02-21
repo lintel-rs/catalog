@@ -1,0 +1,51 @@
+name: Publish catalog
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: cachix/install-nix-action@v31
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: lintel
+
+      - name: Build lintel-catalog-builder
+        run: nix build github:lintel-rs/lintel#lintel-catalog-builder
+
+      - name: Generate catalog
+        run: ./result/bin/lintel-catalog-builder generate --config lintel-catalog.toml --target default
+
+      - name: Clone catalog-generated
+        run: git clone https://x-access-token:${{ secrets.CATALOG_PUSH_GITHUB_PAT }}@github.com/lintel-rs/catalog-generated.git /tmp/catalog-generated
+
+      - name: Update contents
+        run: |
+          find /tmp/catalog-generated -maxdepth 1 -not -name '.git' -not -path /tmp/catalog-generated -exec rm -rf {} +
+          cp -r .lintel-output/default/. /tmp/catalog-generated/
+
+      - name: Commit and push
+        run: |
+          cd /tmp/catalog-generated
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: regenerate catalog from lintel-rs/catalog@${GITHUB_SHA::7}"
+            git push
+          fi
