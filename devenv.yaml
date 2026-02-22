@@ -3,5 +3,5 @@ inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
   lintel:
-    url: github:lintel-rs/lintel/master
+    url: github:lintel-rs/lintel
     flake: true
