@@ -49,8 +49,23 @@ devenv = { url = "https://devenv.sh/devenv.schema.json", name = "devenv.yaml", d
 name = "GitHub"
 description = "GitHub Actions workflows, Dependabot, issue templates, and other GitHub configuration files"
 
+[groups.rust]
+name = "Rust"
+description = "Rust toolchain configuration: Cargo, Clippy, rustfmt, and rust-toolchain"
+
+[groups.rust.schemas]
+clippy = { name = "Clippy", description = "Clippy lint configuration", file-match = [
+  "clippy.toml",
+  ".clippy.toml",
+  "**/clippy.toml",
+  "**/.clippy.toml",
+] }
+
 [sources.schemastore]
 url = "https://www.schemastore.org/api/json/catalog.json"
 
 [sources.schemastore.organize.github]
 match = ["**.github**"]
+
+[sources.schemastore.organize.rust]
+match = ["**Cargo.toml**", "**rustfmt**", "**rust-toolchain**"]
