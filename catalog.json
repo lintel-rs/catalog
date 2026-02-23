@@ -47,6 +47,18 @@
       ]
     },
     {
+      "name": "lintel.toml",
+      "description": "Lintel configuration file",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/lintel/lintel.json",
+      "fileMatch": ["lintel.toml", "**/lintel.toml"]
+    },
+    {
+      "name": "lintel-catalog.toml",
+      "description": "Lintel catalog builder configuration",
+      "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/lintel/lintel-catalog.json",
+      "fileMatch": ["lintel-catalog.toml", "**/lintel-catalog.toml"]
+    },
+    {
       "name": "devenv.yaml",
       "description": "devenv configuration file",
       "url": "https://raw.githubusercontent.com/lintel-rs/catalog/master/schemas/devenv.json",

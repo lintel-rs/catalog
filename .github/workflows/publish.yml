@@ -26,6 +26,13 @@ jobs:
       - name: Build lintel-catalog-builder
         run: nix build github:lintel-rs/lintel#lintel-catalog-builder
 
+      - name: Cache schema downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/lintel/schemas
+          key: schema-cache-${{ github.run_id }}
+          restore-keys: schema-cache-
+
       - name: Generate catalog
         run: ./result/bin/lintel-catalog-builder generate --config lintel-catalog.toml --target default
 

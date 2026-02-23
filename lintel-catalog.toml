@@ -4,7 +4,7 @@ title = "Lintel default schema catalog"
 [target.default]
 type = "dir"
 dir = ".lintel-output/default"
-base_url = "https://catalog.lintel.tools/"
+base-url = "https://catalog.lintel.tools/"
 github.cname = "catalog.lintel.tools"
 
 [groups.claude-code]
@@ -33,6 +33,20 @@ plugin = { name = "Claude Code Plugin", description = "Claude Code plugin manife
 marketplace = { name = "Claude Code Marketplace", description = "Claude Code plugin marketplace catalog", file-match = [
   "**/.claude-plugin/marketplace.json",
   ".claude-plugin/marketplace.json",
+] }
+
+[groups.lintel]
+name = "Lintel"
+description = "Lintel configuration files"
+
+[groups.lintel.schemas]
+lintel = { name = "lintel.toml", description = "Lintel configuration file", file-match = [
+  "lintel.toml",
+  "**/lintel.toml",
+] }
+lintel-catalog = { name = "lintel-catalog.toml", description = "Lintel catalog builder configuration", file-match = [
+  "lintel-catalog.toml",
+  "**/lintel-catalog.toml",
 ] }
 
 [groups.devenv]

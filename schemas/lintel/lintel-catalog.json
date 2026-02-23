@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatalogConfig",
+  "description": "Top-level configuration loaded from `lintel-catalog.toml`.",
+  "type": "object",
+  "properties": {
+    "catalog": {
+      "$ref": "#/$defs/CatalogMeta"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/TargetConfig"
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/GroupConfig"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/SourceConfig"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": ["catalog"],
+  "$defs": {
+    "CatalogMeta": {
+      "description": "Metadata about the catalog being built.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Optional title for the catalog, included in the output `catalog.json`.",
+          "type": ["string", "null"],
+          "default": null
+        }
+      },
+      "additionalProperties": false
+    },
+    "TargetConfig": {
+      "description": "Target output configuration.",
+      "oneOf": [
+        {
+          "description": "Write output to a local directory.",
+          "type": "object",
+          "properties": {
+            "dir": {
+              "type": "string"
+            },
+            "base-url": {
+              "type": "string"
+            },
+            "github": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/GitHubPagesConfig"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "type": "string",
+              "const": "dir"
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "dir", "base-url"]
+        },
+        {
+          "description": "Generate output optimized for GitHub Pages deployment.",
+          "type": "object",
+          "properties": {
+            "base-url": {
+              "type": "string"
+            },
+            "cname": {
+              "type": ["string", "null"],
+              "default": null
+            },
+            "dir": {
+              "type": ["string", "null"],
+              "default": null
+            },
+            "type": {
+              "type": "string",
+              "const": "github-pages"
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "base-url"]
+        }
+      ]
+    },
+    "GitHubPagesConfig": {
+      "description": "GitHub Pages hosting options (`.nojekyll`, `CNAME`).",
+      "type": "object",
+      "properties": {
+        "cname": {
+          "type": ["string", "null"],
+          "default": null
+        }
+      },
+      "additionalProperties": false
+    },
+    "GroupConfig": {
+      "description": "A named group of schema definitions.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "schemas": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/SchemaDefinition"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["name", "description"]
+    },
+    "SchemaDefinition": {
+      "description": "A single schema definition within a group.",
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "URL to download the schema from. If absent, the schema is expected to\nalready exist locally at `schemas/<group>/<key>.json`.",
+          "type": ["string", "null"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "file-match": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false,
+      "required": ["name", "description"]
+    },
+    "SourceConfig": {
+      "description": "An external catalog source (e.g. `SchemaStore`).",
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "URL to the external catalog JSON.",
+          "type": "string"
+        },
+        "organize": {
+          "description": "Map of directory name → organize entry with name, description, and match patterns.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/OrganizeEntry"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["url"]
+    },
+    "OrganizeEntry": {
+      "description": "An organize entry that classifies schemas from a source into a group directory.\n\nGroup metadata (name, description) is owned by the corresponding `[groups.*]`\nentry; the organize section only handles schema routing via match patterns.",
+      "type": "object",
+      "properties": {
+        "match": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["match"]
+    }
+  }
+}

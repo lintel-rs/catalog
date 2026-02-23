@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config",
+  "type": "object",
+  "properties": {
+    "root": {
+      "description": "If true, stop walking up the directory tree. No parent `lintel.toml`\nfiles will be merged.",
+      "type": "boolean",
+      "default": false
+    },
+    "exclude": {
+      "description": "Glob patterns for files to exclude from validation.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "schemas": {
+      "description": "Custom schema mappings. Keys are glob patterns matching file paths;\nvalues are schema URLs to use for those files.\n\nThese take priority over catalog matching but are overridden by\ninline `$schema` properties and YAML modeline comments.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "no-default-catalog": {
+      "description": "If true, skip the built-in Lintel catalog (only use `SchemaStore`\nand any extra registries).",
+      "type": "boolean",
+      "default": false
+    },
+    "registries": {
+      "description": "Additional schema catalog URLs to fetch alongside `SchemaStore`.\nEach URL should point to a JSON file with the same format as\nthe `SchemaStore` catalog (`{\"schemas\": [...]}`).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "rewrite": {
+      "description": "Schema URI rewrite rules. Keys are prefixes to match; values are\nreplacements. For example, `\"http://localhost:8000/\" = \"//schemas/\"`\nrewrites any schema URI starting with `http://localhost:8000/` so that\nprefix becomes `//schemas/`.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {}
+    },
+    "override": {
+      "description": "Per-file overrides. Earlier entries (child configs) take priority.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Override"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Override": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "description": "Glob patterns for instance file paths this override applies to.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "schemas": {
+          "description": "Glob patterns for schema URIs this override applies to.\nMatched against the original URI (before rewrites) and the resolved\nURI (after rewrites and `//` resolution).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "validate_formats": {
+          "description": "Whether to enable JSON Schema format validation for matched files.\nWhen `None`, the override does not affect format validation.",
+          "type": ["boolean", "null"],
+          "default": null
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
