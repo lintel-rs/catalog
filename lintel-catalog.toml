@@ -17,6 +17,14 @@ match = ["**.github**"]
 [sources.schemastore.organize.rust]
 match = ["**Cargo.toml**", "**rustfmt**", "**rust-toolchain**"]
 
+[sources.schemastore.organize.ast-grep]
+match = ["**sgconfig**", "**astgrep**", "**ast-grep**"]
+
+[sources.schemastore.organize.uet]
+match = [
+  "https://raw.githubusercontent.com/RedpointGames/uet-schema/main/root.json",
+]
+
 [groups.ads]
 name = "Ads"
 description = "IAB Tech Lab digital advertising specifications"
@@ -24,6 +32,10 @@ description = "IAB Tech Lab digital advertising specifications"
 [groups.ads.schemas.sellers]
 description = "IAB Tech Lab sellers.json supply chain transparency file"
 file-match = ["sellers.json", "**/sellers.json"]
+
+[groups.ast-grep]
+name = "ast-grep"
+description = "ast-grep project configuration and rule files"
 
 [groups.claude-code]
 name = "Claude Code"
