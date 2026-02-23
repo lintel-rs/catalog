@@ -1,3 +1,4 @@
+# :schema ./schemas/lintel/lintel-catalog-toml.json
 [catalog]
 title = "Lintel default schema catalog"
 

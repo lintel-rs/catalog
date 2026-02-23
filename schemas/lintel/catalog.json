@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "catalog.json",
+  "description": "Schema catalog index that maps file patterns to JSON Schema URLs.\n\nA catalog is a collection of schema entries used by editors and tools to\nautomatically associate files with the correct schema for validation and\ncompletion. Follows the SchemaStore catalog format.\n\nSee: <https://json.schemastore.org/schema-catalog.json>",
+  "type": "object",
+  "properties": {
+    "version": {
+      "description": "The catalog format version. Currently always `1`.",
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0
+    },
+    "title": {
+      "description": "An optional human-readable title for the catalog.",
+      "type": ["string", "null"]
+    },
+    "schemas": {
+      "description": "The list of schema entries in this catalog.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SchemaEntry"
+      }
+    },
+    "groups": {
+      "description": "Optional grouping of related schemas for catalog consumers that\nsupport richer organization. Consumers that don't understand\n`groups` simply ignore this field.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CatalogGroup"
+      }
+    }
+  },
+  "required": ["version", "schemas"],
+  "$defs": {
+    "SchemaEntry": {
+      "title": "Schema Entry",
+      "description": "A single schema entry in the catalog.\n\nEach entry maps a schema to its URL and the file patterns it applies to.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The display name of the schema.",
+          "type": "string",
+          "examples": ["My Config"]
+        },
+        "description": {
+          "description": "A short description of what the schema validates.",
+          "type": "string"
+        },
+        "url": {
+          "description": "The URL where the schema can be fetched.",
+          "type": "string",
+          "examples": ["https://example.com/schemas/my-config.json"]
+        },
+        "sourceUrl": {
+          "description": "An optional URL pointing to the upstream or canonical source of\nthe schema (e.g. a GitHub raw URL).",
+          "type": ["string", "null"]
+        },
+        "fileMatch": {
+          "title": "File Match",
+          "description": "Glob patterns for files this schema should be applied to.\n\nEditors and tools use these patterns to automatically associate\nmatching files with this schema.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["*.config.json", "**/.config.json"]]
+        },
+        "versions": {
+          "description": "Alternate versions of this schema, keyed by version identifier.\nValues are URLs to the versioned schema.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["name", "description", "url"]
+    },
+    "CatalogGroup": {
+      "title": "Schema Group",
+      "description": "A group of related schemas in the catalog.\n\nGroups provide richer metadata for catalog consumers that support them.\nConsumers that don't understand `groups` simply ignore the field.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The display name for this group.",
+          "type": "string"
+        },
+        "description": {
+          "description": "A short description of the schemas in this group.",
+          "type": "string"
+        },
+        "schemas": {
+          "description": "Schema names that belong to this group.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["name", "description", "schemas"]
+    }
+  }
+}
