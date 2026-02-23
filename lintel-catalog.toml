@@ -7,84 +7,6 @@ dir = ".lintel-output/default"
 base-url = "https://catalog.lintel.tools/"
 github.cname = "catalog.lintel.tools"
 
-[groups.claude-code]
-name = "Claude Code"
-description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
-
-[groups.claude-code.schemas]
-agent = { name = "Claude Code Agent", description = "Claude Code agent definition frontmatter", file-match = [
-  "**/.claude/agents/*.md",
-  ".claude/agents/*.md",
-] }
-skill = { name = "Claude Code Skill", description = "Claude Code skill definition frontmatter", file-match = [
-  "**/skills/*/SKILL.md",
-  "**/skills/*.md",
-  ".claude/skills/*.md",
-] }
-command = { name = "Claude Code Command", description = "Claude Code slash command definition frontmatter", file-match = [
-  "**/.claude/commands/*.md",
-  ".claude/commands/*.md",
-  "**/commands/*.md",
-] }
-plugin = { name = "Claude Code Plugin", description = "Claude Code plugin manifest", file-match = [
-  "**/.claude-plugin/plugin.json",
-  ".claude-plugin/plugin.json",
-] }
-marketplace = { name = "Claude Code Marketplace", description = "Claude Code plugin marketplace catalog", file-match = [
-  "**/.claude-plugin/marketplace.json",
-  ".claude-plugin/marketplace.json",
-] }
-
-[groups.lintel]
-name = "Lintel"
-description = "Lintel configuration files"
-
-[groups.lintel.schemas]
-lintel = { name = "lintel.toml", description = "Lintel configuration file", file-match = [
-  "lintel.toml",
-  "**/lintel.toml",
-] }
-lintel-catalog = { name = "lintel-catalog.toml", description = "Lintel catalog builder configuration", file-match = [
-  "lintel-catalog.toml",
-  "**/lintel-catalog.toml",
-] }
-
-[groups.ads]
-name = "Ads"
-description = "Digital advertising specifications: sellers.json, ads.txt, and related IAB Tech Lab standards"
-
-[groups.ads.schemas]
-sellers = { name = "sellers.json", description = "IAB Tech Lab sellers.json supply chain transparency file", file-match = [
-  "sellers.json",
-  "**/sellers.json",
-] }
-
-[groups.devenv]
-name = "devenv"
-description = "Nix-based development environment configuration"
-
-[groups.devenv.schemas]
-devenv = { url = "https://devenv.sh/devenv.schema.json", name = "devenv.yaml", description = "devenv configuration file", file-match = [
-  "devenv.yaml",
-  "**/devenv.yaml",
-] }
-
-[groups.github]
-name = "GitHub"
-description = "GitHub Actions workflows, Dependabot, issue templates, and other GitHub configuration files"
-
-[groups.rust]
-name = "Rust"
-description = "Rust toolchain configuration: Cargo, Clippy, rustfmt, and rust-toolchain"
-
-[groups.rust.schemas]
-clippy = { name = "Clippy", description = "Clippy lint configuration", file-match = [
-  "clippy.toml",
-  ".clippy.toml",
-  "**/clippy.toml",
-  "**/.clippy.toml",
-] }
-
 [sources.schemastore]
 url = "https://www.schemastore.org/api/json/catalog.json"
 
@@ -93,3 +15,90 @@ match = ["**.github**"]
 
 [sources.schemastore.organize.rust]
 match = ["**Cargo.toml**", "**rustfmt**", "**rust-toolchain**"]
+
+[groups.ads]
+name = "Ads"
+description = "Digital advertising specifications: sellers.json, ads.txt, and related IAB Tech Lab standards"
+
+[groups.ads.schemas.sellers]
+name = "sellers.json"
+description = "IAB Tech Lab sellers.json supply chain transparency file"
+file-match = ["sellers.json", "**/sellers.json"]
+
+[groups.claude-code]
+name = "Claude Code"
+description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
+
+[groups.claude-code.schemas.agent]
+name = "Claude Code Agent"
+description = "Claude Code agent definition frontmatter"
+file-match = ["**/.claude/agents/*.md", ".claude/agents/*.md"]
+
+[groups.claude-code.schemas.command]
+name = "Claude Code Command"
+description = "Claude Code slash command definition frontmatter"
+file-match = [
+  "**/.claude/commands/*.md",
+  ".claude/commands/*.md",
+  "**/commands/*.md",
+]
+
+[groups.claude-code.schemas.marketplace]
+name = "Claude Code Marketplace"
+description = "Claude Code plugin marketplace catalog"
+file-match = [
+  "**/.claude-plugin/marketplace.json",
+  ".claude-plugin/marketplace.json",
+]
+
+[groups.claude-code.schemas.plugin]
+name = "Claude Code Plugin"
+description = "Claude Code plugin manifest"
+file-match = ["**/.claude-plugin/plugin.json", ".claude-plugin/plugin.json"]
+
+[groups.claude-code.schemas.skill]
+name = "Claude Code Skill"
+description = "Claude Code skill definition frontmatter"
+file-match = ["**/skills/*/SKILL.md", "**/skills/*.md", ".claude/skills/*.md"]
+
+[groups.devenv]
+name = "devenv"
+description = "Nix-based development environment configuration"
+
+[groups.devenv.schemas.devenv]
+url = "https://devenv.sh/devenv.schema.json"
+name = "devenv.yaml"
+description = "devenv configuration file"
+file-match = ["devenv.yaml", "**/devenv.yaml"]
+
+[groups.github]
+name = "GitHub"
+description = "GitHub Actions workflows, Dependabot, issue templates, and other GitHub configuration files"
+
+[groups.lintel]
+name = "Lintel"
+description = "Lintel configuration files"
+
+[groups.lintel.schemas.lintel]
+name = "lintel.toml"
+description = "Lintel configuration file"
+file-match = ["lintel.toml", "**/lintel.toml"]
+
+[groups.lintel.schemas.lintel-catalog]
+name = "lintel-catalog.toml"
+description = "Lintel catalog builder configuration"
+file-match = ["lintel-catalog.toml", "**/lintel-catalog.toml"]
+
+[groups.rust]
+name = "Rust"
+description = "Rust toolchain configuration: Cargo, Clippy, rustfmt, and rust-toolchain"
+
+[groups.rust.schemas.clippy]
+name = "Clippy"
+description = "Clippy lint configuration"
+file-match = [
+  "clippy.toml",
+  ".clippy.toml",
+  "**/clippy.toml",
+  "**/.clippy.toml",
+]
