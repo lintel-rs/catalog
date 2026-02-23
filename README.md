@@ -2,35 +2,44 @@
 
 Default schema catalog for [Lintel](https://github.com/lintel-rs/lintel), a JSON Schema validator for configuration files.
 
-This catalog provides schemas for tools that don't have [SchemaStore](https://www.schemastore.org/) entries.
+**Catalog URL:** https://catalog.lintel.tools
+
+This catalog provides schemas for tools that don't have [SchemaStore](https://www.schemastore.org/) entries, including Claude Code, Lintel, Clippy, kysely-codegen, sellers.json, and more. It also imports and organizes schemas from SchemaStore for GitHub Actions, Rust tooling, and other ecosystems.
 
 ## Usage
 
-This catalog is fetched automatically by Lintel. No configuration needed.
+This catalog is fetched **automatically** by Lintel — no configuration needed. Lintel merges it with [SchemaStore](https://www.schemastore.org/) to provide schema validation out of the box.
 
-To add additional catalogs, use `registries` in `lintel.toml`:
+The generated catalog is published at:
+
+```
+https://catalog.lintel.tools/catalog.json
+```
+
+Individual schemas are available at:
+
+```
+https://catalog.lintel.tools/<group>/<schema>.json
+```
+
+For example: https://catalog.lintel.tools/kysely/kysely-codegen.json
+
+### Using as an additional registry
+
+If you're running your own Lintel catalog and want to include these schemas, add it as a registry in `lintel.toml`:
 
 ```toml
-registries = ["github:my-org/my-schemas"]
+registries = ["https://catalog.lintel.tools/catalog.json"]
 ```
 
-The `github:org/repo` shorthand resolves to `https://raw.githubusercontent.com/org/repo/master/catalog.json`.
+### Disabling the default catalog
 
-## Catalog format
+To use only SchemaStore (without this catalog), set `no-default-catalog` in `lintel.toml`:
 
-The catalog follows the [SchemaStore catalog format](https://json.schemastore.org/schema-catalog.json):
-
-```json
-{
-  "$schema": "https://json.schemastore.org/schema-catalog.json",
-  "version": 1,
-  "schemas": [
-    {
-      "name": "My Schema",
-      "description": "Description of the schema",
-      "url": "https://raw.githubusercontent.com/org/repo/master/schemas/my-schema.json",
-      "fileMatch": ["**/*.my-ext"]
-    }
-  ]
-}
+```toml
+no-default-catalog = true
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add new schemas.
