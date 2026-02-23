@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "kysely-codegen",
+  "description": "Configuration file for [kysely-codegen](https://github.com/RobinBlomberg/kysely-codegen), a TypeScript type generator for [Kysely](https://kysely.dev/).\n\nkysely-codegen introspects your database and generates TypeScript type definitions so that Kysely queries are fully typed. Configuration is read from `.kysely-codegenrc.json` in the project root. CLI arguments take precedence over config file values.\n\nSee the [kysely-codegen README](https://github.com/RobinBlomberg/kysely-codegen#readme) for full documentation.",
+  "type": "object",
+  "properties": {
+    "camelCase": {
+      "type": "boolean",
+      "description": "Use the Kysely [`CamelCasePlugin`](https://kysely-org.github.io/kysely-apidoc/classes/CamelCasePlugin.html) for generated table column names. When enabled, column names like `created_at` become `createdAt` in the generated types.",
+      "default": false
+    },
+    "dateParser": {
+      "type": "string",
+      "description": "Specifies which parser to use for PostgreSQL date/time values.\n\n- `timestamp` — Dates are typed as `Date` (default)\n- `string` — Dates are typed as `string`",
+      "enum": ["string", "timestamp"],
+      "default": "timestamp"
+    },
+    "defaultSchemas": {
+      "type": "array",
+      "description": "Sets the default schema(s) for the database connection. Tables in these schemas are generated without a schema prefix.\n\nDefaults to `[\"public\"]` for PostgreSQL and `[]` for other dialects.",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["public"], ["public", "auth"]]
+    },
+    "dialect": {
+      "type": "string",
+      "description": "Sets the SQL dialect. If not provided, it is inferred from the connection string URL.\n\n- `postgres` — PostgreSQL\n- `mysql` — MySQL / MariaDB\n- `mssql` — Microsoft SQL Server\n- `sqlite` — SQLite (via [better-sqlite3](https://github.com/WiseLibs/better-sqlite3))\n- `bun-sqlite` — SQLite via Bun's built-in SQLite\n- `kysely-bun-sqlite` — SQLite via [kysely-bun-sqlite](https://github.com/nicksrandall/kysely-bun-sqlite)\n- `worker-bun-sqlite` — SQLite via Bun worker\n- `libsql` — [libSQL](https://github.com/tursodatabase/libsql) (Turso)",
+      "enum": [
+        "bun-sqlite",
+        "kysely-bun-sqlite",
+        "libsql",
+        "mssql",
+        "mysql",
+        "postgres",
+        "sqlite",
+        "worker-bun-sqlite"
+      ]
+    },
+    "domains": {
+      "type": "boolean",
+      "description": "Controls whether to generate types for [PostgreSQL domains](https://www.postgresql.org/docs/current/sql-createdomain.html). Only relevant when using the `postgres` dialect.",
+      "default": true
+    },
+    "envFile": {
+      "type": "string",
+      "description": "Path to an environment file (e.g. `.env`) to load before reading the connection string. Useful when `DATABASE_URL` is defined in an env file.",
+      "examples": [".env", ".env.local"]
+    },
+    "excludePattern": {
+      "type": ["string", "null"],
+      "description": "A glob pattern to **exclude** tables from code generation. Tables matching this pattern are skipped.",
+      "default": null,
+      "examples": ["_prisma_*", "migrations_*"]
+    },
+    "includePattern": {
+      "type": ["string", "null"],
+      "description": "A glob pattern to **include** only matching tables in code generation. Tables not matching this pattern are skipped.",
+      "default": null,
+      "examples": ["user*", "public.*"]
+    },
+    "logLevel": {
+      "type": "string",
+      "description": "Sets the terminal log level.\n\n- `debug` — All messages\n- `info` — Informational and above\n- `warn` — Warnings and errors (default)\n- `error` — Errors only\n- `silent` — No output",
+      "enum": ["debug", "info", "warn", "error", "silent"],
+      "default": "warn"
+    },
+    "numericParser": {
+      "type": "string",
+      "description": "Specifies which parser to use for PostgreSQL `numeric` / `decimal` values.\n\n- `string` — Typed as `string` (default, preserves precision)\n- `number` — Typed as `number` (may lose precision for large values)\n- `number-or-string` — Typed as `number | string`",
+      "enum": ["number", "number-or-string", "string"],
+      "default": "string"
+    },
+    "outFile": {
+      "type": ["string", "null"],
+      "description": "Sets the output file path for the generated type definitions. When set to `null`, uses the default path inside `node_modules`.",
+      "default": null,
+      "examples": ["./src/db.d.ts", "./types/database.ts"]
+    },
+    "overrides": {
+      "type": "object",
+      "description": "Specifies type overrides for specific table columns. Allows you to manually set the TypeScript type for columns where the inferred type is not ideal.",
+      "properties": {
+        "columns": {
+          "type": "object",
+          "description": "A map of `\"table.column\"` (or `\"schema.table.column\"`) to a TypeScript type expression string.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "user.id": "Generated<string>",
+              "post.metadata": "Record<string, unknown>"
+            }
+          ]
+        }
+      }
+    },
+    "partitions": {
+      "type": "boolean",
+      "description": "Includes [PostgreSQL table partitions](https://www.postgresql.org/docs/current/ddl-partitioning.html) in the generated code. Only relevant when using the `postgres` dialect.",
+      "default": false
+    },
+    "print": {
+      "type": "boolean",
+      "description": "Prints the generated output to the terminal (stdout) instead of writing to a file. Useful for previewing output or piping to other tools.",
+      "default": false
+    },
+    "runtimeEnums": {
+      "description": "Generates TypeScript `enum` declarations for [PostgreSQL enum types](https://www.postgresql.org/docs/current/datatype-enum.html) instead of union types. Only relevant when using the `postgres` dialect.\n\n- `false` — Generate union types like `\"a\" | \"b\"` (default)\n- `true` — Generate runtime enums with default naming\n- `\"pascal-case\"` — Generate enums with PascalCase member names\n- `\"screaming-snake-case\"` — Generate enums with SCREAMING_SNAKE_CASE member names",
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "string",
+          "enum": ["pascal-case", "screaming-snake-case"]
+        }
+      ],
+      "default": false
+    },
+    "singularize": {
+      "description": "Singularizes generated type aliases (e.g. `Users` becomes `User`).\n\n- `false` — No singularization (default)\n- `true` — Use built-in singularization rules\n- `{...}` — A record of regex pattern to replacement string for custom singularization rules",
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "object",
+          "description": "Custom singularization rules as a map of regex patterns to replacement strings.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      ],
+      "default": false
+    },
+    "skipAutogeneratedFileComment": {
+      "type": "boolean",
+      "description": "Skips adding the `// This file was generated by kysely-codegen` comment at the top of the generated file."
+    },
+    "typeOnlyImports": {
+      "type": "boolean",
+      "description": "Uses TypeScript's `import type` syntax in the generated code (e.g. `import type { ColumnType } from 'kysely'` instead of `import { ColumnType } from 'kysely'`).",
+      "default": true
+    },
+    "url": {
+      "type": "string",
+      "description": "The database connection string URL. If not provided, reads from the `DATABASE_URL` environment variable.\n\nExamples for each dialect:\n- PostgreSQL: `postgres://user:pass@localhost:5432/mydb`\n- MySQL: `mysql://user:pass@localhost:3306/mydb`\n- SQLite: `C:/path/to/db.sqlite` or `:memory:`\n- libSQL: `libsql://your-db.turso.io`\n- MSSQL: `Server=localhost;Database=mydb;User Id=sa;Password=pass;`"
+    },
+    "verify": {
+      "type": "boolean",
+      "description": "Verifies that the generated types are **up-to-date** without writing any files. Exits with a non-zero code if the output file would change. Useful in CI pipelines."
+    }
+  }
+}

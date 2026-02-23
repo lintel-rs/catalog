@@ -1,25 +1,29 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "CatalogConfig",
-  "description": "Top-level configuration loaded from `lintel-catalog.toml`.",
+  "title": "lintel-catalog.toml",
+  "description": "Configuration file for the Lintel catalog builder.\n\nDefines how to build a JSON Schema catalog from local schema definitions and\nexternal sources. The catalog builder reads this file, fetches schemas,\norganizes them into groups, and writes the output to one or more targets.\n\nPlace this file at the root of your catalog repository.",
   "type": "object",
   "properties": {
     "catalog": {
+      "description": "Catalog metadata such as the catalog title. Corresponds to the\n`[catalog]` TOML section.",
       "$ref": "#/$defs/CatalogMeta"
     },
     "target": {
+      "description": "Named build targets that control where output files are written.\n\nEach key is a target name (e.g. `local`, `pages`) and the value\nspecifies the target type and its options. Multiple targets can be built\nin a single run.\n\nCorresponds to `[target.<name>]` sections in TOML.",
       "type": "object",
       "additionalProperties": {
         "$ref": "#/$defs/TargetConfig"
       }
     },
     "groups": {
+      "description": "Named schema groups.\n\nEach key is a group identifier (used as the output directory name) and\nthe value defines the group's display name, description, and schema\ndefinitions.\n\nCorresponds to `[groups.<name>]` sections in TOML.",
       "type": "object",
       "additionalProperties": {
         "$ref": "#/$defs/GroupConfig"
       }
     },
     "sources": {
+      "description": "Named external catalog sources to import schemas from.\n\nEach key is a source identifier and the value specifies the catalog URL\nand optional organization rules that route imported schemas into groups.\n\nCorresponds to `[sources.<name>]` sections in TOML.",
       "type": "object",
       "additionalProperties": {
         "$ref": "#/$defs/SourceConfig"
@@ -30,31 +34,41 @@
   "required": ["catalog"],
   "$defs": {
     "CatalogMeta": {
-      "description": "Metadata about the catalog being built.",
+      "title": "Catalog Metadata",
+      "description": "Metadata for the catalog, specified in the `[catalog]` section.\n\nThis section is required even if empty.",
       "type": "object",
       "properties": {
         "title": {
-          "description": "Optional title for the catalog, included in the output `catalog.json`.",
+          "description": "Human-readable title for the catalog, included in the generated\n`catalog.json` output.",
           "type": ["string", "null"],
+          "examples": ["Lintel Schema Catalog"],
           "default": null
         }
       },
       "additionalProperties": false
     },
     "TargetConfig": {
-      "description": "Target output configuration.",
+      "title": "Build Target",
+      "description": "Output target configuration.\n\nEach target specifies where the built catalog and schema files are written.\nUse `type = \"dir\"` for a plain directory output or `type = \"github-pages\"`\nfor GitHub Pages deployment with automatic `.nojekyll` and optional `CNAME`.",
       "oneOf": [
         {
           "description": "Write output to a local directory.",
           "type": "object",
           "properties": {
             "dir": {
-              "type": "string"
+              "description": "Output directory path (relative to the catalog repository root).",
+              "type": "string",
+              "examples": ["../catalog-generated"]
             },
             "base-url": {
-              "type": "string"
+              "description": "Base URL where the catalog will be hosted. Schema URLs in\n`catalog.json` are constructed relative to this URL.",
+              "type": "string",
+              "examples": [
+                "https://raw.githubusercontent.com/org/catalog/master/"
+              ]
             },
             "github": {
+              "description": "Optional GitHub Pages settings. When present, a `.nojekyll` file is\ncreated in the output directory.",
               "anyOf": [
                 {
                   "$ref": "#/$defs/GitHubPagesConfig"
@@ -77,13 +91,17 @@
           "type": "object",
           "properties": {
             "base-url": {
-              "type": "string"
+              "description": "Base URL where the GitHub Pages site is hosted.",
+              "type": "string",
+              "examples": ["https://catalog.example.com/"]
             },
             "cname": {
+              "description": "Custom domain for GitHub Pages. When set, a `CNAME` file is written\nto the output directory.",
               "type": ["string", "null"],
               "default": null
             },
             "dir": {
+              "description": "Output directory path. Defaults to `docs/` if not specified.",
               "type": ["string", "null"],
               "default": null
             },
@@ -98,27 +116,35 @@
       ]
     },
     "GitHubPagesConfig": {
-      "description": "GitHub Pages hosting options (`.nojekyll`, `CNAME`).",
+      "title": "GitHub Pages Options",
+      "description": "Options for GitHub Pages hosting.\n\nWhen present on a `dir` target, a `.nojekyll` file is created and an\noptional `CNAME` file is written.",
       "type": "object",
       "properties": {
         "cname": {
+          "description": "Custom domain for GitHub Pages. When set, a `CNAME` file is written to\nthe output directory with this value.",
           "type": ["string", "null"],
+          "examples": ["catalog.example.com"],
           "default": null
         }
       },
       "additionalProperties": false
     },
     "GroupConfig": {
-      "description": "A named group of schema definitions.",
+      "title": "Schema Group",
+      "description": "A named collection of related schema definitions.\n\nGroups organize schemas into directories in the built catalog. Each group\nhas a display name and description that appear in the catalog index, and\ncontains one or more schema definitions.\n\nCorresponds to a `[groups.<id>]` section in TOML.",
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "description": "Human-readable display name for this group.",
+          "type": "string",
+          "examples": ["GitHub", "Claude Code"]
         },
         "description": {
+          "description": "Short description of the schemas in this group, shown in the catalog\nindex.",
           "type": "string"
         },
         "schemas": {
+          "description": "Schema definitions within this group.\n\nEach key is a schema identifier (used as the filename, e.g. `agent` ->\n`agent.json`) and the value describes the schema source, display name,\nand file-match patterns.\n\nCorresponds to `[groups.<group>.schemas.<id>]` sections in TOML.",
           "type": "object",
           "additionalProperties": {
             "$ref": "#/$defs/SchemaDefinition"
@@ -129,24 +155,31 @@
       "required": ["name", "description"]
     },
     "SchemaDefinition": {
-      "description": "A single schema definition within a group.",
+      "title": "Schema Definition",
+      "description": "An individual schema entry within a group.\n\nDefines where to obtain the schema, its display metadata, and which files it\nshould match in the catalog.",
       "type": "object",
       "properties": {
         "url": {
-          "description": "URL to download the schema from. If absent, the schema is expected to\nalready exist locally at `schemas/<group>/<key>.json`.",
+          "description": "URL to download the schema from.\n\nIf omitted, the schema is expected to already exist locally at\n`schemas/<group>/<key>.json`.",
           "type": ["string", "null"]
         },
         "name": {
-          "type": "string"
+          "description": "Human-readable display name for this schema.",
+          "type": "string",
+          "examples": ["GitHub Workflow", "devenv.yaml"]
         },
         "description": {
+          "description": "Short description of what this schema validates.",
           "type": "string"
         },
         "file-match": {
+          "title": "File Match",
+          "description": "Glob patterns for files this schema should be auto-associated with.\n\nEditors and tools use these patterns to automatically apply the schema\nwhen a matching file is opened.",
           "type": "array",
           "items": {
             "type": "string"
           },
+          "examples": [["**/.github/workflows/*.yml"], ["devenv.yaml"]],
           "default": []
         }
       },
@@ -154,15 +187,17 @@
       "required": ["name", "description"]
     },
     "SourceConfig": {
-      "description": "An external catalog source (e.g. `SchemaStore`).",
+      "title": "External Catalog Source",
+      "description": "An external schema catalog to import schemas from.\n\nThe catalog builder fetches the JSON catalog from the given URL, then uses\nthe `organize` rules to route matching schemas into local groups.\n\nCorresponds to a `[sources.<id>]` section in TOML.",
       "type": "object",
       "properties": {
         "url": {
-          "description": "URL to the external catalog JSON.",
-          "type": "string"
+          "description": "URL to the external catalog JSON file (in `SchemaStore` format:\n`{\"schemas\": [...]}`).",
+          "type": "string",
+          "examples": ["https://www.schemastore.org/api/json/catalog.json"]
         },
         "organize": {
-          "description": "Map of directory name → organize entry with name, description, and match patterns.",
+          "description": "Rules for routing schemas from this source into local groups.\n\nEach key is a group identifier (matching a key in `[groups]`) and the\nvalue contains glob patterns. Schemas whose names or URLs match any\npattern are placed into that group.\n\nCorresponds to `[sources.<source>.organize.<group>]` sections in TOML.",
           "type": "object",
           "additionalProperties": {
             "$ref": "#/$defs/OrganizeEntry"
@@ -173,14 +208,17 @@
       "required": ["url"]
     },
     "OrganizeEntry": {
-      "description": "An organize entry that classifies schemas from a source into a group directory.\n\nGroup metadata (name, description) is owned by the corresponding `[groups.*]`\nentry; the organize section only handles schema routing via match patterns.",
+      "title": "Organize Entry",
+      "description": "Routing rule that assigns schemas from an external source to a local group.\n\nContains glob patterns to match against schema names or URLs. Group metadata\n(display name, description) is defined in the corresponding `[groups]`\nentry.",
       "type": "object",
       "properties": {
         "match": {
+          "description": "Glob patterns matched against schema names or URLs from the external\ncatalog.\n\nSchemas matching any pattern are imported into the corresponding group\ndirectory.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "examples": [["**.github**"], ["*docker*"]]
         }
       },
       "additionalProperties": false,

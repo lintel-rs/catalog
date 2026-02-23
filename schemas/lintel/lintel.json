@@ -1,23 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Config",
+  "title": "lintel.toml",
+  "description": "Configuration file for the Lintel JSON/YAML schema validator.\n\nLintel walks up the directory tree from the validated file looking for\n`lintel.toml` files and merges them together. Settings in child directories\ntake priority over parent directories. Set `root = true` to stop the upward\nsearch.\n\nPlace `lintel.toml` at your project root (or any subdirectory that needs\ndifferent settings).",
   "type": "object",
   "properties": {
     "root": {
-      "description": "If true, stop walking up the directory tree. No parent `lintel.toml`\nfiles will be merged.",
+      "description": "Mark this configuration file as the project root.\n\nWhen `true`, Lintel stops walking up the directory tree and will not\nmerge any `lintel.toml` files from parent directories. Use this at your\nrepository root to prevent inheriting settings from enclosing\ndirectories.",
       "type": "boolean",
       "default": false
     },
     "exclude": {
-      "description": "Glob patterns for files to exclude from validation.",
+      "title": "Exclude Patterns",
+      "description": "Glob patterns for files to exclude from validation.\n\nMatched against file paths relative to the working directory. Standard\nglob syntax is supported: `*` matches within a single directory, `**`\nmatches across directory boundaries.",
       "type": "array",
       "items": {
         "type": "string"
       },
+      "examples": [["vendor/**", "testdata/**", "*.generated.json"]],
       "default": []
     },
     "schemas": {
-      "description": "Custom schema mappings. Keys are glob patterns matching file paths;\nvalues are schema URLs to use for those files.\n\nThese take priority over catalog matching but are overridden by\ninline `$schema` properties and YAML modeline comments.",
+      "title": "Schema Mappings",
+      "description": "Custom schema-to-file mappings.\n\nKeys are glob patterns matched against file paths; values are schema\nURLs (or `//`-prefixed local paths) to apply. These mappings take\npriority over catalog auto-detection but are overridden by inline\n`$schema` properties and YAML modeline comments.\n\nExample:\n```toml\n[schemas]\n\"config/*.yaml\" = \"https://json.schemastore.org/github-workflow.json\"\n\"myschema.json\" = \"//schemas/custom.json\"\n```",
       "type": "object",
       "additionalProperties": {
         "type": "string"
@@ -25,20 +29,24 @@
       "default": {}
     },
     "no-default-catalog": {
-      "description": "If true, skip the built-in Lintel catalog (only use `SchemaStore`\nand any extra registries).",
+      "title": "No Default Catalog",
+      "description": "Disable the built-in Lintel catalog.\n\nWhen `true`, only `SchemaStore` and any additional registries listed in\n`registries` are used for schema auto-detection. The default Lintel\ncatalog (which provides curated schema mappings) is skipped.",
       "type": "boolean",
       "default": false
     },
     "registries": {
-      "description": "Additional schema catalog URLs to fetch alongside `SchemaStore`.\nEach URL should point to a JSON file with the same format as\nthe `SchemaStore` catalog (`{\"schemas\": [...]}`).",
+      "title": "Additional Registries",
+      "description": "Additional schema catalog URLs to fetch alongside `SchemaStore`.\n\nEach entry should be a URL pointing to a JSON file in `SchemaStore`\ncatalog format (`{\"schemas\": [...]}`).\n\nRegistries from child configs appear first, followed by parent\nregistries (duplicates are removed). This lets child directories add\nproject-specific catalogs while inheriting organization-wide ones.",
       "type": "array",
       "items": {
         "type": "string"
       },
+      "examples": [["https://example.com/custom-catalog.json"]],
       "default": []
     },
     "rewrite": {
-      "description": "Schema URI rewrite rules. Keys are prefixes to match; values are\nreplacements. For example, `\"http://localhost:8000/\" = \"//schemas/\"`\nrewrites any schema URI starting with `http://localhost:8000/` so that\nprefix becomes `//schemas/`.",
+      "title": "Rewrite Rules",
+      "description": "Schema URI rewrite rules.\n\nKeys are URI prefixes to match; values are replacement prefixes. The\nlongest matching prefix wins. Use `//` as a value prefix to reference\npaths relative to the directory containing `lintel.toml`.\n\nExample:\n```toml\n[rewrite]\n\"http://localhost:8000/\" = \"//schemas/\"\n```\nThis rewrites `http://localhost:8000/foo.json` to\n`//schemas/foo.json`, which then resolves to a local file relative to\nthe config directory.",
       "type": "object",
       "additionalProperties": {
         "type": "string"
@@ -46,7 +54,7 @@
       "default": {}
     },
     "override": {
-      "description": "Per-file overrides. Earlier entries (child configs) take priority.",
+      "description": "Per-file or per-schema override rules.\n\nIn TOML, each override is written as a `[[override]]` block (double\nbrackets). Earlier entries take priority; child config overrides come\nbefore parent config overrides after merging.",
       "type": "array",
       "items": {
         "$ref": "#/$defs/Override"
@@ -56,26 +64,40 @@
   "additionalProperties": false,
   "$defs": {
     "Override": {
+      "title": "Override Rule",
+      "description": "Conditional settings applied to files or schemas matching specific patterns.\n\nEach `[[override]]` block targets files by path glob, schemas by URI glob,\nor both. When a file matches, the settings in that block override the\ntop-level defaults. Earlier entries (from child configs) take priority over\nlater entries (from parent configs).\n\nIn TOML, override blocks are written as `[[override]]` (double brackets) to\ncreate an array of tables.",
       "type": "object",
       "properties": {
         "files": {
-          "description": "Glob patterns for instance file paths this override applies to.",
+          "title": "File Patterns",
+          "description": "Glob patterns matched against instance file paths (relative to the\nworking directory).\n\nUse standard glob syntax: `*` matches any single path component, `**`\nmatches zero or more path components, and `?` matches a single\ncharacter.",
           "type": "array",
           "items": {
             "type": "string"
           },
+          "examples": [
+            ["schemas/vector.json"],
+            ["schemas/**/*.json"],
+            ["config/*.yaml"]
+          ],
           "default": []
         },
         "schemas": {
-          "description": "Glob patterns for schema URIs this override applies to.\nMatched against the original URI (before rewrites) and the resolved\nURI (after rewrites and `//` resolution).",
+          "title": "Schema Patterns",
+          "description": "Glob patterns matched against schema URIs.\n\nEach pattern is tested against both the original URI (before rewrite\nrules) and the resolved URI (after rewrites and `//` prefix\nresolution), so you can match on either form.",
           "type": "array",
           "items": {
             "type": "string"
           },
+          "examples": [
+            ["https://json.schemastore.org/vector.json"],
+            ["https://json.schemastore.org/*.json"]
+          ],
           "default": []
         },
         "validate_formats": {
-          "description": "Whether to enable JSON Schema format validation for matched files.\nWhen `None`, the override does not affect format validation.",
+          "title": "Validate Formats",
+          "description": "Enable or disable JSON Schema `format` keyword validation for matching\nfiles.\n\nWhen `true`, string values are validated against built-in formats such\nas `date-time`, `email`, `uri`, etc. When `false`, format annotations\nare ignored during validation. When omitted, this override does not\naffect the format validation setting and the next matching override (or\nthe default of `true`) applies.",
           "type": ["boolean", "null"],
           "default": null
         }

@@ -75,6 +75,15 @@ file-match = ["devenv.yaml", "**/devenv.yaml"]
 name = "GitHub"
 description = "GitHub Actions workflows, Dependabot, issue templates, and other GitHub configuration files"
 
+[groups.kysely]
+name = "Kysely"
+description = "Kysely SQL query builder tooling and code generation"
+
+[groups.kysely.schemas.kysely-codegen]
+name = "kysely-codegen"
+description = "kysely-codegen configuration for TypeScript type generation from database schemas"
+file-match = [".kysely-codegenrc.json", "**/.kysely-codegenrc.json"]
+
 [groups.lintel]
 name = "Lintel"
 description = "Lintel configuration files"
