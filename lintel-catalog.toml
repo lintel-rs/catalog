@@ -49,6 +49,16 @@ lintel-catalog = { name = "lintel-catalog.toml", description = "Lintel catalog b
   "**/lintel-catalog.toml",
 ] }
 
+[groups.ads]
+name = "Ads"
+description = "Digital advertising specifications: sellers.json, ads.txt, and related IAB Tech Lab standards"
+
+[groups.ads.schemas]
+sellers = { name = "sellers.json", description = "IAB Tech Lab sellers.json supply chain transparency file", file-match = [
+  "sellers.json",
+  "**/sellers.json",
+] }
+
 [groups.devenv]
 name = "devenv"
 description = "Nix-based development environment configuration"

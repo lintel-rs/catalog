@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "sellers.json",
+  "description": "Schema for the [IAB Tech Lab sellers.json](https://iabtechlab.com/sellers-json/) specification (v1.0, July 2019).\n\nsellers.json provides a mechanism for advertising systems to publicly declare the sellers that they represent and those sellers' identifiers within their systems, enabling buyers to discover who the entities are that are either **direct sellers** of or **intermediaries** in the selling of digital advertising.\n\nA published and accessible sellers.json file allows:\n- The identity of the **final seller** of a bid request to be discovered (assuming they are [ads.txt](https://iabtechlab.com/ads-txt/) authorized)\n- The identities of all **nodes** (entities that participated in the bid request) in the [SupplyChain object](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/supplychainobject.md) to be discovered\n- Smaller bid request object sizes by allowing information to be looked up and cached offline\n\n## Access method\n\nThe file must be hosted at the **root domain** of the advertising system at the path `/sellers.json` (e.g. `https://example.com/sellers.json`). The root domain is defined as the public suffix plus one string in the name per the [Public Suffix List](https://publicsuffix.org/). The file may also be hosted on subdomains as needed.\n\nThe response must include `Content-Type: application/json` (optionally with `; charset=utf-8`). HTTPS is preferred over HTTP.\n\n## Caching\n\nConsumers should respect standard HTTP cache-control headers (`Expires`, `Cache-Control`). If no cache directives are present, a **7-day** default expiry should be used.\n\nSee the [sellers.json specification (PDF)](https://iabtechlab.com/wp-content/uploads/2019/07/Sellers.json_Final.pdf) for the full reference. Licensed under [Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/) by the OpenRTB Working Group.",
+  "type": "object",
+  "properties": {
+    "sellers": {
+      "type": "array",
+      "description": "The list of **all** Seller objects represented by the advertising system. All sellers must be included even if they are confidential (with `is_confidential` set to `1`).",
+      "items": {
+        "$ref": "#/$defs/Seller"
+      }
+    },
+    "identifiers": {
+      "type": "array",
+      "description": "Array of [Identifier](#/$defs/Identifier) objects associated with this advertising system. Examples include [TAG](https://www.tagtoday.net/)-IDs, [Dun & Bradstreet](https://www.dnb.com/) DUNS numbers, or any custom identifier that a consuming advertising system might need.\n\nSee [Identifier Names](#/$defs/Identifier) for standard identifiers.",
+      "items": {
+        "$ref": "#/$defs/Identifier"
+      }
+    },
+    "contact_email": {
+      "type": "string",
+      "format": "email",
+      "description": "An email address to contact the advertising system for questions or inquiries about this file."
+    },
+    "contact_address": {
+      "type": "string",
+      "description": "The business address of the advertising system."
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the sellers.json specification. Currently the only valid value is `\"1.0\"`.",
+      "const": "1.0"
+    },
+    "ext": {
+      "type": "object",
+      "description": "Placeholder for advertising-system-specific extensions to this object."
+    }
+  },
+  "required": ["sellers", "version"],
+  "examples": [
+    {
+      "contact_email": "adops@advertisingsystem.com",
+      "contact_address": "Advertising System Inc., 101 Main Street, New York, NY 10101",
+      "version": "1.0",
+      "identifiers": [
+        {
+          "name": "TAG-ID",
+          "value": "28cb65e5bbc0bd5f"
+        }
+      ],
+      "sellers": [
+        {
+          "seller_id": "1942009976",
+          "name": "Publisher1",
+          "domain": "publisher1.com",
+          "seller_type": "PUBLISHER"
+        },
+        {
+          "seller_id": "1397382429",
+          "name": "Exchange1",
+          "domain": "exchange1.com",
+          "seller_type": "INTERMEDIARY"
+        },
+        {
+          "seller_id": "20000000",
+          "name": "Seller And Intermediary, Inc",
+          "domain": "sellerandintermediary.com",
+          "seller_type": "PUBLISHER",
+          "comment": "NorthAmerica O&O inventory"
+        },
+        {
+          "seller_id": "20000001",
+          "name": "Seller And Intermediary, Inc",
+          "domain": "sellerandintermediary.com",
+          "seller_type": "PUBLISHER",
+          "comment": "APAC O&O inventory"
+        },
+        {
+          "seller_id": "20000002",
+          "name": "Seller And Intermediary, Inc",
+          "domain": "sellerandintermediary.com",
+          "seller_type": "INTERMEDIARY",
+          "comment": "Non O&O inventory"
+        },
+        {
+          "seller_id": "101010101",
+          "name": "Hybrid Seller",
+          "domain": "hybridseller.com",
+          "seller_type": "BOTH",
+          "comment": "Sells both O&O and other sellers' inventory"
+        },
+        {
+          "seller_id": "00000001",
+          "seller_type": "INTERMEDIARY",
+          "is_confidential": 1
+        },
+        {
+          "seller_id": "EB_0001",
+          "name": "Passthrough Publisher",
+          "domain": "passthroughpublisher.com",
+          "seller_type": "PUBLISHER",
+          "is_passthrough": 1,
+          "comment": "direct buyer/seller of this inventory must establish an account relationship with Passthrough Publisher"
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "Seller": {
+      "type": "object",
+      "description": "The identification of a selling legal entity that is paid for inventory sold on behalf of `seller_id`.\n\nIt is **invalid** for a `seller_id` to represent multiple entities — every `seller_id` must map to only a single entity that is paid for inventory transacted with that `seller_id`. It is valid for a selling entity to have **multiple** `seller_id` values within an advertising system (e.g. separate IDs for different regions or inventory types).",
+      "properties": {
+        "seller_id": {
+          "type": "string",
+          "description": "The identifier associated with the seller or reseller account within the advertising system. This is the same ID that appears in:\n- An [ads.txt](https://iabtechlab.com/ads-txt/) file\n- The [SupplyChain](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/supplychainobject.md) `.nodes` array `sid` property\n- In most cases, the `Publisher.Id` property of an [OpenRTB](https://github.com/InteractiveAdvertisingBureau/openrtb2.x) bid request"
+        },
+        "is_confidential": {
+          "type": "integer",
+          "description": "Indicates whether the identity of the seller is confidential.\n\n- `0` — Not confidential (default). `name` and `domain` **must** be provided.\n- `1` — Confidential. `name` and `domain` may be omitted.",
+          "enum": [0, 1],
+          "default": 0
+        },
+        "seller_type": {
+          "type": "string",
+          "description": "An enumeration of the type of account. This field should be treated as **case-insensitive** when interpreting the data.\n\n- `PUBLISHER` — The inventory sold through this account is on a site, app, or other medium **owned by the named entity** and the advertising system pays them directly.\n- `INTERMEDIARY` — The inventory sold through this account is **not owned** by the named entity or the advertising system does **not** pay them directly.\n- `BOTH` — Both types of inventory are transacted by this seller.",
+          "enum": ["PUBLISHER", "INTERMEDIARY", "BOTH"]
+        },
+        "is_passthrough": {
+          "type": "integer",
+          "description": "Indicates whether the seller is a **passthrough** partner — a facilitator of inventory from the upstream supplier to the consumer of the inventory. The upstream supplier and consumer must establish a business relationship with each other such that the upstream supplier has control of their account within the consumer's platform.\n\nWhen set to `1`:\n- This seller has an **account control relationship** with the downstream/consuming advertising system\n- If this seller is the **last link** in a SupplyChain, the buying system must have established an account control relationship with this seller to transact the seller's inventory\n- If this is **not** the last link in a SupplyChain, this seller should exist between two entities that have an account control relationship\n\nWhen set to `0` (default):\n- The downstream/consuming advertising system has **no** account control relationship with this seller",
+          "enum": [0, 1],
+          "default": 0
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the company (the **legal entity**) that is paid for inventory transacted under the given `seller_id`.\n\n**Required** when `is_confidential` is `0` (the default). May be omitted only when `is_confidential` is set to `1`."
+        },
+        "domain": {
+          "type": "string",
+          "description": "The business domain name of the company (the **legal entity**) that is paid for inventory transacted under the given `seller_id`.\n\nThis should be the **root domain** only (public suffix plus one label, e.g. `example.com`), not a full URL. Implementers should use the [Public Suffix List](https://publicsuffix.org/) to derive the root domain. When `seller_type` is `INTERMEDIARY` or `BOTH`, this should be the root domain of the seller's own sellers.json file.\n\n**Required** if the seller has a web presence and `is_confidential` is `0`. May be omitted when `is_confidential` is `1` or when the seller has no web presence."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Any helpful description for this inventory. Useful for sellers that have **multiple** `seller_id` values to describe what each `seller_id` represents (e.g. regional inventory, O&O vs. non-O&O)."
+        },
+        "ext": {
+          "type": "object",
+          "description": "Placeholder for advertising-system-specific extensions to this object."
+        }
+      },
+      "required": ["seller_id", "seller_type"],
+      "if": {
+        "not": {
+          "properties": {
+            "is_confidential": { "const": 1 }
+          },
+          "required": ["is_confidential"]
+        }
+      },
+      "then": {
+        "required": ["seller_id", "seller_type", "name"]
+      }
+    },
+    "Identifier": {
+      "type": "object",
+      "description": "An arbitrary name/value pair used to communicate common values such as business identifiers, certification identifiers, or any other identifier that a consuming system might need to better interoperate with the seller.\n\n## Standard identifier names\n\n- `TAG-ID` — [Trustworthy Accountability Group](https://www.tagtoday.net/) ID\n- `DUNS` — [Dun & Bradstreet](https://www.dnb.com/) DUNS Number",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The identifier type name (referred to in the spec as *\"the description of the identifier\"*). See the [standard identifier names](#/$defs/Identifier) table above.",
+          "examples": ["TAG-ID", "DUNS"]
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the identifier.",
+          "examples": ["28cb65e5bbc0bd5f"]
+        }
+      },
+      "required": ["name", "value"]
+    }
+  }
+}
