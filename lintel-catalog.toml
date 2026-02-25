@@ -26,10 +26,9 @@ match = ["biome.json", "biome.jsonc"]
 [sources.schemastore.organize.typescript]
 match = ["**tsconfig**"]
 
-[sources.schemastore.organize.uet]
-match = [
-  "https://raw.githubusercontent.com/RedpointGames/uet-schema/main/root.json",
-]
+[groups.schemastore]
+name = "SchemaStore"
+description = "Additional schemas from the SchemaStore catalog"
 
 [groups.ads]
 name = "Ads"
@@ -204,13 +203,3 @@ file-match = [
 [groups.typescript]
 name = "TypeScript"
 description = "TypeScript compiler and project configuration"
-
-[groups.typescript.schemas.tsconfig]
-url = "https://json.schemastore.org/tsconfig"
-description = "TypeScript compiler configuration file"
-file-match = [
-  "tsconfig.json",
-  "tsconfig*.json",
-  "**/tsconfig.json",
-  "**/tsconfig*.json",
-]
