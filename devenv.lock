@@ -110,14 +110,15 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1771814373,
+        "lastModified": 1772071946,
         "owner": "lintel-rs",
         "repo": "lintel",
-        "rev": "d6cc141c8baba50aba50af666a4d02f08280a42b",
+        "rev": "b61913b46da78c8591dbc64c6437063e1d6d54f2",
         "type": "github"
       },
       "original": {
         "owner": "lintel-rs",
+        "ref": "v0.0.13",
         "repo": "lintel",
         "type": "github"
       }
