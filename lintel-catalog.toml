@@ -1,15 +1,19 @@
 # :schema ./schemas/lintel/lintel-catalog-toml.json
 [catalog]
-title = "Lintel default schema catalog"
+title = "Lintel Catalog"
 
 [target.default]
 type = "dir"
 dir = ".lintel-output/default"
 base-url = "https://catalog.lintel.tools/"
+
+[target.default.site]
+description = "The default schema catalog for Lintel, the multi-format JSON Schema linter for all your config files."
 github.cname = "catalog.lintel.tools"
 
 [sources.schemastore]
 url = "https://www.schemastore.org/api/json/catalog.json"
+exclude-matches = ["biome.jsonc"]
 
 [sources.schemastore.organize.github]
 match = ["**.github**"]
