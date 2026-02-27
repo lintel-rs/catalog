@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "lintel-catalog.toml",
+  "title": "Lintel Catalog",
   "description": "Configuration file for the Lintel catalog builder.\n\nDefines how to build a JSON Schema catalog from local schema definitions and\nexternal sources. The catalog builder reads this file, fetches schemas,\norganizes them into groups, and writes the output to one or more targets.\n\nPlace this file at the root of your catalog repository.",
   "type": "object",
   "properties": {
@@ -43,77 +43,77 @@
           "type": ["string", "null"],
           "examples": ["Lintel Schema Catalog"],
           "default": null
+        },
+        "source-base-url": {
+          "description": "Base URL for local schema source files.\n\nWhen set, local schemas (those without a `url`) get their `x-lintel`\n`source` field constructed as `{source-base-url}/schemas/{group}/{key}.json`.\nThis is typically a raw GitHub URL pointing to the catalog repository.\n\nWhen omitted, local schemas use a relative path like\n`schemas/{group}/{key}.json`.",
+          "type": ["string", "null"],
+          "examples": [
+            "https://raw.githubusercontent.com/lintel-rs/catalog/master"
+          ],
+          "default": null
         }
       },
       "additionalProperties": false
     },
     "TargetConfig": {
       "title": "Build Target",
-      "description": "Output target configuration.\n\nEach target specifies where the built catalog and schema files are written.\nUse `type = \"dir\"` for a plain directory output or `type = \"github-pages\"`\nfor GitHub Pages deployment with automatic `.nojekyll` and optional `CNAME`.",
-      "oneOf": [
-        {
-          "description": "Write output to a local directory.",
-          "type": "object",
-          "properties": {
-            "dir": {
-              "description": "Output directory path (relative to the catalog repository root).",
-              "type": "string",
-              "examples": ["../catalog-generated"]
-            },
-            "base-url": {
-              "description": "Base URL where the catalog will be hosted. Schema URLs in\n`catalog.json` are constructed relative to this URL.",
-              "type": "string",
-              "examples": [
-                "https://raw.githubusercontent.com/org/catalog/master/"
-              ]
-            },
-            "github": {
-              "description": "Optional GitHub Pages settings. When present, a `.nojekyll` file is\ncreated in the output directory.",
-              "anyOf": [
-                {
-                  "$ref": "#/$defs/GitHubPagesConfig"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "type": {
-              "type": "string",
-              "const": "dir"
-            }
-          },
-          "additionalProperties": false,
-          "required": ["type", "dir", "base-url"]
+      "description": "Output target configuration.\n\nEach target specifies where the built catalog and schema files are written.\nWhen `site.github` is present, GitHub Pages files (`.nojekyll`, `CNAME`) are\nwritten automatically.",
+      "type": "object",
+      "properties": {
+        "dir": {
+          "description": "Output directory path (relative to the catalog repository root).",
+          "type": "string",
+          "examples": ["../catalog-generated"]
         },
-        {
-          "description": "Generate output optimized for GitHub Pages deployment.",
-          "type": "object",
-          "properties": {
-            "base-url": {
-              "description": "Base URL where the GitHub Pages site is hosted.",
-              "type": "string",
-              "examples": ["https://catalog.example.com/"]
+        "base-url": {
+          "description": "Base URL where the catalog will be hosted. Schema URLs in\n`catalog.json` are constructed relative to this URL.",
+          "type": "string",
+          "examples": ["https://raw.githubusercontent.com/org/catalog/master/"]
+        },
+        "site": {
+          "description": "Site-level configuration for description and hosting options.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SiteConfig"
             },
-            "cname": {
-              "description": "Custom domain for GitHub Pages. When set, a `CNAME` file is written\nto the output directory.",
-              "type": ["string", "null"],
-              "default": null
-            },
-            "dir": {
-              "description": "Output directory path. Defaults to `docs/` if not specified.",
-              "type": ["string", "null"],
-              "default": null
-            },
-            "type": {
-              "type": "string",
-              "const": "github-pages"
+            {
+              "type": "null"
             }
-          },
-          "additionalProperties": false,
-          "required": ["type", "base-url"]
+          ]
         }
-      ]
+      },
+      "additionalProperties": false,
+      "required": ["dir", "base-url"]
+    },
+    "SiteConfig": {
+      "title": "Site Config",
+      "description": "Site-level configuration for a build target.\n\nControls metadata and hosting options that apply to the generated static\nsite.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Human-readable description for the site, used in the HTML meta\ndescription tag and JSON-LD structured data.",
+          "type": ["string", "null"],
+          "default": null
+        },
+        "ga-tracking-id": {
+          "description": "Google Analytics tracking ID (measurement ID).\n\nWhen set, the generated site includes the Google Analytics Global Site\nTag (`gtag.js`) snippet in every page's `<head>`. The snippet loads\nthe gtag.js library and configures it with the provided measurement ID.\n\nThe injected markup looks like:\n\n```html\n<!-- Google tag (gtag.js) -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', 'GA_TRACKING_ID');\n</script>\n```\n\nwhere `GA_TRACKING_ID` is replaced with the value of this field\n(e.g. `G-XXXXXXXXXX`).\n\nLeave unset (or omit) to disable Google Analytics entirely.",
+          "type": ["string", "null"],
+          "examples": ["G-XXXXXXXXXX"],
+          "default": null
+        },
+        "github": {
+          "description": "GitHub Pages hosting options.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GitHubPagesConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
     },
     "GitHubPagesConfig": {
       "title": "GitHub Pages Options",
@@ -183,6 +183,14 @@
           },
           "examples": [["**/.github/workflows/*.yml"], ["devenv.yaml"]],
           "default": []
+        },
+        "versions": {
+          "description": "Alternate versions of this schema, keyed by version identifier.\nValues are URLs to the versioned schema.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
         }
       },
       "additionalProperties": false
@@ -196,6 +204,15 @@
           "description": "URL to the external catalog JSON file (in `SchemaStore` format:\n`{\"schemas\": [...]}`).",
           "type": "string",
           "examples": ["https://www.schemastore.org/api/json/catalog.json"]
+        },
+        "exclude-matches": {
+          "description": "Filenames to exclude from this source.\n\nIf any of a schema's `fileMatch` entries match one of these patterns\n(using the same glob logic as `organize`), the schema is skipped\nentirely. Use this to suppress source schemas that duplicate\nexplicitly configured group entries.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["biome.jsonc"]],
+          "default": []
         },
         "organize": {
           "description": "Rules for routing schemas from this source into local groups.\n\nEach key is a group identifier (matching a key in `[groups]`) and the\nvalue contains glob patterns. Schemas whose names or URLs match any\npattern are placed into that group.\n\nCorresponds to `[sources.<source>.organize.<group>]` sections in TOML.",

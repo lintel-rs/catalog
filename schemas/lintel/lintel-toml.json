@@ -59,6 +59,18 @@
       "items": {
         "$ref": "#/$defs/Override"
       }
+    },
+    "format": {
+      "title": "Format",
+      "description": "Formatting configuration for `lintel format`.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Format"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "additionalProperties": false,
@@ -103,6 +115,2333 @@
         }
       },
       "additionalProperties": false
+    },
+    "Format": {
+      "title": "Format",
+      "description": "Formatting configuration.\n\nControls how `lintel format` behaves. The `dprint` field passes\nconfiguration through to the dprint-based formatters (JSON, TOML,\nMarkdown) and `pretty_yaml`.",
+      "type": "object",
+      "properties": {
+        "dprint": {
+          "description": "dprint formatter configuration.\n\nGlobal fields (`lineWidth`, `indentWidth`, `useTabs`, `newLineKind`)\napply to all formatters. Per-plugin sections (`json`, `toml`,\n`markdown`) override the global defaults for that plugin.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DprintConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "DprintConfig": {
+      "title": "dprint configuration file",
+      "description": "Schema for a dprint configuration file.",
+      "type": "object",
+      "properties": {
+        "$schema": {
+          "title": "JSON Schema",
+          "description": "The JSON schema URL for editor validation and autocompletion.\n\nThe dprint VS Code extension automatically constructs a composite\nschema based on the installed plugins, so you usually don't need\nto set this manually.",
+          "type": ["string", "null"]
+        },
+        "incremental": {
+          "title": "Incremental",
+          "description": "Only format files that have changed since the last formatting run.\n\nWhen `true` (the default), dprint tracks which files have been\nformatted and skips unchanged files on subsequent runs. Set to\n`false` to always reformat all matched files.\n\nCan also be toggled via the `--incremental` / `--incremental=false`\nCLI flag.",
+          "type": ["boolean", "null"]
+        },
+        "extends": {
+          "title": "Extends",
+          "description": "One or more configuration files to extend.\n\nCan be a single path/URL or an array of paths/URLs. Properties from\nextended configs are merged, with the current file taking\nprecedence. Earlier entries in an array take priority over later\nones.\n\nSupports the `${configDir}` variable (resolves to the directory of\nthe current config file) and `${originConfigDir}` (resolves to the\ndirectory of the original/root config file).\n\nWhen extending remote configs (URLs), `includes` and non-Wasm\n`plugins` entries are ignored for security.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Extends"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineWidth": {
+          "title": "Line Width",
+          "description": "The maximum line width the formatter tries to stay under.\n\nThe formatter may exceed this width in certain cases where breaking\nthe line would produce worse output. This is a global default that\nindividual plugins can override in their configuration sections.",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "indentWidth": {
+          "title": "Indent Width",
+          "description": "The number of characters for each indent level.\n\nWhen `useTabs` is `true`, this controls the visual width of each\ntab character. When `useTabs` is `false`, this is the number of\nspaces inserted per indent level. This is a global default that\nindividual plugins can override in their configuration sections.",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "useTabs": {
+          "title": "Use Tabs",
+          "description": "Whether to use tabs (`true`) or spaces (`false`) for indentation.\n\nThis is a global default that individual plugins can override in\ntheir configuration sections.",
+          "type": ["boolean", "null"]
+        },
+        "newLineKind": {
+          "title": "New Line Kind",
+          "description": "The newline character style to use when formatting.\n\nThis is a global default that individual plugins can override in\ntheir configuration sections.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewLineKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "includes": {
+          "title": "Includes",
+          "description": "Glob patterns for files to include in formatting.\n\nWhen specified, only files matching at least one of these patterns\nare formatted. When omitted, all files matched by installed plugins\nare formatted (respecting `excludes`).\n\nUses gitignore-style glob syntax.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "examples": [["src/**/*.{ts,tsx,json}"]]
+        },
+        "excludes": {
+          "title": "Excludes",
+          "description": "Glob patterns for files or directories to exclude from formatting.\n\nUses gitignore-style glob syntax. Files already ignored by\n`.gitignore` are excluded automatically. Prefix a pattern with `!`\nto un-exclude files that were previously excluded.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "examples": [["**/*-lock.json", "**/node_modules"]]
+        },
+        "plugins": {
+          "title": "Plugins",
+          "description": "Plugin URLs or local file paths.\n\nEach entry is a URL to a WebAssembly plugin (`.wasm`) or a local\nfile path. The order determines precedence when multiple plugins\ncan handle the same file extension — the first matching plugin\nwins.\n\nCan also be specified via the `--plugins` CLI flag.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            [
+              "https://plugins.dprint.dev/typescript-0.93.3.wasm",
+              "https://plugins.dprint.dev/json-0.19.4.wasm"
+            ]
+          ]
+        },
+        "typescript": {
+          "description": "TypeScript / JavaScript plugin configuration.\n\nSee: <https://dprint.dev/plugins/typescript/config/>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TypeScriptConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "json": {
+          "description": "JSON plugin configuration.\n\nSee: <https://dprint.dev/plugins/json/config/>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JsonConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "toml": {
+          "description": "TOML plugin configuration.\n\nSee: <https://dprint.dev/plugins/toml/config/>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TomlConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "markdown": {
+          "description": "Markdown plugin configuration.\n\nSee: <https://dprint.dev/plugins/markdown/config/>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MarkdownConfig"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/PluginConfig"
+      }
+    },
+    "Extends": {
+      "description": "One or more configuration files to extend.\n\nCan be a single path/URL string or an array of paths/URLs. Properties\nfrom extended configs are merged, with the current file taking\nprecedence. Earlier entries in an array take priority over later ones.\n\nSupports the `${configDir}` variable (resolves to the directory\ncontaining the current config file) and `${originConfigDir}` (resolves\nto the directory of the original/root config file).\n\nWhen extending remote configs (URLs), `includes` and non-Wasm `plugins`\nentries are ignored for security.",
+      "anyOf": [
+        {
+          "description": "A single file path or URL to a configuration file to extend.",
+          "type": "string"
+        },
+        {
+          "description": "A collection of file paths and/or URLs to configuration files to\nextend.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "NewLineKind": {
+      "title": "New Line Kind",
+      "description": "The newline character style to use when formatting files.",
+      "oneOf": [
+        {
+          "description": "For each file, uses the newline kind found at the end of the last\nline.",
+          "type": "string",
+          "const": "auto"
+        },
+        {
+          "description": "Uses carriage return followed by line feed (`\\r\\n`).",
+          "type": "string",
+          "const": "crlf"
+        },
+        {
+          "description": "Uses line feed (`\\n`).",
+          "type": "string",
+          "const": "lf"
+        },
+        {
+          "description": "Uses the system standard (e.g., CRLF on Windows, LF on\nmacOS/Linux).",
+          "type": "string",
+          "const": "system"
+        }
+      ]
+    },
+    "TypeScriptConfig": {
+      "title": "TypeScript / JavaScript Plugin Configuration",
+      "description": "Configuration for the dprint [TypeScript / JavaScript](https://dprint.dev/plugins/typescript/config/) plugin.\n\nSee: <https://dprint.dev/plugins/typescript/config/>",
+      "type": "object",
+      "properties": {
+        "locked": {
+          "description": "Whether the configuration is not allowed to be overridden or extended.",
+          "type": ["boolean", "null"]
+        },
+        "associations": {
+          "description": "File patterns to associate with this plugin.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "arguments.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#argumentspreferHanging>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreferHanging"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arguments.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#argumentspreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "arguments.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#argumentsspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "arguments.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#argumentstrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arrayExpression.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayExpressionpreferHanging>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreferHanging"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arrayExpression.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayExpressionpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "arrayExpression.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayExpressionspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "arrayExpression.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayExpressiontrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arrayPattern.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayPatternpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "arrayPattern.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayPatternpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "arrayPattern.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayPatternspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "arrayPattern.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrayPatterntrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arrowFunction.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrowFunctionbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "arrowFunction.useParentheses": {
+          "description": "Whether to use parentheses around a single parameter in an arrow function.\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#arrowFunctionuseParentheses>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseParentheses"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "binaryExpression.linePerExpression": {
+          "description": "Whether to force a line per expression when spanning multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#binaryExpressionlinePerExpression>",
+          "type": ["boolean", "null"]
+        },
+        "binaryExpression.operatorPosition": {
+          "description": "Where to place the operator for expressions that span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#binaryExpressionoperatorPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "binaryExpression.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#binaryExpressionpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "binaryExpression.spaceSurroundingBitwiseAndArithmeticOperator": {
+          "description": "Whether to surround the operator in a binary expression with spaces.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#binaryExpressionspaceSurroundingBitwiseAndArithmeticOperator>",
+          "type": ["boolean", "null"]
+        },
+        "bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#bracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "catchClause.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#catchClausespaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "classDeclaration.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#classDeclarationbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "classExpression.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#classExpressionbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commentLine.forceSpaceAfterSlashes": {
+          "description": "Forces a space after the double slash in a comment line.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#commentLineforceSpaceAfterSlashes>",
+          "type": ["boolean", "null"]
+        },
+        "computed.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#computedpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "conditionalExpression.operatorPosition": {
+          "description": "Where to place the operator for expressions that span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#conditionalExpressionoperatorPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "conditionalExpression.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#conditionalExpressionpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "conditionalType.operatorPosition": {
+          "description": "Where to place the operator for expressions that span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#conditionalTypeoperatorPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "conditionalType.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#conditionalTypepreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "constructSignature.spaceAfterNewKeyword": {
+          "description": "Whether to add a space after the `new` keyword in a construct signature.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#constructSignaturespaceAfterNewKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "constructor.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#constructorbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "constructor.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a constructor.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#constructorspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "constructorType.spaceAfterNewKeyword": {
+          "description": "Whether to add a space after the `new` keyword in a constructor type.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#constructorTypespaceAfterNewKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "decorators.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#decoratorspreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "deno": {
+          "description": "Top level configuration that sets the configuration to what is used in Deno.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#deno>",
+          "type": ["boolean", "null"]
+        },
+        "doWhileStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#doWhileStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "doWhileStatement.nextControlFlowPosition": {
+          "description": "Where to place the next control flow within a control flow statement.\n\nDefault: `\"sameLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#doWhileStatementnextControlFlowPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "doWhileStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#doWhileStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "doWhileStatement.spaceAfterWhileKeyword": {
+          "description": "Whether to add a space after the `while` keyword in a do while statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#doWhileStatementspaceAfterWhileKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "doWhileStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#doWhileStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "enumDeclaration.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#enumDeclarationbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "enumDeclaration.memberSpacing": {
+          "description": "How to space the members of an enum.\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#enumDeclarationmemberSpacing>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberSpacing"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "enumDeclaration.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#enumDeclarationtrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportDeclaration.forceMultiLine": {
+          "description": "If code import/export specifiers should be forced to be on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationforceMultiLine>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ForceMultiLine"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportDeclaration.forceSingleLine": {
+          "description": "If code should be forced to be on a single line if able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationforceSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "exportDeclaration.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "exportDeclaration.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "exportDeclaration.sortNamedExports": {
+          "description": "The kind of sort ordering to use.\n\nDefault: `\"caseInsensitive\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationsortNamedExports>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortImportDeclarations"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportDeclaration.sortTypeOnlyExports": {
+          "description": "The kind of sort ordering to use for typed imports and exports.\n\nDefault: `\"none\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationsortTypeOnlyExports>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortTypeOnlyExports"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exportDeclaration.spaceSurroundingNamedExports": {
+          "description": "Whether to add spaces around named exports in an export declaration.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationspaceSurroundingNamedExports>",
+          "type": ["boolean", "null"]
+        },
+        "exportDeclaration.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#exportDeclarationtrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extendsClause.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#extendsClausepreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "forInStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forInStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "forInStatement.singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementsingleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forInStatement.spaceAfterForKeyword": {
+          "description": "Whether to add a space after the `for` keyword in a \"for in\" statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementspaceAfterForKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "forInStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "forInStatement.useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forInStatementuseBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forOfStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forOfStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "forOfStatement.singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementsingleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forOfStatement.spaceAfterForKeyword": {
+          "description": "Whether to add a space after the `for` keyword in a \"for of\" statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementspaceAfterForKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "forOfStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "forOfStatement.useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forOfStatementuseBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "forStatement.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "forStatement.singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementsingleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forStatement.spaceAfterForKeyword": {
+          "description": "Whether to add a space after the `for` keyword in a \"for\" statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementspaceAfterForKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "forStatement.spaceAfterSemiColons": {
+          "description": "Whether to add a space after the semi-colons in a \"for\" statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementspaceAfterSemiColons>",
+          "type": ["boolean", "null"]
+        },
+        "forStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "forStatement.useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#forStatementuseBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "functionDeclaration.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#functionDeclarationbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "functionDeclaration.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a function declaration.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#functionDeclarationspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "functionExpression.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#functionExpressionbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "functionExpression.spaceAfterFunctionKeyword": {
+          "description": "Whether to add a space after the function keyword of a function expression.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#functionExpressionspaceAfterFunctionKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "functionExpression.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a function expression.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#functionExpressionspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "getAccessor.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#getAccessorbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "getAccessor.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a get accessor.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#getAccessorspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "ifStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ifStatement.nextControlFlowPosition": {
+          "description": "Where to place the next control flow within a control flow statement.\n\nDefault: `\"sameLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementnextControlFlowPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ifStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "ifStatement.singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementsingleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ifStatement.spaceAfterIfKeyword": {
+          "description": "Whether to add a space after the `if` keyword in an \"if\" statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementspaceAfterIfKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "ifStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "ifStatement.useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ifStatementuseBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ignoreFileCommentText": {
+          "description": "The text to use for a file ignore comment (ex. `// dprint-ignore-file`).\n\nDefault: `\"dprint-ignore-file\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ignoreFileCommentText>",
+          "type": ["string", "null"]
+        },
+        "ignoreNodeCommentText": {
+          "description": "The text to use for an ignore comment (ex. `// dprint-ignore`).\n\nDefault: `\"dprint-ignore\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#ignoreNodeCommentText>",
+          "type": ["string", "null"]
+        },
+        "implementsClause.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#implementsClausepreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "importDeclaration.forceMultiLine": {
+          "description": "If code import/export specifiers should be forced to be on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationforceMultiLine>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ForceMultiLine"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "importDeclaration.forceSingleLine": {
+          "description": "If code should be forced to be on a single line if able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationforceSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "importDeclaration.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "importDeclaration.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "importDeclaration.sortNamedImports": {
+          "description": "The kind of sort ordering to use.\n\nDefault: `\"caseInsensitive\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationsortNamedImports>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortImportDeclarations"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "importDeclaration.sortTypeOnlyImports": {
+          "description": "The kind of sort ordering to use for typed imports and exports.\n\nDefault: `\"none\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationsortTypeOnlyImports>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortTypeOnlyExports"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "importDeclaration.spaceSurroundingNamedImports": {
+          "description": "Whether to add spaces around named imports in an import declaration.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationspaceSurroundingNamedImports>",
+          "type": ["boolean", "null"]
+        },
+        "importDeclaration.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#importDeclarationtrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "indentWidth": {
+          "description": "The number of columns for an indent.\n\nDefault: `2`\n\nSee: <https://dprint.dev/plugins/typescript/config/#indentWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "interfaceDeclaration.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#interfaceDeclarationbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsx.bracketPosition": {
+          "description": "If the end angle bracket of a jsx open element or self closing element should be on the same or next line when the attributes span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxbracketPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsx.forceNewLinesSurroundingContent": {
+          "description": "Forces newlines surrounding the content of JSX elements.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxforceNewLinesSurroundingContent>",
+          "type": ["boolean", "null"]
+        },
+        "jsx.multiLineParens": {
+          "description": "Surrounds the top-most JSX element or fragment in parentheses when it spans multiple lines.\n\nDefault: `\"prefer\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxmultiLineParens>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MultiLineParens"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsx.quoteStyle": {
+          "description": "How to use single or double quotes in JSX attributes.\n\nDefault: `\"preferDouble\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxquoteStyle>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuoteStyleKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsxAttributes.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxAttributespreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "jsxAttributes.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxAttributespreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "jsxElement.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxElementpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "jsxExpressionContainer.spaceSurroundingExpression": {
+          "description": "Whether to add a space surrounding the expression of a JSX container.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxExpressionContainerspaceSurroundingExpression>",
+          "type": ["boolean", "null"]
+        },
+        "jsxOpeningElement.bracketPosition": {
+          "description": "If the end angle bracket of a jsx open element or self closing element should be on the same or next line when the attributes span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxOpeningElementbracketPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsxSelfClosingElement.bracketPosition": {
+          "description": "If the end angle bracket of a jsx open element or self closing element should be on the same or next line when the attributes span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxSelfClosingElementbracketPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jsxSelfClosingElement.spaceBeforeSlash": {
+          "description": "Whether to add a space before a JSX element's slash when self closing.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#jsxSelfClosingElementspaceBeforeSlash>",
+          "type": ["boolean", "null"]
+        },
+        "lineWidth": {
+          "description": "The width of a line the printer will try to stay under. Note that the printer may exceed this width in certain cases.\n\nDefault: `120`\n\nSee: <https://dprint.dev/plugins/typescript/config/#lineWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "mappedType.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#mappedTypepreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "memberExpression.linePerExpression": {
+          "description": "Whether to force a line per expression when spanning multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#memberExpressionlinePerExpression>",
+          "type": ["boolean", "null"]
+        },
+        "memberExpression.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#memberExpressionpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "method.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#methodbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a method.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#methodspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "module.sortExportDeclarations": {
+          "description": "The kind of sort ordering to use.\n\nDefault: `\"caseInsensitive\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#modulesortExportDeclarations>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortImportDeclarations"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "module.sortImportDeclarations": {
+          "description": "The kind of sort ordering to use.\n\nDefault: `\"caseInsensitive\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#modulesortImportDeclarations>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SortImportDeclarations"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "moduleDeclaration.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#moduleDeclarationbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "newLineKind": {
+          "description": "The kind of newline to use.\n\nDefault: `\"lf\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#newLineKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewLineKind2"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "nextControlFlowPosition": {
+          "description": "Where to place the next control flow within a control flow statement.\n\nDefault: `\"sameLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#nextControlFlowPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objectExpression.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectExpressionpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "objectExpression.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectExpressionpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "objectExpression.spaceSurroundingProperties": {
+          "description": "Whether to add a space surrounding the properties of a single line object expression.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectExpressionspaceSurroundingProperties>",
+          "type": ["boolean", "null"]
+        },
+        "objectExpression.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectExpressiontrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objectPattern.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectPatternpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "objectPattern.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectPatternpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "objectPattern.spaceSurroundingProperties": {
+          "description": "Whether to add a space surrounding the properties of a single line object pattern.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectPatternspaceSurroundingProperties>",
+          "type": ["boolean", "null"]
+        },
+        "objectPattern.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#objectPatterntrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operatorPosition": {
+          "description": "Where to place the operator for expressions that span multiple lines.\n\nDefault: `\"nextLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#operatorPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameters.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parameterspreferHanging>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreferHanging"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameters.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parameterspreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "parameters.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parametersspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "parameters.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parameterstrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parenExpression.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parenExpressionspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "parentheses.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#parenthesespreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#preferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#preferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "quoteProps": {
+          "description": "Change when properties in objects are quoted.\n\nDefault: `\"preserve\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#quoteProps>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuoteProps"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quoteStyle": {
+          "description": "How to use single or double quotes.\n\nDefault: `\"alwaysDouble\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#quoteStyle>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuoteStyle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semiColons": {
+          "description": "How semi-colons should be used.\n\nDefault: `\"prefer\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#semiColons>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemiColons"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sequenceExpression.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#sequenceExpressionpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "setAccessor.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#setAccessorbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "setAccessor.spaceBeforeParentheses": {
+          "description": "Whether to add a space before the parentheses of a set accessor.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#setAccessorspaceBeforeParentheses>",
+          "type": ["boolean", "null"]
+        },
+        "singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#singleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#spaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "spaceSurroundingProperties": {
+          "description": "Whether to add a space surrounding the properties of single line object-like nodes.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#spaceSurroundingProperties>",
+          "type": ["boolean", "null"]
+        },
+        "staticBlock.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#staticBlockbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "switchCase.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#switchCasebracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "switchStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#switchStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "switchStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#switchStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "switchStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#switchStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "taggedTemplate.spaceBeforeLiteral": {
+          "description": "Whether to add a space before the literal in a tagged template.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#taggedTemplatespaceBeforeLiteral>",
+          "type": ["boolean", "null"]
+        },
+        "trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#trailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tryStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tryStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tryStatement.nextControlFlowPosition": {
+          "description": "Where to place the next control flow within a control flow statement.\n\nDefault: `\"sameLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tryStatementnextControlFlowPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tupleType.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tupleTypepreferHanging>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreferHanging"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tupleType.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tupleTypepreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "tupleType.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tupleTypespaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "tupleType.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#tupleTypetrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeAnnotation.spaceBeforeColon": {
+          "description": "Whether to add a space before the colon of a type annotation.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeAnnotationspaceBeforeColon>",
+          "type": ["boolean", "null"]
+        },
+        "typeAssertion.spaceBeforeExpression": {
+          "description": "Whether to add a space before the expression in a type assertion.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeAssertionspaceBeforeExpression>",
+          "type": ["boolean", "null"]
+        },
+        "typeLiteral.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "typeLiteral.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "typeLiteral.separatorKind": {
+          "description": "The kind of separator to use in type literals.\n\nDefault: `\"semiColon\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralseparatorKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SeparatorKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeLiteral.separatorKind.multiLine": {
+          "description": "The kind of separator to use in type literals.\n\nDefault: `\"semiColon\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralseparatorKindmultiLine>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SeparatorKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeLiteral.separatorKind.singleLine": {
+          "description": "The kind of separator to use in type literals.\n\nDefault: `\"semiColon\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralseparatorKindsingleLine>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SeparatorKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeLiteral.spaceSurroundingProperties": {
+          "description": "Whether to add a space surrounding the properties of a single line type literal.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteralspaceSurroundingProperties>",
+          "type": ["boolean", "null"]
+        },
+        "typeLiteral.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeLiteraltrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeParameters.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `\"never\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeParameterspreferHanging>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PreferHanging"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typeParameters.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeParameterspreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "typeParameters.trailingCommas": {
+          "description": "If trailing commas should be used.\n\nDefault: `\"onlyMultiLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#typeParameterstrailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unionAndIntersectionType.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#unionAndIntersectionTypepreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "unionAndIntersectionType.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#unionAndIntersectionTypepreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#useBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "useTabs": {
+          "description": "Whether to use tabs (true) or spaces (false).\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#useTabs>",
+          "type": ["boolean", "null"]
+        },
+        "variableStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#variableStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "variableStatement.preferSingleLine": {
+          "description": "If code should revert back from being on multiple lines to being on a single line when able.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#variableStatementpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "whileStatement.bracePosition": {
+          "description": "Where to place the opening brace.\n\nDefault: `\"sameLineUnlessHanging\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementbracePosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BracePosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "whileStatement.preferHanging": {
+          "description": "Set to prefer hanging indentation when exceeding the line width instead of making code split up on multiple lines.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementpreferHanging>",
+          "type": ["boolean", "null"]
+        },
+        "whileStatement.singleBodyPosition": {
+          "description": "Where to place the expression of a statement that could possibly be on one line (ex. `if (true) console.log(5);`).\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementsingleBodyPosition>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperatorPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "whileStatement.spaceAfterWhileKeyword": {
+          "description": "Whether to add a space after the `while` keyword in a while statement.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementspaceAfterWhileKeyword>",
+          "type": ["boolean", "null"]
+        },
+        "whileStatement.spaceAround": {
+          "description": "Whether to place spaces around enclosed expressions.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementspaceAround>",
+          "type": ["boolean", "null"]
+        },
+        "whileStatement.useBraces": {
+          "description": "If braces should be used or not.\n\nDefault: `\"whenNotSingleLine\"`\n\nSee: <https://dprint.dev/plugins/typescript/config/#whileStatementuseBraces>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UseBraces"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "PreferHanging": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Always prefers hanging regardless of the number of elements.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Only prefers hanging if there is a single item.",
+          "type": "string",
+          "const": "onlySingleItem"
+        },
+        {
+          "description": "Never prefers hanging.",
+          "type": "string",
+          "const": "never"
+        }
+      ]
+    },
+    "TrailingCommas": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Trailing commas should not be used.",
+          "type": "string",
+          "const": "never"
+        },
+        {
+          "description": "Trailing commas should always be used.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Trailing commas should only be used in multi-line scenarios.",
+          "type": "string",
+          "const": "onlyMultiLine"
+        }
+      ]
+    },
+    "BracePosition": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Maintains the brace being on the next line or the same line.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Forces the brace to be on the same line.",
+          "type": "string",
+          "const": "sameLine"
+        },
+        {
+          "description": "Forces the brace to be on the next line.",
+          "type": "string",
+          "const": "nextLine"
+        },
+        {
+          "description": "Forces the brace to be on the next line if the same line is hanging, but otherwise uses the same line.",
+          "type": "string",
+          "const": "sameLineUnlessHanging"
+        }
+      ]
+    },
+    "UseParentheses": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Forces parentheses.",
+          "type": "string",
+          "const": "force"
+        },
+        {
+          "description": "Maintains the current state of the parentheses.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Prefers not using parentheses when possible.",
+          "type": "string",
+          "const": "preferNone"
+        }
+      ]
+    },
+    "OperatorPosition": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Maintains the position of the expression.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Forces the whole statement to be on one line.",
+          "type": "string",
+          "const": "sameLine"
+        },
+        {
+          "description": "Forces the expression to be on the next line.",
+          "type": "string",
+          "const": "nextLine"
+        }
+      ]
+    },
+    "MemberSpacing": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Forces a new line between members.",
+          "type": "string",
+          "const": "newLine"
+        },
+        {
+          "description": "Forces a blank line between members.",
+          "type": "string",
+          "const": "blankLine"
+        },
+        {
+          "description": "Maintains whether a newline or blankline is used.",
+          "type": "string",
+          "const": "maintain"
+        }
+      ]
+    },
+    "ForceMultiLine": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["always", "never"]
+        },
+        {
+          "description": "Force multiple lines only if importing more than one thing.",
+          "type": "string",
+          "const": "whenMultiple"
+        }
+      ]
+    },
+    "SortImportDeclarations": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Maintains the current ordering.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Alphabetically and case sensitive.",
+          "type": "string",
+          "const": "caseSensitive"
+        },
+        {
+          "description": "Alphabetically and case insensitive.",
+          "type": "string",
+          "const": "caseInsensitive"
+        }
+      ]
+    },
+    "SortTypeOnlyExports": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Puts type-only named imports and exports first.",
+          "type": "string",
+          "const": "first"
+        },
+        {
+          "description": "Puts type-only named imports and exports last.",
+          "type": "string",
+          "const": "last"
+        },
+        {
+          "description": "Does not sort based on if a type-only named import or export.",
+          "type": "string",
+          "const": "none"
+        }
+      ]
+    },
+    "UseBraces": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Uses braces if they're used. Doesn't use braces if they're not used.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Uses braces when the body is on a different line.",
+          "type": "string",
+          "const": "whenNotSingleLine"
+        },
+        {
+          "description": "Forces the use of braces. Will add them if they aren't used.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Forces no braces when the header is one line and body is one line. Otherwise forces braces.",
+          "type": "string",
+          "const": "preferNone"
+        }
+      ]
+    },
+    "MultiLineParens": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Never wrap JSX with parentheses.",
+          "type": "string",
+          "const": "never"
+        },
+        {
+          "description": "Prefer wrapping with parentheses in most scenarios, except in function arguments and JSX attributes.",
+          "type": "string",
+          "const": "prefer"
+        },
+        {
+          "description": "Always wrap JSX with parentheses if it spans multiple lines.",
+          "type": "string",
+          "const": "always"
+        }
+      ]
+    },
+    "QuoteStyleKind": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Prefers using double quotes except in scenarios where the string contains more double quotes than single quotes.",
+          "type": "string",
+          "const": "preferDouble"
+        },
+        {
+          "description": "Prefers using single quotes except in scenarios where the string contains more single quotes than double quotes.",
+          "type": "string",
+          "const": "preferSingle"
+        }
+      ]
+    },
+    "NewLineKind2": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "For each file, uses the last newline kind found in the file.",
+          "type": "string",
+          "const": "auto"
+        },
+        {
+          "description": "Uses carriage return, line feed.",
+          "type": "string",
+          "const": "crlf"
+        },
+        {
+          "description": "Uses line feed.",
+          "type": "string",
+          "const": "lf"
+        },
+        {
+          "description": "Uses the system standard (ex. crlf on Windows).",
+          "type": "string",
+          "const": "system"
+        }
+      ]
+    },
+    "QuoteProps": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Remove unnecessary quotes around property names.",
+          "type": "string",
+          "const": "asNeeded"
+        },
+        {
+          "description": "Same as 'asNeeded', but if one property requires quotes then quote them all.",
+          "type": "string",
+          "const": "consistent"
+        },
+        {
+          "description": "Preserve quotes around property names.",
+          "type": "string",
+          "const": "preserve"
+        }
+      ]
+    },
+    "QuoteStyle": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Always uses double quotes.",
+          "type": "string",
+          "const": "alwaysDouble"
+        },
+        {
+          "description": "Always uses single quotes.",
+          "type": "string",
+          "const": "alwaysSingle"
+        },
+        {
+          "description": "Prefers using double quotes except in scenarios where the string contains more double quotes than single quotes.",
+          "type": "string",
+          "const": "preferDouble"
+        },
+        {
+          "description": "Prefers using single quotes except in scenarios where the string contains more single quotes than double quotes.",
+          "type": "string",
+          "const": "preferSingle"
+        }
+      ]
+    },
+    "SemiColons": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Always uses semi-colons where applicable.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Prefers semi-colons, but doesn't add one in certain scenarios such as for the last member of a single-line type literal.",
+          "type": "string",
+          "const": "prefer"
+        },
+        {
+          "description": "Uses automatic semi-colon insertion. Only adds a semi-colon at the start of some expression statements when necessary. Read more: <https://standardjs.com/rules.html#semicolons>",
+          "type": "string",
+          "const": "asi"
+        }
+      ]
+    },
+    "SeparatorKind": {
+      "description": "See: <https://dprint.dev/plugins/typescript/config/>",
+      "oneOf": [
+        {
+          "description": "Use semi-colons.",
+          "type": "string",
+          "const": "semiColon"
+        },
+        {
+          "description": "Use commas.",
+          "type": "string",
+          "const": "comma"
+        }
+      ]
+    },
+    "JsonConfig": {
+      "title": "JSON Plugin Configuration",
+      "description": "Configuration for the dprint [JSON](https://dprint.dev/plugins/json/config/) plugin.\n\nSee: <https://dprint.dev/plugins/json/config/>",
+      "type": "object",
+      "properties": {
+        "locked": {
+          "description": "Whether the configuration is not allowed to be overridden or extended.",
+          "type": ["boolean", "null"]
+        },
+        "associations": {
+          "description": "File patterns to associate with this plugin.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "array.preferSingleLine": {
+          "description": "If arrays and objects should collapse to a single line if it would be below the line width.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/json/config/#arraypreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "commentLine.forceSpaceAfterSlashes": {
+          "description": "Forces a space after slashes.  For example: `// comment` instead of `//comment`\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/json/config/#commentLineforceSpaceAfterSlashes>",
+          "type": ["boolean", "null"]
+        },
+        "deno": {
+          "description": "Top level configuration that sets the configuration to what is used in Deno.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/json/config/#deno>",
+          "type": ["boolean", "null"]
+        },
+        "ignoreNodeCommentText": {
+          "description": "The text to use for an ignore comment (ex. `// dprint-ignore`).\n\nDefault: `\"dprint-ignore\"`\n\nSee: <https://dprint.dev/plugins/json/config/#ignoreNodeCommentText>",
+          "type": ["string", "null"]
+        },
+        "indentWidth": {
+          "description": "The number of characters for an indent.\n\nDefault: `2`\n\nSee: <https://dprint.dev/plugins/json/config/#indentWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "jsonTrailingCommaFiles": {
+          "description": "When `trailingCommas` is `jsonc`, treat these files as JSONC and use trailing commas (ex. `[\"tsconfig.json\", \".vscode/settings.json\"]`).\n\nSee: <https://dprint.dev/plugins/json/config/#jsonTrailingCommaFiles>",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "lineWidth": {
+          "description": "The width of a line the printer will try to stay under. Note that the printer may exceed this width in certain cases.\n\nDefault: `120`\n\nSee: <https://dprint.dev/plugins/json/config/#lineWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "newLineKind": {
+          "description": "The kind of newline to use.\n\nDefault: `\"lf\"`\n\nSee: <https://dprint.dev/plugins/json/config/#newLineKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewLineKind3"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "object.preferSingleLine": {
+          "description": "If arrays and objects should collapse to a single line if it would be below the line width.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/json/config/#objectpreferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "preferSingleLine": {
+          "description": "If arrays and objects should collapse to a single line if it would be below the line width.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/json/config/#preferSingleLine>",
+          "type": ["boolean", "null"]
+        },
+        "trailingCommas": {
+          "description": "Whether to use trailing commas.\n\nDefault: `\"jsonc\"`\n\nSee: <https://dprint.dev/plugins/json/config/#trailingCommas>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrailingCommas2"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "useTabs": {
+          "description": "Whether to use tabs (true) or spaces (false).\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/json/config/#useTabs>",
+          "type": ["boolean", "null"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "NewLineKind3": {
+      "description": "See: <https://dprint.dev/plugins/json/config/>",
+      "oneOf": [
+        {
+          "description": "For each file, uses the newline kind found at the end of the last line.",
+          "type": "string",
+          "const": "auto"
+        },
+        {
+          "description": "Uses carriage return, line feed.",
+          "type": "string",
+          "const": "crlf"
+        },
+        {
+          "description": "Uses line feed.",
+          "type": "string",
+          "const": "lf"
+        },
+        {
+          "description": "Uses the system standard (ex. crlf on Windows).",
+          "type": "string",
+          "const": "system"
+        }
+      ]
+    },
+    "TrailingCommas2": {
+      "description": "See: <https://dprint.dev/plugins/json/config/>",
+      "oneOf": [
+        {
+          "description": "Always format with trailing commas. Beware: trailing commas can cause many JSON parsers to fail.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Use trailing commas in JSONC files and do not use trailing commas in JSON files.",
+          "type": "string",
+          "const": "jsonc"
+        },
+        {
+          "description": "Keep the trailing comma if it exists.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Never format with trailing commas.",
+          "type": "string",
+          "const": "never"
+        }
+      ]
+    },
+    "TomlConfig": {
+      "title": "TOML Plugin Configuration",
+      "description": "Configuration for the dprint [TOML](https://dprint.dev/plugins/toml/config/) plugin.\n\nSee: <https://dprint.dev/plugins/toml/config/>",
+      "type": "object",
+      "properties": {
+        "locked": {
+          "description": "Whether the configuration is not allowed to be overridden or extended.",
+          "type": ["boolean", "null"]
+        },
+        "associations": {
+          "description": "File patterns to associate with this plugin.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "cargo.applyConventions": {
+          "description": "Whether to apply sorting to a Cargo.toml file.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/toml/config/#cargoapplyConventions>",
+          "type": ["boolean", "null"]
+        },
+        "comment.forceLeadingSpace": {
+          "description": "Whether to force a leading space in a comment.\n\nDefault: `true`\n\nSee: <https://dprint.dev/plugins/toml/config/#commentforceLeadingSpace>",
+          "type": ["boolean", "null"]
+        },
+        "indentWidth": {
+          "description": "The number of characters for an indent.\n\nDefault: `2`\n\nSee: <https://dprint.dev/plugins/toml/config/#indentWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "lineWidth": {
+          "description": "The width of a line the printer will try to stay under. Note that the printer may exceed this width in certain cases.\n\nDefault: `120`\n\nSee: <https://dprint.dev/plugins/toml/config/#lineWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "newLineKind": {
+          "description": "The kind of newline to use.\n\nDefault: `\"lf\"`\n\nSee: <https://dprint.dev/plugins/toml/config/#newLineKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewLineKind4"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "useTabs": {
+          "description": "Whether to use tabs (true) or spaces (false).\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/toml/config/#useTabs>",
+          "type": ["boolean", "null"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "NewLineKind4": {
+      "description": "See: <https://dprint.dev/plugins/toml/config/>",
+      "oneOf": [
+        {
+          "description": "For each file, uses the newline kind found at the end of the last line.",
+          "type": "string",
+          "const": "auto"
+        },
+        {
+          "description": "Uses carriage return, line feed.",
+          "type": "string",
+          "const": "crlf"
+        },
+        {
+          "description": "Uses line feed.",
+          "type": "string",
+          "const": "lf"
+        },
+        {
+          "description": "Uses the system standard (ex. crlf on Windows).",
+          "type": "string",
+          "const": "system"
+        }
+      ]
+    },
+    "MarkdownConfig": {
+      "title": "Markdown Plugin Configuration",
+      "description": "Configuration for the dprint [Markdown](https://dprint.dev/plugins/markdown/config/) plugin.\n\nSee: <https://dprint.dev/plugins/markdown/config/>",
+      "type": "object",
+      "properties": {
+        "locked": {
+          "description": "Whether the configuration is not allowed to be overridden or extended.",
+          "type": ["boolean", "null"]
+        },
+        "associations": {
+          "description": "File patterns to associate with this plugin.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "deno": {
+          "description": "Top level configuration that sets the configuration to what is used in Deno.\n\nDefault: `false`\n\nSee: <https://dprint.dev/plugins/markdown/config/#deno>",
+          "type": ["boolean", "null"]
+        },
+        "emphasisKind": {
+          "description": "The character to use for emphasis/italics.\n\nDefault: `\"underscores\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#emphasisKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrongKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "headingKind": {
+          "description": "The style of heading to use for level 1 and level 2 headings. Level 3 and higher always use ATX headings.\n\nDefault: `\"atx\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#headingKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HeadingKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ignoreDirective": {
+          "description": "The text to use for an ignore directive (ex. `<!-- dprint-ignore -->`).\n\nDefault: `\"dprint-ignore\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#ignoreDirective>",
+          "type": ["string", "null"]
+        },
+        "ignoreEndDirective": {
+          "description": "The text to use for an ignore end directive (ex. `<!-- dprint-ignore-end -->`).\n\nDefault: `\"dprint-ignore-end\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#ignoreEndDirective>",
+          "type": ["string", "null"]
+        },
+        "ignoreFileDirective": {
+          "description": "The text to use for an ignore file directive (ex. `<!-- dprint-ignore-file -->`).\n\nDefault: `\"dprint-ignore-file\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#ignoreFileDirective>",
+          "type": ["string", "null"]
+        },
+        "ignoreStartDirective": {
+          "description": "The text to use for an ignore start directive (ex. `<!-- dprint-ignore-start -->`).\n\nDefault: `\"dprint-ignore-start\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#ignoreStartDirective>",
+          "type": ["string", "null"]
+        },
+        "lineWidth": {
+          "description": "The width of a line the printer will try to stay under. Note that the printer may exceed this width in certain cases.\n\nDefault: `80`\n\nSee: <https://dprint.dev/plugins/markdown/config/#lineWidth>",
+          "type": ["integer", "null"],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "newLineKind": {
+          "description": "The kind of newline to use.\n\nDefault: `\"lf\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#newLineKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NewLineKind5"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "strongKind": {
+          "description": "The character to use for strong emphasis/bold.\n\nDefault: `\"asterisks\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#strongKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StrongKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tags": {
+          "description": "Custom tag to file extension mappings for formatting code blocks. For example: { \"markdown\": \"md\" }\n\nSee: <https://dprint.dev/plugins/markdown/config/#tags>",
+          "type": ["object", "null"],
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "textWrap": {
+          "description": "Text wrapping possibilities.\n\nDefault: `\"maintain\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#textWrap>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TextWrap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unorderedListKind": {
+          "description": "The character to use for unordered lists.\n\nDefault: `\"dashes\"`\n\nSee: <https://dprint.dev/plugins/markdown/config/#unorderedListKind>",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UnorderedListKind"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "StrongKind": {
+      "description": "See: <https://dprint.dev/plugins/markdown/config/>",
+      "oneOf": [
+        {
+          "description": "Uses asterisks (*) for emphasis.",
+          "type": "string",
+          "const": "asterisks"
+        },
+        {
+          "description": "Uses underscores (_) for emphasis.",
+          "type": "string",
+          "const": "underscores"
+        }
+      ]
+    },
+    "HeadingKind": {
+      "description": "See: <https://dprint.dev/plugins/markdown/config/>",
+      "oneOf": [
+        {
+          "description": "Uses # or ## before the heading text (ATX headings).",
+          "type": "string",
+          "const": "atx"
+        },
+        {
+          "description": "Uses an underline of = or - beneath the heading text (setext headings). Only applies to level 1 and 2 headings.",
+          "type": "string",
+          "const": "setext"
+        }
+      ]
+    },
+    "NewLineKind5": {
+      "description": "See: <https://dprint.dev/plugins/markdown/config/>",
+      "oneOf": [
+        {
+          "description": "For each file, uses the newline kind found at the end of the last line.",
+          "type": "string",
+          "const": "auto"
+        },
+        {
+          "description": "Uses carriage return, line feed.",
+          "type": "string",
+          "const": "crlf"
+        },
+        {
+          "description": "Uses line feed.",
+          "type": "string",
+          "const": "lf"
+        },
+        {
+          "description": "Uses the system standard (ex. crlf on Windows).",
+          "type": "string",
+          "const": "system"
+        }
+      ]
+    },
+    "TextWrap": {
+      "description": "See: <https://dprint.dev/plugins/markdown/config/>",
+      "oneOf": [
+        {
+          "description": "Always wraps text.",
+          "type": "string",
+          "const": "always"
+        },
+        {
+          "description": "Maintains line breaks.",
+          "type": "string",
+          "const": "maintain"
+        },
+        {
+          "description": "Never wraps text.",
+          "type": "string",
+          "const": "never"
+        }
+      ]
+    },
+    "UnorderedListKind": {
+      "description": "See: <https://dprint.dev/plugins/markdown/config/>",
+      "oneOf": [
+        {
+          "description": "Uses dashes (-) as primary character for lists.",
+          "type": "string",
+          "const": "dashes"
+        },
+        {
+          "description": "Uses asterisks (*) as primary character for lists.",
+          "type": "string",
+          "const": "asterisks"
+        }
+      ]
+    },
+    "PluginConfig": {
+      "title": "Plugin Configuration",
+      "description": "Configuration for a dprint plugin not covered by the typed plugin\nstructs.\n\nKnown plugins (`typescript`, `json`, `toml`, `markdown`) have dedicated\ntyped structs. This catch-all is used for any other plugin name.",
+      "type": "object",
+      "properties": {
+        "locked": {
+          "title": "Locked",
+          "description": "Prevent properties in this plugin section from being overridden by\nextended configurations.",
+          "type": ["boolean", "null"]
+        },
+        "associations": {
+          "title": "File Associations",
+          "description": "File patterns to associate with this plugin.",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "examples": [["**/*.myconfig", ".myconfigrc"]]
+        }
+      },
+      "additionalProperties": true
     }
   }
 }

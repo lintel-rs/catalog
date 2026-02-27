@@ -1,18 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "catalog.json",
-  "description": "Schema catalog index that maps file patterns to JSON Schema URLs.\n\nA catalog is a collection of schema entries used by editors and tools to\nautomatically associate files with the correct schema for validation and\ncompletion. Follows the SchemaStore catalog format.\n\nSee: <https://json.schemastore.org/schema-catalog.json>",
+  "title": "Schema Catalog",
+  "description": "Schema catalog index that maps file patterns to JSON Schema URLs.\n\nA catalog is a collection of schema entries used by editors and tools to\nautomatically associate files with the correct schema for validation and\ncompletion. Follows the `SchemaStore` catalog format.\n\nSee: <https://json.schemastore.org/schema-catalog.json>",
   "type": "object",
   "properties": {
+    "$schema": {
+      "description": "The `$schema` URL for this catalog. Defaults to the Lintel catalog schema.",
+      "type": ["string", "null"],
+      "default": null
+    },
     "version": {
-      "description": "The catalog format version. Currently always `1`.",
+      "description": "The catalog format version.",
       "type": "integer",
       "format": "uint32",
-      "minimum": 0
+      "minimum": 0,
+      "default": 1
     },
     "title": {
       "description": "An optional human-readable title for the catalog.",
-      "type": ["string", "null"]
+      "type": ["string", "null"],
+      "default": null
     },
     "schemas": {
       "description": "The list of schema entries in this catalog.",
@@ -26,10 +33,11 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/CatalogGroup"
-      }
+      },
+      "default": []
     }
   },
-  "required": ["version", "schemas"],
+  "required": ["schemas"],
   "$defs": {
     "SchemaEntry": {
       "title": "Schema Entry",
@@ -43,7 +51,8 @@
         },
         "description": {
           "description": "A short description of what the schema validates.",
-          "type": "string"
+          "type": "string",
+          "default": ""
         },
         "url": {
           "description": "The URL where the schema can be fetched.",
@@ -71,7 +80,7 @@
           }
         }
       },
-      "required": ["name", "description", "url"]
+      "required": ["name", "url"]
     },
     "CatalogGroup": {
       "title": "Schema Group",

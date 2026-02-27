@@ -7,7 +7,7 @@
 }:
 
 let
-  lintelPkgs = inputs.lintel.packages.${pkgs.system};
+  lintelPkgs = inputs.lintel.packages.${pkgs.stdenv.hostPlatform.system};
   lintel = lintelPkgs.default;
   lintel-catalog-builder = lintelPkgs.lintel-catalog-builder;
 in

@@ -2,14 +2,15 @@
 
 [catalog]
 title = "Lintel Catalog"
+source-base-url = "https://raw.githubusercontent.com/lintel-rs/catalog/master"
 
 [target.default]
-type = "dir"
 dir = ".lintel-output/default"
 base-url = "https://catalog.lintel.tools/"
 
 [target.default.site]
 description = "The default schema catalog for Lintel, the multi-format JSON Schema linter for all your config files."
+ga-tracking-id = "G-2YYZC8ZK47"
 github.cname = "catalog.lintel.tools"
 
 [sources.schemastore]
