@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Schema Catalog",
   "description": "Schema catalog index that maps file patterns to JSON Schema URLs.\n\nA catalog is a collection of schema entries used by editors and tools to\nautomatically associate files with the correct schema for validation and\ncompletion. Follows the `SchemaStore` catalog format.\n\nSee: <https://json.schemastore.org/schema-catalog.json>",
+  "x-lintel": {
+    "fileMatch": ["catalog.json", "**/catalog.json"]
+  },
   "type": "object",
   "properties": {
     "$schema": {

@@ -1,5 +1,4 @@
 # :schema ./schemas/lintel/lintel-catalog-toml.json
-
 [catalog]
 title = "Lintel Catalog"
 source-base-url = "https://raw.githubusercontent.com/lintel-rs/catalog/master"
@@ -37,8 +36,14 @@ name = "Ads"
 description = "IAB Tech Lab digital advertising specifications"
 
 [groups.ads.schemas.sellers]
-description = "IAB Tech Lab sellers.json supply chain transparency file"
-file-match = ["sellers.json", "**/sellers.json"]
+
+[groups.ast-grep]
+name = "ast-grep"
+description = "ast-grep project configuration and rule files"
+
+[groups.biome]
+name = "Biome"
+description = "Biome formatter, linter, and code analysis tool"
 
 [groups.biome.schemas.biome]
 description = "Biome configuration file"
@@ -113,79 +118,25 @@ url = "https://biomejs.dev/schemas/latest/schema.json"
 "2.4.3" = "https://biomejs.dev/schemas/2.4.3/schema.json"
 "2.4.4" = "https://biomejs.dev/schemas/2.4.4/schema.json"
 
+[groups.claude-code]
+name = "Claude Code"
+description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
+
 [groups.claude-code.schemas.agent]
-description = "Claude Code subagent definition frontmatter"
-file-match = ["**/.claude/agents/*.md", ".claude/agents/*.md"]
+[groups.claude-code.schemas.command]
+[groups.claude-code.schemas.marketplace]
+[groups.claude-code.schemas.plugin]
+[groups.claude-code.schemas.skill]
+
+[groups.devenv]
+name = "devenv"
+description = "Nix-based development environment configuration"
 
 [groups.devenv.schemas.devenv]
 name = "devenv.yaml"
 description = "devenv configuration file"
 file-match = ["devenv.yaml", "**/devenv.yaml"]
 url = "https://devenv.sh/devenv.schema.json"
-
-[groups.kysely.schemas.kysely-codegen]
-description = "kysely-codegen TypeScript type generation configuration"
-file-match = [".kysely-codegenrc.json", "**/.kysely-codegenrc.json"]
-
-[groups.lintel.schemas.catalog]
-description = "Schema catalog index file"
-file-match = ["catalog.json", "**/catalog.json"]
-
-[groups.rust.schemas.clippy]
-description = "Clippy lint configuration"
-file-match = [
-  "clippy.toml",
-  ".clippy.toml",
-  "**/clippy.toml",
-  "**/.clippy.toml",
-]
-
-[groups.claude-code.schemas.command]
-description = "Claude Code slash command frontmatter"
-file-match = [
-  "**/.claude/commands/*.md",
-  ".claude/commands/*.md",
-  "**/commands/*.md",
-]
-
-[groups.lintel.schemas.lintel-catalog-toml]
-description = "Lintel catalog builder configuration"
-file-match = ["lintel-catalog.toml", "**/lintel-catalog.toml"]
-
-[groups.claude-code.schemas.marketplace]
-description = "Claude Code plugin marketplace catalog"
-file-match = [
-  "**/.claude-plugin/marketplace.json",
-  ".claude-plugin/marketplace.json",
-]
-
-[groups.lintel.schemas.lintel-toml]
-description = "Lintel validator configuration"
-file-match = ["lintel.toml", "**/lintel.toml"]
-
-[groups.ast-grep]
-name = "ast-grep"
-description = "ast-grep project configuration and rule files"
-
-[groups.claude-code.schemas.plugin]
-description = "Claude Code plugin manifest"
-file-match = ["**/.claude-plugin/plugin.json", ".claude-plugin/plugin.json"]
-
-[groups.biome]
-name = "Biome"
-description = "Biome formatter, linter, and code analysis tool"
-
-[groups.claude-code.schemas.skill]
-description = "Claude Code skill definition frontmatter"
-file-match = ["**/skills/*/SKILL.md", "**/skills/*.md", ".claude/skills/*.md"]
-
-[groups.claude-code]
-name = "Claude Code"
-description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
-
-[groups.devenv]
-name = "devenv"
-description = "Nix-based development environment configuration"
 
 [groups.github]
 name = "GitHub"
@@ -195,13 +146,21 @@ description = "GitHub Actions workflows, Dependabot, issue templates, and other 
 name = "Kysely"
 description = "Kysely SQL query builder tooling and code generation"
 
+[groups.kysely.schemas.kysely-codegen]
+
 [groups.lintel]
 name = "Lintel"
 description = "Lintel configuration files"
 
+[groups.lintel.schemas.catalog]
+[groups.lintel.schemas.lintel-catalog-toml]
+[groups.lintel.schemas.lintel-toml]
+
 [groups.rust]
 name = "Rust"
 description = "Rust toolchain configuration: Cargo, Clippy, rustfmt, and rust-toolchain"
+
+[groups.rust.schemas.clippy]
 
 [groups.schemastore]
 name = "SchemaStore"

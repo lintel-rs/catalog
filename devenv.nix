@@ -29,9 +29,6 @@ in
     nixfmt = {
       enable = true;
     };
-    taplo = {
-      enable = true;
-    };
     lintel = {
       enable = true;
       name = "lintel";
