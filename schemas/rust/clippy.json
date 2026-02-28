@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Clippy Configuration",
-  "description": "Configuration file for [Clippy](https://doc.rust-lang.org/clippy/), the Rust linter. Placed at `clippy.toml` or `.clippy.toml` in the project root.\n\nSee the [lint configuration reference](https://doc.rust-lang.org/stable/clippy/lint_configuration.html) for full documentation.\n\nArray options support the special `\"..\"` element to extend the default list rather than replacing it.",
+  "description": "Configuration file for [Clippy](https://doc.rust-lang.org/clippy/), the Rust linter.\n\n## Overview\n\nClippy can be configured using a `clippy.toml` or `.clippy.toml` file at the project root. The configuration file is searched for in this order:\n\n1. The directory specified by `CLIPPY_CONF_DIR`\n2. The directory specified by `CARGO_MANIFEST_DIR`\n3. The current directory\n\nConfiguration uses simple `variable = value` mapping:\n\n```toml\navoid-breaking-exported-api = false\ndisallowed-names = [\"toto\", \"tata\", \"titi\"]\nmsrv = \"1.70.0\"\n```\n\nFor array options with defaults, use `\"..\"` to extend the default list rather than replacing it:\n\n```toml\n# default of disallowed-names is [\"foo\", \"baz\", \"quux\"]\ndisallowed-names = [\"bar\", \"..\"] # -> [\"bar\", \"foo\", \"baz\", \"quux\"]\n```\n\nSee the [Clippy Configuration guide](https://doc.rust-lang.org/clippy/configuration.html) for full details on configuring Clippy.\n\nAll lint configuration options listed here are sourced from the [Lint Configuration reference](https://doc.rust-lang.org/clippy/lint_configuration.html). This schema will be updated as that source page is updated.",
   "x-lintel": {
     "catalogDescription": "Configuration for Clippy, the Rust linter.",
     "fileMatch": [
@@ -14,7 +14,7 @@
   "type": "object",
   "properties": {
     "absolute-paths-allowed-crates": {
-      "description": "Which crates to allow absolute paths from. Use with the `absolute_paths` lint.",
+      "description": "Which crates to allow absolute paths from.\n\n**Affected lints:** [`absolute_paths`](https://rust-lang.github.io/rust-clippy/master/index.html#absolute_paths)",
       "type": "array",
       "items": {
         "type": "string"
@@ -22,78 +22,78 @@
       "default": []
     },
     "absolute-paths-max-segments": {
-      "description": "The maximum number of segments a path can have before being linted. Use with the `absolute_paths` lint.",
+      "description": "The maximum number of segments a path can have before being linted.\n\n**Affected lints:** [`absolute_paths`](https://rust-lang.github.io/rust-clippy/master/index.html#absolute_paths)",
       "type": "integer",
       "minimum": 0,
       "default": 2
     },
     "accept-comment-above-attributes": {
-      "description": "Whether to accept a safety comment above the attributes for an `unsafe` block.",
+      "description": "Whether to accept a safety comment above the attributes for an `unsafe` block.\n\n**Affected lints:** [`undocumented_unsafe_blocks`](https://rust-lang.github.io/rust-clippy/master/index.html#undocumented_unsafe_blocks)",
       "type": "boolean",
       "default": true
     },
     "accept-comment-above-statement": {
-      "description": "Whether to accept a safety comment above the statement containing an `unsafe` block.",
+      "description": "Whether to accept a safety comment above the statement containing an `unsafe` block.\n\n**Affected lints:** [`undocumented_unsafe_blocks`](https://rust-lang.github.io/rust-clippy/master/index.html#undocumented_unsafe_blocks)",
       "type": "boolean",
       "default": true
     },
     "allow-comparison-to-zero": {
-      "description": "Don't lint when comparing the result of a modulo operation to zero.",
+      "description": "Don't lint when comparing the result of a modulo operation to zero.\n\n**Affected lints:** [`modulo_arithmetic`](https://rust-lang.github.io/rust-clippy/master/index.html#modulo_arithmetic)",
       "type": "boolean",
       "default": true
     },
     "allow-dbg-in-tests": {
-      "description": "Whether `dbg!` should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether `dbg!` should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`dbg_macro`](https://rust-lang.github.io/rust-clippy/master/index.html#dbg_macro)",
       "type": "boolean",
       "default": false
     },
     "allow-exact-repetitions": {
-      "description": "Whether to allow items with the same name as the containing module.",
+      "description": "Whether to allow items with the same name as the containing module.\n\n**Affected lints:** [`module_name_repetitions`](https://rust-lang.github.io/rust-clippy/master/index.html#module_name_repetitions)",
       "type": "boolean",
       "default": true
     },
     "allow-expect-in-consts": {
-      "description": "Whether `expect` should be allowed within `const` blocks evaluated at compile time.",
+      "description": "Whether `expect` should be allowed within `const` blocks evaluated at compile time.\n\n**Affected lints:** [`expect_used`](https://rust-lang.github.io/rust-clippy/master/index.html#expect_used)",
       "type": "boolean",
       "default": true
     },
     "allow-expect-in-tests": {
-      "description": "Whether `expect` should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether `expect` should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`expect_used`](https://rust-lang.github.io/rust-clippy/master/index.html#expect_used)",
       "type": "boolean",
       "default": false
     },
     "allow-indexing-slicing-in-tests": {
-      "description": "Whether indexing and slicing should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether indexing and slicing should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`indexing_slicing`](https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing)",
       "type": "boolean",
       "default": false
     },
     "allow-mixed-uninlined-format-args": {
-      "description": "Whether to allow mixed uninlined format args, e.g. `format!(\"{} {x}\", x.y)`.",
+      "description": "Whether to allow mixed uninlined format args, e.g. `format!(\"{} {x}\", x.y)`.\n\n**Affected lints:** [`uninlined_format_args`](https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args)",
       "type": "boolean",
       "default": true
     },
     "allow-one-hash-in-raw-strings": {
-      "description": "Whether to allow `r#\"\"#` when `r\"\"` can be used.",
+      "description": "Whether to allow `r#\"\"#` when `r\"\"` can be used.\n\n**Affected lints:** [`needless_raw_string_hashes`](https://rust-lang.github.io/rust-clippy/master/index.html#needless_raw_string_hashes)",
       "type": "boolean",
       "default": false
     },
     "allow-panic-in-tests": {
-      "description": "Whether `panic` should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether `panic` should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`panic`](https://rust-lang.github.io/rust-clippy/master/index.html#panic)",
       "type": "boolean",
       "default": false
     },
     "allow-print-in-tests": {
-      "description": "Whether print macros (e.g. `println!`) should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether print macros (e.g. `println!`) should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`print_stderr`](https://rust-lang.github.io/rust-clippy/master/index.html#print_stderr), [`print_stdout`](https://rust-lang.github.io/rust-clippy/master/index.html#print_stdout)",
       "type": "boolean",
       "default": false
     },
     "allow-private-module-inception": {
-      "description": "Whether to allow module inception if the module is not public.",
+      "description": "Whether to allow module inception if the module is not public.\n\n**Affected lints:** [`module_inception`](https://rust-lang.github.io/rust-clippy/master/index.html#module_inception)",
       "type": "boolean",
       "default": false
     },
     "allow-renamed-params-for": {
-      "description": "List of trait paths for which renamed parameter names are allowed. Supports the `\"..\"` element to extend the default list.",
+      "description": "List of trait paths for which renamed parameter names are allowed. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`renamed_function_params`](https://rust-lang.github.io/rust-clippy/master/index.html#renamed_function_params)",
       "type": "array",
       "items": {
         "type": "string"
@@ -105,22 +105,22 @@
       ]
     },
     "allow-unwrap-in-consts": {
-      "description": "Whether `unwrap` should be allowed within `const` blocks evaluated at compile time.",
+      "description": "Whether `unwrap` should be allowed within `const` blocks evaluated at compile time.\n\n**Affected lints:** [`unwrap_used`](https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_used)",
       "type": "boolean",
       "default": true
     },
     "allow-unwrap-in-tests": {
-      "description": "Whether `unwrap` should be allowed in test functions or `#[cfg(test)]` code.",
+      "description": "Whether `unwrap` should be allowed in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`unwrap_used`](https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_used)",
       "type": "boolean",
       "default": false
     },
     "allow-useless-vec-in-tests": {
-      "description": "Whether `useless_vec` should be ignored in test functions or `#[cfg(test)]` code.",
+      "description": "Whether `useless_vec` should be ignored in test functions or `#[cfg(test)]` code.\n\n**Affected lints:** [`useless_vec`](https://rust-lang.github.io/rust-clippy/master/index.html#useless_vec)",
       "type": "boolean",
       "default": false
     },
     "allowed-dotfiles": {
-      "description": "Additional dotfiles (files or directories starting with a dot) to allow.",
+      "description": "Additional dotfiles (files or directories starting with a dot) to allow.\n\n**Affected lints:** [`path_ends_with_ext`](https://rust-lang.github.io/rust-clippy/master/index.html#path_ends_with_ext)",
       "type": "array",
       "items": {
         "type": "string"
@@ -128,7 +128,7 @@
       "default": []
     },
     "allowed-duplicate-crates": {
-      "description": "A list of crate names that are allowed to have multiple versions in the dependency tree.",
+      "description": "A list of crate names that are allowed to have multiple versions in the dependency tree.\n\n**Affected lints:** [`multiple_crate_versions`](https://rust-lang.github.io/rust-clippy/master/index.html#multiple_crate_versions)",
       "type": "array",
       "items": {
         "type": "string"
@@ -136,7 +136,7 @@
       "default": []
     },
     "allowed-idents-below-min-chars": {
-      "description": "Identifiers that are allowed to be shorter than `min-ident-chars-threshold`. Supports the `\"..\"` element to extend the default list.",
+      "description": "Identifiers that are allowed to be shorter than `min-ident-chars-threshold`. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`min_ident_chars`](https://rust-lang.github.io/rust-clippy/master/index.html#min_ident_chars)",
       "type": "array",
       "items": {
         "type": "string"
@@ -144,7 +144,7 @@
       "default": ["i", "j", "x", "y", "z", "w", "n"]
     },
     "allowed-prefixes": {
-      "description": "List of prefixes to allow when checking for module name repetitions. Supports the `\"..\"` element to extend the default list.",
+      "description": "List of prefixes to allow when checking for module name repetitions. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`module_name_repetitions`](https://rust-lang.github.io/rust-clippy/master/index.html#module_name_repetitions)",
       "type": "array",
       "items": {
         "type": "string"
@@ -152,7 +152,7 @@
       "default": ["to", "as", "into", "from", "try_into", "try_from"]
     },
     "allowed-scripts": {
-      "description": "The list of Unicode scripts allowed in identifiers. Supports the `\"..\"` element to extend the default list.",
+      "description": "The list of Unicode scripts allowed in identifiers. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`disallowed_script_idents`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_script_idents)",
       "type": "array",
       "items": {
         "type": "string"
@@ -160,7 +160,7 @@
       "default": ["Latin"]
     },
     "allowed-wildcard-imports": {
-      "description": "List of path segments allowed to have wildcard imports (e.g. `prelude`).",
+      "description": "List of path segments allowed to have wildcard imports (e.g. `prelude`).\n\n**Affected lints:** [`wildcard_imports`](https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports)",
       "type": "array",
       "items": {
         "type": "string"
@@ -168,7 +168,7 @@
       "default": []
     },
     "arithmetic-side-effects-allowed": {
-      "description": "Types to allow arithmetic operations on without linting. Supports the `\"..\"` element to extend the default list.",
+      "description": "Types to allow arithmetic operations on without linting. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`arithmetic_side_effects`](https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects)",
       "type": "array",
       "items": {
         "type": "string"
@@ -176,7 +176,7 @@
       "default": []
     },
     "arithmetic-side-effects-allowed-binary": {
-      "description": "Pairs of types `[left, right]` for which binary arithmetic operations are allowed. Use `\"*\"` as a wildcard to match any type.",
+      "description": "Pairs of types `[left, right]` for which binary arithmetic operations are allowed. Use `\"*\"` as a wildcard to match any type.\n\n**Affected lints:** [`arithmetic_side_effects`](https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects)",
       "type": "array",
       "items": {
         "type": "array",
@@ -189,7 +189,7 @@
       "default": []
     },
     "arithmetic-side-effects-allowed-unary": {
-      "description": "Types for which unary arithmetic operations (negation, `!`) are allowed.",
+      "description": "Types for which unary arithmetic operations (negation, `!`) are allowed.\n\n**Affected lints:** [`arithmetic_side_effects`](https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects)",
       "type": "array",
       "items": {
         "type": "string"
@@ -197,18 +197,18 @@
       "default": []
     },
     "array-size-threshold": {
-      "description": "The maximum allowed size (in bytes) for arrays on the stack.",
+      "description": "The maximum allowed size (in bytes) for arrays on the stack.\n\n**Affected lints:** [`large_const_arrays`](https://rust-lang.github.io/rust-clippy/master/index.html#large_const_arrays), [`large_stack_arrays`](https://rust-lang.github.io/rust-clippy/master/index.html#large_stack_arrays)",
       "type": "integer",
       "minimum": 0,
       "default": 16384
     },
     "avoid-breaking-exported-api": {
-      "description": "Suppress lints whenever the suggested fix would cause breakage for other crates.",
+      "description": "Suppress lints whenever the suggested fix would cause breakage for other crates.\n\n**Affected lints:** [`box_collection`](https://rust-lang.github.io/rust-clippy/master/index.html#box_collection), [`enum_variant_names`](https://rust-lang.github.io/rust-clippy/master/index.html#enum_variant_names), [`large_types_passed_by_value`](https://rust-lang.github.io/rust-clippy/master/index.html#large_types_passed_by_value), [`linkedlist`](https://rust-lang.github.io/rust-clippy/master/index.html#linkedlist), [`needless_pass_by_ref_mut`](https://rust-lang.github.io/rust-clippy/master/index.html#needless_pass_by_ref_mut), [`option_option`](https://rust-lang.github.io/rust-clippy/master/index.html#option_option), [`owned_cow`](https://rust-lang.github.io/rust-clippy/master/index.html#owned_cow), [`rc_buffer`](https://rust-lang.github.io/rust-clippy/master/index.html#rc_buffer), [`rc_mutex`](https://rust-lang.github.io/rust-clippy/master/index.html#rc_mutex), [`redundant_allocation`](https://rust-lang.github.io/rust-clippy/master/index.html#redundant_allocation), [`ref_option`](https://rust-lang.github.io/rust-clippy/master/index.html#ref_option), [`single_call_fn`](https://rust-lang.github.io/rust-clippy/master/index.html#single_call_fn), [`trivially_copy_pass_by_ref`](https://rust-lang.github.io/rust-clippy/master/index.html#trivially_copy_pass_by_ref), [`unnecessary_box_returns`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_box_returns), [`unnecessary_wraps`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_wraps), [`unused_self`](https://rust-lang.github.io/rust-clippy/master/index.html#unused_self), [`upper_case_acronyms`](https://rust-lang.github.io/rust-clippy/master/index.html#upper_case_acronyms), [`vec_box`](https://rust-lang.github.io/rust-clippy/master/index.html#vec_box), [`wrong_self_convention`](https://rust-lang.github.io/rust-clippy/master/index.html#wrong_self_convention)",
       "type": "boolean",
       "default": true
     },
     "await-holding-invalid-types": {
-      "description": "Types that may not be held across `.await` points.",
+      "description": "Types that may not be held across `.await` points.\n\n**Affected lints:** [`await_holding_invalid_type`](https://rust-lang.github.io/rust-clippy/master/index.html#await_holding_invalid_type)",
       "type": "array",
       "items": {
         "oneOf": [
@@ -224,39 +224,39 @@
       "default": []
     },
     "cargo-ignore-publish": {
-      "description": "For internal testing only. Whether to ignore the `publish` field in `Cargo.toml`.",
+      "description": "For internal testing only. Whether to ignore the `publish` field in `Cargo.toml`.\n\n**Affected lints:** [`cargo_common_metadata`](https://rust-lang.github.io/rust-clippy/master/index.html#cargo_common_metadata)",
       "type": "boolean",
       "default": false
     },
     "check-incompatible-msrv-in-tests": {
-      "description": "Whether to also check MSRV compatibility in test code.",
+      "description": "Whether to also check MSRV compatibility in test code.\n\n**Affected lints:** [`incompatible_msrv`](https://rust-lang.github.io/rust-clippy/master/index.html#incompatible_msrv)",
       "type": "boolean",
       "default": false
     },
     "check-inconsistent-struct-field-initializers": {
-      "description": "Whether to suggest reordering constructor fields when some have shorthand initializers.",
+      "description": "Whether to suggest reordering constructor fields when some have shorthand initializers.\n\n**Affected lints:** [`inconsistent_struct_constructor`](https://rust-lang.github.io/rust-clippy/master/index.html#inconsistent_struct_constructor)",
       "type": "boolean",
       "default": false
     },
     "check-private-items": {
-      "description": "Whether to also run the applicable lint on private items.",
+      "description": "Whether to also run the applicable lint on private items.\n\n**Affected lints:** [`missing_errors_doc`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_errors_doc), [`missing_panics_doc`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_panics_doc), [`missing_safety_doc`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_safety_doc), [`unnecessary_safety_doc`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_safety_doc)",
       "type": "boolean",
       "default": false
     },
     "cognitive-complexity-threshold": {
-      "description": "The maximum cognitive complexity a function can have.",
+      "description": "The maximum cognitive complexity a function can have.\n\n**Affected lints:** [`cognitive_complexity`](https://rust-lang.github.io/rust-clippy/master/index.html#cognitive_complexity)",
       "type": "integer",
       "minimum": 0,
       "default": 25
     },
     "const-literal-digits-threshold": {
-      "description": "Minimum number of digits in a float literal in a const context before linting.",
+      "description": "Minimum number of digits in a float literal in a const context before linting.\n\n**Affected lints:** [`excessive_precision`](https://rust-lang.github.io/rust-clippy/master/index.html#excessive_precision)",
       "type": "integer",
       "minimum": 0,
       "default": 30
     },
     "disallowed-macros": {
-      "description": "List of macros that are not allowed to be used. Each entry can be a path string or an object with additional metadata.",
+      "description": "List of macros that are not allowed to be used. Each entry can be a path string or an object with additional metadata.\n\n**Affected lints:** [`disallowed_macros`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_macros)",
       "type": "array",
       "items": {
         "oneOf": [
@@ -272,7 +272,7 @@
       "default": []
     },
     "disallowed-methods": {
-      "description": "List of methods that are not allowed to be used. Each entry can be a path string or an object with additional metadata.",
+      "description": "List of methods that are not allowed to be used. Each entry can be a path string or an object with additional metadata.\n\n**Affected lints:** [`disallowed_methods`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_methods)",
       "type": "array",
       "items": {
         "oneOf": [
@@ -288,7 +288,7 @@
       "default": []
     },
     "disallowed-names": {
-      "description": "List of disallowed variable names (e.g. placeholder names). Supports the `\"..\"` element to extend the default list.",
+      "description": "List of disallowed variable names (e.g. placeholder names). Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`disallowed_names`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_names)",
       "type": "array",
       "items": {
         "type": "string"
@@ -296,7 +296,7 @@
       "default": ["foo", "baz", "quux"]
     },
     "disallowed-types": {
-      "description": "List of types that are not allowed to be used. Each entry can be a path string or an object with additional metadata.",
+      "description": "List of types that are not allowed to be used. Each entry can be a path string or an object with additional metadata.\n\n**Affected lints:** [`disallowed_types`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_types)",
       "type": "array",
       "items": {
         "oneOf": [
@@ -312,7 +312,7 @@
       "default": []
     },
     "doc-valid-idents": {
-      "description": "List of identifiers that are valid in documentation without backtick quoting. Supports the `\"..\"` element to extend the default list.",
+      "description": "List of identifiers that are valid in documentation without backtick quoting. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`doc_markdown`](https://rust-lang.github.io/rust-clippy/master/index.html#doc_markdown)",
       "type": "array",
       "items": {
         "type": "string"
@@ -395,17 +395,17 @@
       ]
     },
     "enable-raw-pointer-heuristic-for-send": {
-      "description": "Whether to apply the raw pointer heuristic to determine if a type is `Send`.",
+      "description": "Whether to apply the raw pointer heuristic to determine if a type is `Send`.\n\n**Affected lints:** [`non_send_fields_in_send_ty`](https://rust-lang.github.io/rust-clippy/master/index.html#non_send_fields_in_send_ty)",
       "type": "boolean",
       "default": true
     },
     "enforce-iter-loop-reborrow": {
-      "description": "Whether to recommend using implicit `into_iter()` for reborrowed values in `for` loops.",
+      "description": "Whether to recommend using implicit `into_iter()` for reborrowed values in `for` loops.\n\n**Affected lints:** [`explicit_iter_loop`](https://rust-lang.github.io/rust-clippy/master/index.html#explicit_iter_loop)",
       "type": "boolean",
       "default": false
     },
     "enforced-import-renames": {
-      "description": "List of imports that must always be renamed. Each entry specifies a path and its required rename.",
+      "description": "List of imports that must always be renamed. Each entry specifies a path and its required rename.\n\n**Affected lints:** [`missing_enforced_import_renames`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_enforced_import_renames)",
       "type": "array",
       "items": {
         "$ref": "#/$defs/ImportRename"
@@ -413,31 +413,31 @@
       "default": []
     },
     "enum-variant-name-threshold": {
-      "description": "The minimum number of enum variants for the enum variant name lints to trigger.",
+      "description": "The minimum number of enum variants for the enum variant name lints to trigger.\n\n**Affected lints:** [`enum_variant_names`](https://rust-lang.github.io/rust-clippy/master/index.html#enum_variant_names)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "enum-variant-size-threshold": {
-      "description": "The maximum size (in bytes) of an enum variant before suggesting boxing.",
+      "description": "The maximum size (in bytes) of an enum variant before suggesting boxing.\n\n**Affected lints:** [`large_enum_variant`](https://rust-lang.github.io/rust-clippy/master/index.html#large_enum_variant)",
       "type": "integer",
       "minimum": 0,
       "default": 200
     },
     "excessive-nesting-threshold": {
-      "description": "The maximum block nesting depth allowed before linting.",
+      "description": "The maximum block nesting depth allowed before linting.\n\n**Affected lints:** [`excessive_nesting`](https://rust-lang.github.io/rust-clippy/master/index.html#excessive_nesting)",
       "type": "integer",
       "minimum": 0,
       "default": 0
     },
     "future-size-threshold": {
-      "description": "The maximum byte size of a `Future` before linting.",
+      "description": "The maximum byte size of a `Future` before linting.\n\n**Affected lints:** [`large_futures`](https://rust-lang.github.io/rust-clippy/master/index.html#large_futures)",
       "type": "integer",
       "minimum": 0,
       "default": 16384
     },
     "ignore-interior-mutability": {
-      "description": "Types to treat as if they have no interior mutability. Supports the `\"..\"` element to extend the default list.",
+      "description": "Types to treat as if they have no interior mutability. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`borrow_interior_mutable_const`](https://rust-lang.github.io/rust-clippy/master/index.html#borrow_interior_mutable_const), [`declare_interior_mutable_const`](https://rust-lang.github.io/rust-clippy/master/index.html#declare_interior_mutable_const), [`ifs_same_cond`](https://rust-lang.github.io/rust-clippy/master/index.html#ifs_same_cond), [`mutable_key_type`](https://rust-lang.github.io/rust-clippy/master/index.html#mutable_key_type)",
       "type": "array",
       "items": {
         "type": "string"
@@ -445,13 +445,13 @@
       "default": ["bytes::Bytes"]
     },
     "inherent-impl-lint-scope": {
-      "description": "The scope for checking duplicate inherent implementations.",
+      "description": "The scope for checking duplicate inherent implementations.\n\n**Affected lints:** [`multiple_inherent_impl`](https://rust-lang.github.io/rust-clippy/master/index.html#multiple_inherent_impl)",
       "type": "string",
       "enum": ["crate", "file", "module"],
       "default": "crate"
     },
     "large-error-ignored": {
-      "description": "Error types to ignore for the `result_large_err` lint.",
+      "description": "Error types to ignore for the `result_large_err` lint.\n\n**Affected lints:** [`result_large_err`](https://rust-lang.github.io/rust-clippy/master/index.html#result_large_err)",
       "type": "array",
       "items": {
         "type": "string"
@@ -459,76 +459,76 @@
       "default": []
     },
     "large-error-threshold": {
-      "description": "The maximum size (in bytes) of the `Err` variant in a `Result` type.",
+      "description": "The maximum size (in bytes) of the `Err` variant in a `Result` type.\n\n**Affected lints:** [`result_large_err`](https://rust-lang.github.io/rust-clippy/master/index.html#result_large_err)",
       "type": "integer",
       "minimum": 0,
       "default": 128
     },
     "lint-commented-code": {
-      "description": "Whether to lint collapsible `if`/`else` chains that contain comments between them.",
+      "description": "Whether to lint collapsible `if`/`else` chains that contain comments between them.\n\n**Affected lints:** [`collapsible_else_if`](https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_else_if), [`collapsible_if`](https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_if)",
       "type": "boolean",
       "default": false
     },
     "literal-representation-threshold": {
-      "description": "The lower bound for linting decimal literals that are not human-readable.",
+      "description": "The lower bound for linting decimal literals that are not human-readable.\n\n**Affected lints:** [`decimal_literal_representation`](https://rust-lang.github.io/rust-clippy/master/index.html#decimal_literal_representation)",
       "type": "integer",
       "minimum": 0,
       "default": 16384
     },
     "matches-for-let-else": {
-      "description": "Which kind of `match` arms to consider when linting `manual_let_else`.",
+      "description": "Which kind of `match` arms to consider when linting `manual_let_else`.\n\n**Affected lints:** [`manual_let_else`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_let_else)",
       "type": "string",
       "enum": ["WellKnownTypes", "Simple", "All"],
       "default": "WellKnownTypes"
     },
     "max-fn-params-bools": {
-      "description": "The maximum number of boolean parameters a function can have.",
+      "description": "The maximum number of boolean parameters a function can have.\n\n**Affected lints:** [`fn_params_excessive_bools`](https://rust-lang.github.io/rust-clippy/master/index.html#fn_params_excessive_bools)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "max-include-file-size": {
-      "description": "The maximum size (in bytes) of a file included via `include_bytes!` or `include_str!`.",
+      "description": "The maximum size (in bytes) of a file included via `include_bytes!` or `include_str!`.\n\n**Affected lints:** [`large_include_file`](https://rust-lang.github.io/rust-clippy/master/index.html#large_include_file)",
       "type": "integer",
       "minimum": 0,
       "default": 1000000
     },
     "max-struct-bools": {
-      "description": "The maximum number of boolean fields a struct can have.",
+      "description": "The maximum number of boolean fields a struct can have.\n\n**Affected lints:** [`struct_excessive_bools`](https://rust-lang.github.io/rust-clippy/master/index.html#struct_excessive_bools)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "max-suggested-slice-pattern-length": {
-      "description": "The maximum number of elements in a suggested slice pattern.",
+      "description": "The maximum number of elements in a suggested slice pattern.\n\n**Affected lints:** [`index_refutable_slice`](https://rust-lang.github.io/rust-clippy/master/index.html#index_refutable_slice)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "max-trait-bounds": {
-      "description": "The maximum number of trait bounds before suggesting a trait alias.",
+      "description": "The maximum number of trait bounds before suggesting a trait alias.\n\n**Affected lints:** [`type_repetition_in_bounds`](https://rust-lang.github.io/rust-clippy/master/index.html#type_repetition_in_bounds)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "min-ident-chars-threshold": {
-      "description": "Minimum number of characters an identifier must have. Identifiers shorter than this are linted.",
+      "description": "Minimum number of characters an identifier must have. Identifiers shorter than this are linted.\n\n**Affected lints:** [`min_ident_chars`](https://rust-lang.github.io/rust-clippy/master/index.html#min_ident_chars)",
       "type": "integer",
       "minimum": 0,
       "default": 1
     },
     "missing-docs-allow-unused": {
-      "description": "Whether to allow underscore-prefixed fields to skip documentation.",
+      "description": "Whether to allow underscore-prefixed fields to skip documentation.\n\n**Affected lints:** [`missing_docs_in_private_items`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_docs_in_private_items)",
       "type": "boolean",
       "default": false
     },
     "missing-docs-in-crate-items": {
-      "description": "Whether to only check items visible within the current crate for missing documentation.",
+      "description": "Whether to only check items visible within the current crate for missing documentation.\n\n**Affected lints:** [`missing_docs_in_private_items`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_docs_in_private_items)",
       "type": "boolean",
       "default": false
     },
     "module-item-order-groupings": {
-      "description": "Named groupings of source item kinds for the `arbitrary_source_item_ordering` lint. Each entry defines a group name and the item kinds it contains.",
+      "description": "Named groupings of source item kinds for the `arbitrary_source_item_ordering` lint. Each entry defines a group name and the item kinds it contains.\n\n**Affected lints:** [`arbitrary_source_item_ordering`](https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering)",
       "type": "array",
       "items": {
         "$ref": "#/$defs/ModuleItemOrderGrouping"
@@ -573,50 +573,50 @@
       ]
     },
     "module-items-ordered-within-groupings": {
-      "description": "Whether items within groupings must be ordered alphabetically. Can be `\"none\"`, `\"all\"`, or a specific grouping name.",
+      "description": "Whether items within groupings must be ordered alphabetically. Can be `\"none\"`, `\"all\"`, or a specific grouping name.\n\n**Affected lints:** [`arbitrary_source_item_ordering`](https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering)",
       "type": "string",
       "default": "none"
     },
     "msrv": {
-      "description": "The minimum supported Rust version. Clippy will take this into account when suggesting alternatives that require a newer version. Use a version string like `\"1.70.0\"`.",
+      "description": "The minimum supported Rust version. Clippy will take this into account when suggesting alternatives that require a newer version. Use a version string like `\"1.70.0\"`. You can also omit the patch version: `\"1.70\"` equals `\"1.70.0\"`.\n\n**Affected lints:** [`allow_attributes`](https://rust-lang.github.io/rust-clippy/master/index.html#allow_attributes), [`allow_attributes_without_reason`](https://rust-lang.github.io/rust-clippy/master/index.html#allow_attributes_without_reason), [`almost_complete_range`](https://rust-lang.github.io/rust-clippy/master/index.html#almost_complete_range), [`approx_constant`](https://rust-lang.github.io/rust-clippy/master/index.html#approx_constant), [`assigning_clones`](https://rust-lang.github.io/rust-clippy/master/index.html#assigning_clones), [`borrow_as_ptr`](https://rust-lang.github.io/rust-clippy/master/index.html#borrow_as_ptr), [`cast_abs_to_unsigned`](https://rust-lang.github.io/rust-clippy/master/index.html#cast_abs_to_unsigned), [`checked_conversions`](https://rust-lang.github.io/rust-clippy/master/index.html#checked_conversions), [`cloned_instead_of_copied`](https://rust-lang.github.io/rust-clippy/master/index.html#cloned_instead_of_copied), [`collapsible_match`](https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_match), [`collapsible_str_replace`](https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_str_replace), [`deprecated_cfg_attr`](https://rust-lang.github.io/rust-clippy/master/index.html#deprecated_cfg_attr), [`derivable_impls`](https://rust-lang.github.io/rust-clippy/master/index.html#derivable_impls), [`err_expect`](https://rust-lang.github.io/rust-clippy/master/index.html#err_expect), [`filter_map_next`](https://rust-lang.github.io/rust-clippy/master/index.html#filter_map_next), [`from_over_into`](https://rust-lang.github.io/rust-clippy/master/index.html#from_over_into), [`if_then_some_else_none`](https://rust-lang.github.io/rust-clippy/master/index.html#if_then_some_else_none), [`index_refutable_slice`](https://rust-lang.github.io/rust-clippy/master/index.html#index_refutable_slice), [`inefficient_to_string`](https://rust-lang.github.io/rust-clippy/master/index.html#inefficient_to_string), [`io_other_error`](https://rust-lang.github.io/rust-clippy/master/index.html#io_other_error), [`iter_kv_map`](https://rust-lang.github.io/rust-clippy/master/index.html#iter_kv_map), [`legacy_numeric_constants`](https://rust-lang.github.io/rust-clippy/master/index.html#legacy_numeric_constants), [`len_zero`](https://rust-lang.github.io/rust-clippy/master/index.html#len_zero), [`lines_filter_map_ok`](https://rust-lang.github.io/rust-clippy/master/index.html#lines_filter_map_ok), [`manual_abs_diff`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_abs_diff), [`manual_bits`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_bits), [`manual_c_str_literals`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_c_str_literals), [`manual_clamp`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_clamp), [`manual_div_ceil`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_div_ceil), [`manual_flatten`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_flatten), [`manual_hash_one`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_hash_one), [`manual_is_ascii_check`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_ascii_check), [`manual_is_power_of_two`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_power_of_two), [`manual_let_else`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_let_else), [`manual_midpoint`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_midpoint), [`manual_non_exhaustive`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_non_exhaustive), [`manual_option_as_slice`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_option_as_slice), [`manual_pattern_char_comparison`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_pattern_char_comparison), [`manual_range_contains`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_range_contains), [`manual_rem_euclid`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_rem_euclid), [`manual_repeat_n`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_repeat_n), [`manual_retain`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_retain), [`manual_slice_fill`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_slice_fill), [`manual_slice_size_calculation`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_slice_size_calculation), [`manual_split_once`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_split_once), [`manual_str_repeat`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_str_repeat), [`manual_strip`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_strip), [`manual_try_fold`](https://rust-lang.github.io/rust-clippy/master/index.html#manual_try_fold), [`map_clone`](https://rust-lang.github.io/rust-clippy/master/index.html#map_clone), [`map_unwrap_or`](https://rust-lang.github.io/rust-clippy/master/index.html#map_unwrap_or), [`map_with_unused_argument_over_ranges`](https://rust-lang.github.io/rust-clippy/master/index.html#map_with_unused_argument_over_ranges), [`match_like_matches_macro`](https://rust-lang.github.io/rust-clippy/master/index.html#match_like_matches_macro), [`mem_replace_option_with_some`](https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_option_with_some), [`mem_replace_with_default`](https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_with_default), [`missing_const_for_fn`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_const_for_fn), [`needless_borrow`](https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrow), [`non_std_lazy_statics`](https://rust-lang.github.io/rust-clippy/master/index.html#non_std_lazy_statics), [`option_as_ref_deref`](https://rust-lang.github.io/rust-clippy/master/index.html#option_as_ref_deref), [`or_fun_call`](https://rust-lang.github.io/rust-clippy/master/index.html#or_fun_call), [`ptr_as_ptr`](https://rust-lang.github.io/rust-clippy/master/index.html#ptr_as_ptr), [`question_mark`](https://rust-lang.github.io/rust-clippy/master/index.html#question_mark), [`redundant_field_names`](https://rust-lang.github.io/rust-clippy/master/index.html#redundant_field_names), [`redundant_static_lifetimes`](https://rust-lang.github.io/rust-clippy/master/index.html#redundant_static_lifetimes), [`repeat_vec_with_capacity`](https://rust-lang.github.io/rust-clippy/master/index.html#repeat_vec_with_capacity), [`same_item_push`](https://rust-lang.github.io/rust-clippy/master/index.html#same_item_push), [`seek_from_current`](https://rust-lang.github.io/rust-clippy/master/index.html#seek_from_current), [`to_digit_is_some`](https://rust-lang.github.io/rust-clippy/master/index.html#to_digit_is_some), [`transmute_ptr_to_ref`](https://rust-lang.github.io/rust-clippy/master/index.html#transmute_ptr_to_ref), [`tuple_array_conversions`](https://rust-lang.github.io/rust-clippy/master/index.html#tuple_array_conversions), [`type_repetition_in_bounds`](https://rust-lang.github.io/rust-clippy/master/index.html#type_repetition_in_bounds), [`unchecked_time_subtraction`](https://rust-lang.github.io/rust-clippy/master/index.html#unchecked_time_subtraction), [`uninlined_format_args`](https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args), [`unnecessary_lazy_evaluations`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_lazy_evaluations), [`unnecessary_unwrap`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_unwrap), [`unnested_or_patterns`](https://rust-lang.github.io/rust-clippy/master/index.html#unnested_or_patterns), [`unused_trait_names`](https://rust-lang.github.io/rust-clippy/master/index.html#unused_trait_names), [`use_self`](https://rust-lang.github.io/rust-clippy/master/index.html#use_self), [`zero_ptr`](https://rust-lang.github.io/rust-clippy/master/index.html#zero_ptr)",
       "type": "string",
       "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
     },
     "pass-by-value-size-limit": {
-      "description": "Minimum size (in bytes) for a type to be passed by reference instead of by value.",
+      "description": "Minimum size (in bytes) for a type to be passed by reference instead of by value.\n\n**Affected lints:** [`large_types_passed_by_value`](https://rust-lang.github.io/rust-clippy/master/index.html#large_types_passed_by_value)",
       "type": "integer",
       "minimum": 0,
       "default": 256
     },
     "pub-underscore-fields-behavior": {
-      "description": "Lint behavior for `pub` fields with underscore-prefixed names.",
+      "description": "Lint behavior for `pub` fields with underscore-prefixed names.\n\n**Affected lints:** [`pub_underscore_fields`](https://rust-lang.github.io/rust-clippy/master/index.html#pub_underscore_fields)",
       "type": "string",
       "enum": ["PubliclyExported", "AllPubFields"],
       "default": "PubliclyExported"
     },
     "recursive-self-in-type-definitions": {
-      "description": "Whether to suggest replacing recursive type references with `Self`.",
+      "description": "Whether to suggest replacing recursive type references with `Self`.\n\n**Affected lints:** [`use_self`](https://rust-lang.github.io/rust-clippy/master/index.html#use_self)",
       "type": "boolean",
       "default": true
     },
     "semicolon-inside-block-ignore-singleline": {
-      "description": "Whether to only lint multiline blocks for semicolons inside blocks.",
+      "description": "Whether to only lint multiline blocks for semicolons inside blocks.\n\n**Affected lints:** [`semicolon_inside_block`](https://rust-lang.github.io/rust-clippy/master/index.html#semicolon_inside_block)",
       "type": "boolean",
       "default": false
     },
     "semicolon-outside-block-ignore-multiline": {
-      "description": "Whether to only lint single-line blocks for semicolons outside blocks.",
+      "description": "Whether to only lint single-line blocks for semicolons outside blocks.\n\n**Affected lints:** [`semicolon_outside_block`](https://rust-lang.github.io/rust-clippy/master/index.html#semicolon_outside_block)",
       "type": "boolean",
       "default": false
     },
     "single-char-binding-names-threshold": {
-      "description": "The maximum number of single-character bindings a scope can have.",
+      "description": "The maximum number of single-character bindings a scope can have.\n\n**Affected lints:** [`many_single_char_names`](https://rust-lang.github.io/rust-clippy/master/index.html#many_single_char_names)",
       "type": "integer",
       "minimum": 0,
       "default": 4
     },
     "source-item-ordering": {
-      "description": "Which source item kinds to check for ordering within modules.",
+      "description": "Which source item kinds to check for ordering within modules.\n\n**Affected lints:** [`arbitrary_source_item_ordering`](https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering)",
       "type": "array",
       "items": {
         "type": "string",
@@ -625,13 +625,13 @@
       "default": ["enum", "impl", "module", "struct", "trait"]
     },
     "stack-size-threshold": {
-      "description": "The maximum stack size (in bytes) a function is allowed to use.",
+      "description": "The maximum stack size (in bytes) a function is allowed to use.\n\n**Affected lints:** [`large_stack_frames`](https://rust-lang.github.io/rust-clippy/master/index.html#large_stack_frames)",
       "type": "integer",
       "minimum": 0,
       "default": 512000
     },
     "standard-macro-braces": {
-      "description": "Enforce specific brace styles for macro invocations. Each entry specifies a macro name and the brace character to enforce.",
+      "description": "Enforce specific brace styles for macro invocations. Each entry specifies a macro name and the brace character to enforce.\n\n**Affected lints:** [`nonstandard_macro_braces`](https://rust-lang.github.io/rust-clippy/master/index.html#nonstandard_macro_braces)",
       "type": "array",
       "items": {
         "$ref": "#/$defs/MacroBrace"
@@ -639,36 +639,36 @@
       "default": []
     },
     "struct-field-name-threshold": {
-      "description": "The minimum number of struct fields for the struct field name lints to trigger.",
+      "description": "The minimum number of struct fields for the struct field name lints to trigger.\n\n**Affected lints:** [`struct_field_names`](https://rust-lang.github.io/rust-clippy/master/index.html#struct_field_names)",
       "type": "integer",
       "minimum": 0,
       "default": 3
     },
     "suppress-restriction-lint-in-const": {
-      "description": "Whether to suppress restriction lints in constant code.",
+      "description": "Whether to suppress restriction lints in constant code.\n\n**Affected lints:** [`indexing_slicing`](https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing)",
       "type": "boolean",
       "default": false
     },
     "too-large-for-stack": {
-      "description": "The maximum object size (in bytes) on the stack before suggesting boxing.",
+      "description": "The maximum object size (in bytes) on the stack before suggesting boxing.\n\n**Affected lints:** [`boxed_local`](https://rust-lang.github.io/rust-clippy/master/index.html#boxed_local), [`useless_vec`](https://rust-lang.github.io/rust-clippy/master/index.html#useless_vec)",
       "type": "integer",
       "minimum": 0,
       "default": 200
     },
     "too-many-arguments-threshold": {
-      "description": "The maximum number of parameters a function can have.",
+      "description": "The maximum number of parameters a function can have.\n\n**Affected lints:** [`too_many_arguments`](https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments)",
       "type": "integer",
       "minimum": 0,
       "default": 7
     },
     "too-many-lines-threshold": {
-      "description": "The maximum number of lines a function body can have.",
+      "description": "The maximum number of lines a function body can have.\n\n**Affected lints:** [`too_many_lines`](https://rust-lang.github.io/rust-clippy/master/index.html#too_many_lines)",
       "type": "integer",
       "minimum": 0,
       "default": 100
     },
     "trait-assoc-item-kinds-order": {
-      "description": "The preferred ordering of associated items in a trait definition.",
+      "description": "The preferred ordering of associated items in a trait definition.\n\n**Affected lints:** [`arbitrary_source_item_ordering`](https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering)",
       "type": "array",
       "items": {
         "type": "string",
@@ -677,51 +677,51 @@
       "default": ["const", "type", "fn"]
     },
     "trivial-copy-size-limit": {
-      "description": "The maximum size (in bytes) of a `Copy` type that can be passed by value. Defaults to `target_pointer_width * 2` when unset.",
+      "description": "The maximum size (in bytes) of a `Copy` type that can be passed by value. Defaults to `target_pointer_width * 2` when unset.\n\n**Affected lints:** [`trivially_copy_pass_by_ref`](https://rust-lang.github.io/rust-clippy/master/index.html#trivially_copy_pass_by_ref)",
       "type": "integer",
       "minimum": 0
     },
     "type-complexity-threshold": {
-      "description": "The maximum complexity score a type can have before being linted.",
+      "description": "The maximum complexity score a type can have before being linted.\n\n**Affected lints:** [`type_complexity`](https://rust-lang.github.io/rust-clippy/master/index.html#type_complexity)",
       "type": "integer",
       "minimum": 0,
       "default": 250
     },
     "unnecessary-box-size": {
-      "description": "The byte size below which `Box<T>` is unnecessary and the value should be unboxed.",
+      "description": "The byte size below which `Box<T>` is unnecessary and the value should be unboxed.\n\n**Affected lints:** [`unnecessary_box_returns`](https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_box_returns)",
       "type": "integer",
       "minimum": 0,
       "default": 128
     },
     "unreadable-literal-lint-fractions": {
-      "description": "Whether to lint the decimal fraction part of float literals for readability.",
+      "description": "Whether to lint the decimal fraction part of float literals for readability.\n\n**Affected lints:** [`unreadable_literal`](https://rust-lang.github.io/rust-clippy/master/index.html#unreadable_literal)",
       "type": "boolean",
       "default": true
     },
     "upper-case-acronyms-aggressive": {
-      "description": "Whether to enable verbose/aggressive mode for upper-case acronym checking.",
+      "description": "Whether to enable verbose/aggressive mode for upper-case acronym checking.\n\n**Affected lints:** [`upper_case_acronyms`](https://rust-lang.github.io/rust-clippy/master/index.html#upper_case_acronyms)",
       "type": "boolean",
       "default": false
     },
     "vec-box-size-threshold": {
-      "description": "The maximum size (in bytes) of a boxed type in a `Vec` before suggesting `Vec<T>` instead.",
+      "description": "The maximum size (in bytes) of a boxed type in a `Vec` before suggesting `Vec<T>` instead.\n\n**Affected lints:** [`vec_box`](https://rust-lang.github.io/rust-clippy/master/index.html#vec_box)",
       "type": "integer",
       "minimum": 0,
       "default": 4096
     },
     "verbose-bit-mask-threshold": {
-      "description": "The maximum bit mask size before suggesting `.trailing_zeros()`.",
+      "description": "The maximum bit mask size before suggesting `.trailing_zeros()`.\n\n**Affected lints:** [`verbose_bit_mask`](https://rust-lang.github.io/rust-clippy/master/index.html#verbose_bit_mask)",
       "type": "integer",
       "minimum": 0,
       "default": 1
     },
     "warn-on-all-wildcard-imports": {
-      "description": "Whether to warn on all wildcard imports, including those from prelude modules.",
+      "description": "Whether to warn on all wildcard imports, including those from prelude modules.\n\n**Affected lints:** [`wildcard_imports`](https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports)",
       "type": "boolean",
       "default": false
     },
     "warn-unsafe-macro-metavars-in-private-macros": {
-      "description": "Whether to warn about unsafe metavariable expansions in private `macro_rules!` macros.",
+      "description": "Whether to warn about unsafe metavariable expansions in private `macro_rules!` macros.\n\n**Affected lints:** [`macro_metavars_in_unsafe`](https://rust-lang.github.io/rust-clippy/master/index.html#macro_metavars_in_unsafe)",
       "type": "boolean",
       "default": false
     }
