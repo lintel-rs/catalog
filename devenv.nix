@@ -21,6 +21,10 @@ in
     lintel-catalog-builder
   ];
 
+  enterTest = ''
+    ${lintel}/bin/lintel check tests/
+  '';
+
   git-hooks.hooks = {
     prettier = {
       enable = true;
@@ -36,6 +40,7 @@ in
       types_or = [
         "json"
         "yaml"
+        "markdown"
       ];
     };
   };

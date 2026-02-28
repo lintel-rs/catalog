@@ -2,6 +2,7 @@
 
 name: review-code
 description: Reviews code for quality, correctness, and adherence to best practices.
+allowed-tools: Read, Grep, Glob, Bash(git diff \*)
 
 ---
 
