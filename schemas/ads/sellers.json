@@ -3,7 +3,8 @@
   "title": "sellers.json",
   "description": "Schema for the [IAB Tech Lab sellers.json](https://iabtechlab.com/sellers-json/) specification (v1.0, July 2019).\n\nsellers.json provides a mechanism for advertising systems to publicly declare the sellers that they represent and those sellers' identifiers within their systems, enabling buyers to discover who the entities are that are either **direct sellers** of or **intermediaries** in the selling of digital advertising.\n\nA published and accessible sellers.json file allows:\n- The identity of the **final seller** of a bid request to be discovered (assuming they are [ads.txt](https://iabtechlab.com/ads-txt/) authorized)\n- The identities of all **nodes** (entities that participated in the bid request) in the [SupplyChain object](https://github.com/InteractiveAdvertisingBureau/openrtb/blob/main/supplychainobject.md) to be discovered\n- Smaller bid request object sizes by allowing information to be looked up and cached offline\n\n## Access method\n\nThe file must be hosted at the **root domain** of the advertising system at the path `/sellers.json` (e.g. `https://example.com/sellers.json`). The root domain is defined as the public suffix plus one string in the name per the [Public Suffix List](https://publicsuffix.org/). The file may also be hosted on subdomains as needed.\n\nThe response must include `Content-Type: application/json` (optionally with `; charset=utf-8`). HTTPS is preferred over HTTP.\n\n## Caching\n\nConsumers should respect standard HTTP cache-control headers (`Expires`, `Cache-Control`). If no cache directives are present, a **7-day** default expiry should be used.\n\nSee the [sellers.json specification (PDF)](https://iabtechlab.com/wp-content/uploads/2019/07/Sellers.json_Final.pdf) for the full reference. Licensed under [Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/) by the OpenRTB Working Group.",
   "x-lintel": {
-    "catalogDescription": "IAB Tech Lab sellers.json specification for ads.txt supply chain transparency."
+    "catalogDescription": "IAB Tech Lab sellers.json specification for ads.txt supply chain transparency.",
+    "fileMatch": ["sellers.json", "**/sellers.json"]
   },
   "type": "object",
   "properties": {
@@ -156,7 +157,9 @@
       "if": {
         "not": {
           "properties": {
-            "is_confidential": { "const": 1 }
+            "is_confidential": {
+              "const": 1
+            }
           },
           "required": ["is_confidential"]
         }

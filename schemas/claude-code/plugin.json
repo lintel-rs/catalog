@@ -3,7 +3,8 @@
   "title": "Claude Code Plugin",
   "description": "Schema for [Claude Code plugin](https://code.claude.com/docs/en/plugins) manifest (`.claude-plugin/plugin.json`). Plugins extend Claude Code with reusable skills, agents, hooks, MCP servers, and LSP servers that can be shared across projects and teams via [marketplaces](https://code.claude.com/docs/en/plugin-marketplaces). The manifest defines plugin metadata and optionally declares custom component paths. Components in default locations (`commands/`, `agents/`, `skills/`, `hooks/hooks.json`, `.mcp.json`, `.lsp.json`) are auto-discovered even without a manifest. The manifest is optional — if omitted, the directory name becomes the plugin name. See [plugin manifest schema](https://code.claude.com/docs/en/plugins-reference#plugin-manifest-schema) for the complete reference.",
   "x-lintel": {
-    "catalogDescription": "Claude Code plugin manifest."
+    "catalogDescription": "Claude Code plugin manifest.",
+    "fileMatch": ["**/.claude-plugin/plugin.json", ".claude-plugin/plugin.json"]
   },
   "type": "object",
   "properties": {
@@ -28,7 +29,7 @@
       ]
     },
     "author": {
-      "$ref": "#/$defs/Author",
+      "$ref": "./author.json",
       "description": "Author information for attribution."
     },
     "homepage": {
@@ -48,7 +49,9 @@
     },
     "keywords": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Discovery tags for the plugin. Used when searching or browsing plugins in marketplaces.",
       "examples": [
         ["deployment", "ci-cd"],
@@ -56,7 +59,7 @@
       ]
     },
     "commands": {
-      "$ref": "#/$defs/PathOrPaths",
+      "$ref": "./path-or-paths.json",
       "description": "Additional command file or directory paths, relative to the plugin root starting with `./`. These **supplement** the default `commands/` directory — they don't replace it. Paths should point to `.md` files or directories containing `.md` files. See [path behavior rules](https://code.claude.com/docs/en/plugins-reference#path-behavior-rules).",
       "examples": [
         "./custom/commands/special.md",
@@ -64,7 +67,7 @@
       ]
     },
     "agents": {
-      "$ref": "#/$defs/PathOrPaths",
+      "$ref": "./path-or-paths.json",
       "description": "Additional agent file or directory paths, relative to the plugin root starting with `./`. These **supplement** the default `agents/` directory.",
       "examples": [
         "./custom/agents/",
@@ -72,7 +75,7 @@
       ]
     },
     "skills": {
-      "$ref": "#/$defs/PathOrPaths",
+      "$ref": "./path-or-paths.json",
       "description": "Additional [skill](https://code.claude.com/docs/en/skills) directory paths, relative to the plugin root starting with `./`. These **supplement** the default `skills/` directory. Paths should point to directories containing `SKILL.md` files.",
       "examples": ["./custom/skills/"]
     },
@@ -85,11 +88,13 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of paths to hooks JSON config files."
         },
         {
-          "$ref": "#/$defs/Hooks",
+          "$ref": "./hooks.json",
           "description": "Inline hook definitions."
         }
       ],
@@ -107,7 +112,9 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of paths to MCP config JSON files."
         },
         {
@@ -120,7 +127,7 @@
                 "description": "Reference to an already-configured MCP server by name."
               },
               {
-                "$ref": "#/$defs/McpServerConfig",
+                "$ref": "./mcp-server-config.json",
                 "description": "Inline MCP server definition."
               }
             ]
@@ -138,7 +145,7 @@
       ]
     },
     "outputStyles": {
-      "$ref": "#/$defs/PathOrPaths",
+      "$ref": "./path-or-paths.json",
       "description": "Additional output style files or directories, relative to the plugin root starting with `./`.",
       "examples": ["./styles/"]
     },
@@ -151,14 +158,16 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of paths to LSP config JSON files."
         },
         {
           "type": "object",
           "description": "Inline LSP server definitions. Each key is a language name.",
           "additionalProperties": {
-            "$ref": "#/$defs/LspServerConfig"
+            "$ref": "./lsp-server-config.json"
           }
         }
       ],
@@ -168,351 +177,13 @@
           "go": {
             "command": "gopls",
             "args": ["serve"],
-            "extensionToLanguage": { ".go": "go" }
+            "extensionToLanguage": {
+              ".go": "go"
+            }
           }
         }
       ]
     }
   },
-  "required": ["name"],
-  "$defs": {
-    "Author": {
-      "type": "object",
-      "description": "Author information for the plugin.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Author's display name.",
-          "examples": ["Dev Team", "Jane Doe"]
-        },
-        "email": {
-          "type": "string",
-          "description": "Author's email address.",
-          "examples": ["dev@company.com"]
-        },
-        "url": {
-          "type": "string",
-          "description": "Author's website or profile URL.",
-          "examples": ["https://github.com/author"]
-        }
-      },
-      "additionalProperties": false
-    },
-    "PathOrPaths": {
-      "oneOf": [
-        {
-          "type": "string",
-          "description": "A single relative path starting with `./`."
-        },
-        {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Array of relative paths, each starting with `./`."
-        }
-      ]
-    },
-    "McpServerConfig": {
-      "type": "object",
-      "description": "[MCP server](https://code.claude.com/docs/en/mcp) configuration for a stdio-based server process. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-      "properties": {
-        "command": {
-          "type": "string",
-          "description": "Executable to run for the MCP server. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-          "examples": [
-            "python",
-            "node",
-            "npx",
-            "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
-          ]
-        },
-        "args": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Arguments to pass to the command.",
-          "examples": [["/path/to/server.py"], ["--port", "3000"]]
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": { "type": "string" },
-          "description": "Environment variables for the server process. Values support `${CLAUDE_PLUGIN_ROOT}`.",
-          "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
-        },
-        "cwd": {
-          "type": "string",
-          "description": "Working directory for the server process.",
-          "examples": ["${CLAUDE_PLUGIN_ROOT}"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Connection timeout in milliseconds.",
-          "examples": [30000]
-        }
-      },
-      "required": ["command"]
-    },
-    "LspServerConfig": {
-      "type": "object",
-      "description": "[LSP server](https://code.claude.com/docs/en/plugins-reference#lsp-servers) configuration for a language. The language server binary must be installed separately on the user's machine. See [available LSP plugins](https://code.claude.com/docs/en/plugins-reference#lsp-servers) for pre-built options.",
-      "properties": {
-        "command": {
-          "type": "string",
-          "description": "The LSP binary to execute (must be in `PATH`).",
-          "examples": [
-            "gopls",
-            "typescript-language-server",
-            "rust-analyzer",
-            "pyright"
-          ]
-        },
-        "extensionToLanguage": {
-          "type": "object",
-          "additionalProperties": { "type": "string" },
-          "description": "Maps file extensions to [language identifiers](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentItem).",
-          "examples": [
-            { ".go": "go" },
-            { ".ts": "typescript", ".tsx": "typescriptreact" }
-          ]
-        },
-        "args": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Command-line arguments for the LSP server.",
-          "examples": [["serve"], ["--stdio"]]
-        },
-        "transport": {
-          "type": "string",
-          "description": "Communication transport protocol.",
-          "enum": ["stdio", "socket"],
-          "default": "stdio"
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": { "type": "string" },
-          "description": "Environment variables to set when starting the server."
-        },
-        "initializationOptions": {
-          "type": "object",
-          "description": "Options passed to the server during [initialization](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize)."
-        },
-        "settings": {
-          "type": "object",
-          "description": "Settings passed via [`workspace/didChangeConfiguration`](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_didChangeConfiguration)."
-        },
-        "workspaceFolder": {
-          "type": "string",
-          "description": "Workspace folder path for the server."
-        },
-        "startupTimeout": {
-          "type": "number",
-          "description": "Max time to wait for server startup in milliseconds.",
-          "examples": [5000]
-        },
-        "shutdownTimeout": {
-          "type": "number",
-          "description": "Max time to wait for graceful shutdown in milliseconds.",
-          "examples": [5000]
-        },
-        "restartOnCrash": {
-          "type": "boolean",
-          "description": "Whether to automatically restart the server if it crashes."
-        },
-        "maxRestarts": {
-          "type": "number",
-          "description": "Maximum number of restart attempts before giving up."
-        }
-      },
-      "required": ["command", "extensionToLanguage"]
-    },
-    "Hooks": {
-      "type": "object",
-      "description": "Map of [hook event](https://code.claude.com/docs/en/hooks#hook-events) names to arrays of matcher groups.",
-      "properties": {
-        "SessionStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session starts. Matcher filters by source: `startup`, `resume`, `clear`, `compact`."
-        },
-        "UserPromptSubmit": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when the user submits a prompt. **No matcher support**."
-        },
-        "PreToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. `Bash`, `Edit|Write`, `mcp__.*`)."
-        },
-        "PermissionRequest": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a tool requests user permission. Matcher filters by tool name."
-        },
-        "PostToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool executes successfully. Matcher filters by tool name."
-        },
-        "PostToolUseFailure": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool execution fails. Matcher filters by tool name."
-        },
-        "Notification": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires on notifications. Matcher filters by type: `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`."
-        },
-        "SubagentStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a subagent is spawned. Matcher filters by agent type."
-        },
-        "SubagentStop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a subagent stops. Matcher filters by agent type."
-        },
-        "Stop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when Claude's turn ends. **No matcher support**."
-        },
-        "TeammateIdle": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a teammate goes idle. **No matcher support**."
-        },
-        "TaskCompleted": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a task is marked completed. **No matcher support**."
-        },
-        "ConfigChange": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a configuration file changes during a session. Matcher filters by source: `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`."
-        },
-        "PreCompact": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before context compaction. Matcher filters by trigger: `manual`, `auto`."
-        },
-        "SessionEnd": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session ends. Matcher filters by exit reason."
-        }
-      },
-      "additionalProperties": false
-    },
-    "MatcherGroupArray": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/MatcherGroup" }
-    },
-    "MatcherGroup": {
-      "type": "object",
-      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If `matcher` is omitted, hooks fire on every occurrence. See [matcher patterns](https://code.claude.com/docs/en/hooks#matcher-patterns).",
-      "properties": {
-        "matcher": {
-          "type": "string",
-          "description": "Regex pattern to filter when hooks fire. Use `|` for OR, `.*` for wildcards. MCP tools: `mcp__<server>__<tool>`.",
-          "examples": ["Bash", "Edit|Write", "mcp__.*"]
-        },
-        "hooks": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/HookHandler" }
-        }
-      },
-      "required": ["hooks"]
-    },
-    "HookHandler": {
-      "oneOf": [
-        { "$ref": "#/$defs/CommandHook" },
-        { "$ref": "#/$defs/PromptHook" },
-        { "$ref": "#/$defs/AgentHook" }
-      ]
-    },
-    "CommandHook": {
-      "type": "object",
-      "description": "Runs a shell command or script. Receives [hook context as JSON on stdin](https://code.claude.com/docs/en/hooks#common-input-fields). **Exit 0**: success. **Exit 2**: blocking error. **Other**: non-blocking error.",
-      "properties": {
-        "type": { "const": "command" },
-        "command": {
-          "type": "string",
-          "description": "Shell command or script path. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-          "examples": ["${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 600
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message while the hook runs."
-        },
-        "async": {
-          "type": "boolean",
-          "description": "Run in background. Only for `PostToolUse`/`PostToolUseFailure`.",
-          "default": false
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "command"],
-      "additionalProperties": false
-    },
-    "PromptHook": {
-      "type": "object",
-      "description": "Evaluates a single-turn LLM [prompt-based hook](https://code.claude.com/docs/en/hooks#prompt-based-hooks). Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Cannot use tools.",
-      "properties": {
-        "type": { "const": "prompt" },
-        "prompt": {
-          "type": "string",
-          "description": "Evaluation prompt. Use `$ARGUMENTS` for hook input context."
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for evaluation. Defaults to a fast model.",
-          "examples": ["haiku"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 30
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message while the hook runs."
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    },
-    "AgentHook": {
-      "type": "object",
-      "description": "Runs a multi-turn LLM [agent-based hook](https://code.claude.com/docs/en/hooks#agent-based-hooks) with tool access. Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Can explore the codebase to verify conditions.",
-      "properties": {
-        "type": { "const": "agent" },
-        "prompt": {
-          "type": "string",
-          "description": "Verification prompt. Use `$ARGUMENTS` for hook input context."
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for the agent. Defaults to a fast model.",
-          "examples": ["sonnet"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 60
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message while the hook runs."
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    }
-  }
+  "required": ["name"]
 }

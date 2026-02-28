@@ -3,7 +3,8 @@
   "title": "kysely-codegen",
   "description": "Configuration file for [kysely-codegen](https://github.com/RobinBlomberg/kysely-codegen), a TypeScript type generator for [Kysely](https://kysely.dev/).\n\nkysely-codegen introspects your database and generates TypeScript type definitions so that Kysely queries are fully typed. Configuration is read from `.kysely-codegenrc.json` in the project root. CLI arguments take precedence over config file values.\n\nSee the [kysely-codegen README](https://github.com/RobinBlomberg/kysely-codegen#readme) for full documentation.",
   "x-lintel": {
-    "catalogDescription": "Configuration for kysely-codegen, a TypeScript type generator for Kysely."
+    "catalogDescription": "Configuration for kysely-codegen, a TypeScript type generator for Kysely.",
+    "fileMatch": [".kysely-codegenrc.json", "**/.kysely-codegenrc.json"]
   },
   "type": "object",
   "properties": {
@@ -112,7 +113,9 @@
     "runtimeEnums": {
       "description": "Generates TypeScript `enum` declarations for [PostgreSQL enum types](https://www.postgresql.org/docs/current/datatype-enum.html) instead of union types. Only relevant when using the `postgres` dialect.\n\n- `false` — Generate union types like `\"a\" | \"b\"` (default)\n- `true` — Generate runtime enums with default naming\n- `\"pascal-case\"` — Generate enums with PascalCase member names\n- `\"screaming-snake-case\"` — Generate enums with SCREAMING_SNAKE_CASE member names",
       "oneOf": [
-        { "type": "boolean" },
+        {
+          "type": "boolean"
+        },
         {
           "type": "string",
           "enum": ["pascal-case", "screaming-snake-case"]
@@ -123,7 +126,9 @@
     "singularize": {
       "description": "Singularizes generated type aliases (e.g. `Users` becomes `User`).\n\n- `false` — No singularization (default)\n- `true` — Use built-in singularization rules\n- `{...}` — A record of regex pattern to replacement string for custom singularization rules",
       "oneOf": [
-        { "type": "boolean" },
+        {
+          "type": "boolean"
+        },
         {
           "type": "object",
           "description": "Custom singularization rules as a map of regex patterns to replacement strings.",

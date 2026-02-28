@@ -3,7 +3,12 @@
   "title": "Claude Code Command",
   "description": "Frontmatter schema for Claude Code custom slash commands (`.claude/commands/*.md`). Commands are the **legacy format** for [skills](https://code.claude.com/docs/en/skills) — they support identical frontmatter fields and behavior. New projects should prefer the skill format (`.claude/skills/*/SKILL.md`) for better organization and support for companion files. A file at `.claude/commands/review.md` and a skill at `.claude/skills/review/SKILL.md` both create `/review` and work the same way. If a skill and a command share the same name, the skill takes precedence. Use `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` for argument substitution in the body.",
   "x-lintel": {
-    "catalogDescription": "Frontmatter for Claude Code custom slash commands."
+    "catalogDescription": "Frontmatter for Claude Code custom slash commands.",
+    "fileMatch": [
+      "**/.claude/commands/*.md",
+      ".claude/commands/*.md",
+      "**/commands/*.md"
+    ]
   },
   "type": "object",
   "properties": {
@@ -42,7 +47,9 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of tool names."
         }
       ],
@@ -76,210 +83,10 @@
       "examples": ["Explore", "Plan", "general-purpose"]
     },
     "hooks": {
-      "$ref": "#/$defs/Hooks",
+      "$ref": "./hooks.json",
       "description": "Lifecycle [hooks](https://code.claude.com/docs/en/hooks) scoped to this command. Hooks defined here only fire when this command is active and are cleaned up when the command is unloaded. See [hooks in skills and agents](https://code.claude.com/docs/en/hooks#hooks-in-skills-and-agents)."
     }
   },
   "required": ["name"],
-  "additionalProperties": false,
-  "$defs": {
-    "Hooks": {
-      "type": "object",
-      "description": "Map of [hook event](https://code.claude.com/docs/en/hooks#hook-events) names to arrays of matcher groups.",
-      "properties": {
-        "SessionStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session starts. Matcher filters by source: `startup`, `resume`, `clear`, `compact`. Command hooks have access to `$CLAUDE_ENV_FILE` for [persisting environment variables](https://code.claude.com/docs/en/hooks#persist-environment-variables)."
-        },
-        "UserPromptSubmit": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when the user submits a prompt, before Claude processes it. **No matcher support** — always fires."
-        },
-        "PreToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. `Bash`, `Edit|Write`, `mcp__.*`). See [PreToolUse decision control](https://code.claude.com/docs/en/hooks#pretooluse-decision-control)."
-        },
-        "PermissionRequest": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a tool requests user permission. Matcher filters by tool name. See [PermissionRequest decision control](https://code.claude.com/docs/en/hooks#permissionrequest-decision-control)."
-        },
-        "PostToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool executes successfully. Matcher filters by tool name. Supports [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background)."
-        },
-        "PostToolUseFailure": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool execution fails. Matcher filters by tool name. Supports [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background)."
-        },
-        "Notification": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires on notifications. Matcher filters by type: `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`."
-        },
-        "SubagentStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a subagent is spawned. Matcher filters by agent type."
-        },
-        "SubagentStop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a subagent stops. Matcher filters by agent type."
-        },
-        "Stop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when Claude's turn ends. **No matcher support** — always fires."
-        },
-        "TeammateIdle": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when an [agent team](https://code.claude.com/docs/en/agent-teams) teammate is about to go idle. **No matcher support**."
-        },
-        "TaskCompleted": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a task is being marked as completed. **No matcher support**."
-        },
-        "ConfigChange": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a configuration file changes during a session. Matcher filters by source: `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`."
-        },
-        "PreCompact": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before context compaction. Matcher filters by trigger type: `manual`, `auto`."
-        },
-        "SessionEnd": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session ends. Matcher filters by exit reason: `clear`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`."
-        }
-      },
-      "additionalProperties": false
-    },
-    "MatcherGroupArray": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/MatcherGroup" }
-    },
-    "MatcherGroup": {
-      "type": "object",
-      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If `matcher` is omitted, the hooks fire on every occurrence of the event. See [matcher patterns](https://code.claude.com/docs/en/hooks#matcher-patterns).",
-      "properties": {
-        "matcher": {
-          "type": "string",
-          "description": "Regex pattern to filter when this group's hooks fire. Use `|` for OR, `.*` for wildcards. MCP tools follow the pattern `mcp__<server>__<tool>`. Omit to match all.",
-          "examples": ["Bash", "Edit|Write", "mcp__.*"]
-        },
-        "hooks": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/HookHandler" }
-        }
-      },
-      "required": ["hooks"]
-    },
-    "HookHandler": {
-      "oneOf": [
-        { "$ref": "#/$defs/CommandHook" },
-        { "$ref": "#/$defs/PromptHook" },
-        { "$ref": "#/$defs/AgentHook" }
-      ]
-    },
-    "CommandHook": {
-      "type": "object",
-      "description": "Runs a shell command or script. Receives [hook context as JSON on stdin](https://code.claude.com/docs/en/hooks#common-input-fields). **Exit 0**: success (stdout parsed as JSON). **Exit 2**: blocking error (stderr fed to Claude). **Other**: non-blocking error.",
-      "properties": {
-        "type": { "const": "command" },
-        "command": {
-          "type": "string",
-          "description": "Shell command or script path. Use `$CLAUDE_PROJECT_DIR` for the project root (always quote it) and `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-          "examples": [
-            "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate.sh",
-            "${CLAUDE_PLUGIN_ROOT}/scripts/lint-check.sh"
-          ]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 600,
-          "examples": [10, 30]
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs.",
-          "examples": ["Validating..."]
-        },
-        "async": {
-          "type": "boolean",
-          "description": "Run in background without blocking. Only for `PostToolUse`/`PostToolUseFailure`. See [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background).",
-          "default": false
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove. Primarily useful in skill-scoped hooks.",
-          "default": false
-        }
-      },
-      "required": ["type", "command"],
-      "additionalProperties": false
-    },
-    "PromptHook": {
-      "type": "object",
-      "description": "Evaluates a single-turn LLM [prompt-based hook](https://code.claude.com/docs/en/hooks#prompt-based-hooks). Must respond with `{ok: true}` or `{ok: false, reason: \"...\"}`. Cannot use tools.",
-      "properties": {
-        "type": { "const": "prompt" },
-        "prompt": {
-          "type": "string",
-          "description": "The evaluation prompt. Use `$ARGUMENTS` to interpolate the hook's full input context as JSON.",
-          "examples": ["Is this command safe? $ARGUMENTS"]
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for evaluation. Defaults to a fast model.",
-          "examples": ["haiku"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 30
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs."
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    },
-    "AgentHook": {
-      "type": "object",
-      "description": "Runs a multi-turn LLM [agent-based hook](https://code.claude.com/docs/en/hooks#agent-based-hooks) with tool access. Must respond with `{ok: true}` or `{ok: false, reason: \"...\"}`. Can use `Read`, `Grep`, `Glob`, `Bash`, etc.",
-      "properties": {
-        "type": { "const": "agent" },
-        "prompt": {
-          "type": "string",
-          "description": "The verification prompt. Use `$ARGUMENTS` to interpolate the hook's input context as JSON.",
-          "examples": ["Verify this operation is safe: $ARGUMENTS"]
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for the agent. Defaults to a fast model.",
-          "examples": ["sonnet"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 60
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs."
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    }
-  }
+  "additionalProperties": false
 }

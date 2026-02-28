@@ -1,44 +1,106 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "MCP Server Configuration",
-  "description": "[MCP server](https://code.claude.com/docs/en/mcp) configuration for a stdio-based server process. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+  "description": "Configuration for a single [MCP server](https://code.claude.com/docs/en/mcp) in Claude Code. Supports stdio (local process), HTTP (streamable HTTP transport), and SSE (server-sent events) server types.",
   "x-lintel": {
-    "catalogDescription": "MCP server configuration for a Claude Code plugin."
+    "catalogDescription": "MCP server configuration for Claude Code.",
+    "fileMatch": []
   },
-  "type": "object",
-  "properties": {
-    "command": {
-      "type": "string",
-      "description": "Executable to run (must be in `PATH` or an absolute/relative path).",
-      "examples": [
-        "node",
-        "python",
-        "npx",
-        "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
-      ]
-    },
-    "args": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Command-line arguments for the server process.",
-      "examples": [["./servers/db-server.js", "--config", "./config.json"]]
-    },
-    "env": {
+  "oneOf": [
+    { "$ref": "#/$defs/StdioServer" },
+    { "$ref": "#/$defs/HttpServer" },
+    { "$ref": "#/$defs/SseServer" }
+  ],
+  "$defs": {
+    "StdioServer": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
-      "description": "Environment variables set when starting the server. Values support `${CLAUDE_PLUGIN_ROOT}`.",
-      "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
+      "description": "A stdio-based MCP server that runs as a local child process. Claude Code launches the command and communicates over stdin/stdout using the [MCP stdio transport](https://modelcontextprotocol.io/docs/concepts/transports#stdio). Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+      "properties": {
+        "type": {
+          "const": "stdio",
+          "description": "Transport type. Optional for stdio servers — if `type` is omitted and `command` is present, stdio is assumed."
+        },
+        "command": {
+          "type": "string",
+          "description": "Executable to run (must be in `PATH` or an absolute/relative path).",
+          "examples": [
+            "node",
+            "python",
+            "npx",
+            "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Command-line arguments for the server process.",
+          "examples": [["./servers/db-server.js", "--config", "./config.json"]]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Environment variables set when starting the server. Values support `${CLAUDE_PLUGIN_ROOT}`.",
+          "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
+        },
+        "cwd": {
+          "type": "string",
+          "description": "Working directory for the server process.",
+          "examples": ["${CLAUDE_PLUGIN_ROOT}"]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Connection timeout in milliseconds.",
+          "examples": [30000]
+        }
+      },
+      "required": ["command"]
     },
-    "cwd": {
-      "type": "string",
-      "description": "Working directory for the server process.",
-      "examples": ["${CLAUDE_PLUGIN_ROOT}"]
+    "HttpServer": {
+      "type": "object",
+      "description": "A remote MCP server using the [streamable HTTP transport](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http). Claude Code connects to the server over HTTP/HTTPS.",
+      "properties": {
+        "type": {
+          "const": "http",
+          "description": "Transport type."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the remote MCP server endpoint.",
+          "examples": [
+            "https://mcp.deepwiki.com/mcp",
+            "https://mcp.example.com/api"
+          ]
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "HTTP headers to include with requests (e.g. for authentication).",
+          "examples": [{ "Authorization": "Bearer ${MCP_API_KEY}" }]
+        }
+      },
+      "required": ["type", "url"]
     },
-    "timeout": {
-      "type": "number",
-      "description": "Connection timeout in milliseconds.",
-      "examples": [30000]
+    "SseServer": {
+      "type": "object",
+      "description": "A remote MCP server using the [SSE (server-sent events) transport](https://modelcontextprotocol.io/docs/concepts/transports#http-with-sse). Claude Code connects to the server over HTTP/HTTPS with SSE for server-to-client messages.",
+      "properties": {
+        "type": {
+          "const": "sse",
+          "description": "Transport type."
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the remote MCP server SSE endpoint.",
+          "examples": ["https://mcp.example.com/sse"]
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "HTTP headers to include with requests (e.g. for authentication).",
+          "examples": [{ "Authorization": "Bearer ${MCP_API_KEY}" }]
+        }
+      },
+      "required": ["type", "url"]
     }
-  },
-  "required": ["command"]
+  }
 }

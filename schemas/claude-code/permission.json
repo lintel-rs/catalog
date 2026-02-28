@@ -3,7 +3,8 @@
   "title": "Claude Code Permission Rule",
   "description": "A [permission rule](https://code.claude.com/docs/en/permissions#permission-rule-syntax) string that controls tool access in Claude Code. Rules follow the format `Tool` or `Tool(specifier)` and appear in:\n\n- `allow`, `deny`, and `ask` arrays in [settings files](https://code.claude.com/docs/en/settings#settings-files)\n- `allowed-tools` fields in [skills](https://code.claude.com/docs/en/skills) and [commands](https://code.claude.com/docs/en/skills)\n- `tools` and `disallowedTools` fields in [subagents](https://code.claude.com/docs/en/sub-agents)\n\nRules are evaluated in order: **deny → ask → allow**. The first matching rule wins, so deny rules always take precedence. See [manage permissions](https://code.claude.com/docs/en/permissions#manage-permissions).",
   "x-lintel": {
-    "catalogDescription": "Claude Code permission rule for tool access control."
+    "catalogDescription": "Claude Code permission rule for tool access control.",
+    "fileMatch": []
   },
   "anyOf": [
     {

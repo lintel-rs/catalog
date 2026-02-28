@@ -3,14 +3,22 @@
   "title": "Clippy Configuration",
   "description": "Configuration file for [Clippy](https://doc.rust-lang.org/clippy/), the Rust linter.\n\n## Overview\n\nClippy can be configured using a `clippy.toml` or `.clippy.toml` file at the project root. The configuration file is searched for in this order:\n\n1. The directory specified by `CLIPPY_CONF_DIR`\n2. The directory specified by `CARGO_MANIFEST_DIR`\n3. The current directory\n\nConfiguration uses simple `variable = value` mapping:\n\n```toml\navoid-breaking-exported-api = false\ndisallowed-names = [\"toto\", \"tata\", \"titi\"]\nmsrv = \"1.70.0\"\n```\n\nFor array options with defaults, use `\"..\"` to extend the default list rather than replacing it:\n\n```toml\n# default of disallowed-names is [\"foo\", \"baz\", \"quux\"]\ndisallowed-names = [\"bar\", \"..\"] # -> [\"bar\", \"foo\", \"baz\", \"quux\"]\n```\n\nSee the [Clippy Configuration guide](https://doc.rust-lang.org/clippy/configuration.html) for full details on configuring Clippy.\n\nAll lint configuration options listed here are sourced from the [Lint Configuration reference](https://doc.rust-lang.org/clippy/lint_configuration.html). This schema will be updated as that source page is updated.",
   "x-lintel": {
-    "catalogDescription": "Configuration for Clippy, the Rust linter (detailed reference)."
+    "catalogDescription": "Configuration for Clippy, the Rust linter (detailed reference).",
+    "fileMatch": [
+      "clippy.toml",
+      "**/clippy.toml",
+      ".clippy.toml",
+      "**/.clippy.toml"
+    ]
   },
   "type": "object",
   "properties": {
     "absolute-paths-allowed-crates": {
       "description": "Which crates to allow absolute paths from.\n\n**Affected lints:** [`absolute_paths`](https://rust-lang.github.io/rust-clippy/master/index.html#absolute_paths)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "absolute-paths-max-segments": {
@@ -87,7 +95,9 @@
     "allow-renamed-params-for": {
       "description": "List of trait paths for which renamed parameter names are allowed. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`renamed_function_params`](https://rust-lang.github.io/rust-clippy/master/index.html#renamed_function_params)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": [
         "core::convert::From",
         "core::convert::TryFrom",
@@ -112,43 +122,57 @@
     "allowed-dotfiles": {
       "description": "Additional dotfiles (files or directories starting with a dot) to allow.\n\n**Affected lints:** [`path_ends_with_ext`](https://rust-lang.github.io/rust-clippy/master/index.html#path_ends_with_ext)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "allowed-duplicate-crates": {
       "description": "A list of crate names that are allowed to have multiple versions in the dependency tree.\n\n**Affected lints:** [`multiple_crate_versions`](https://rust-lang.github.io/rust-clippy/master/index.html#multiple_crate_versions)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "allowed-idents-below-min-chars": {
       "description": "Identifiers that are allowed to be shorter than `min-ident-chars-threshold`. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`min_ident_chars`](https://rust-lang.github.io/rust-clippy/master/index.html#min_ident_chars)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": ["i", "j", "x", "y", "z", "w", "n"]
     },
     "allowed-prefixes": {
       "description": "List of prefixes to allow when checking for module name repetitions. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`module_name_repetitions`](https://rust-lang.github.io/rust-clippy/master/index.html#module_name_repetitions)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": ["to", "as", "into", "from", "try_into", "try_from"]
     },
     "allowed-scripts": {
       "description": "The list of Unicode scripts allowed in identifiers. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`disallowed_script_idents`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_script_idents)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": ["Latin"]
     },
     "allowed-wildcard-imports": {
       "description": "List of path segments allowed to have wildcard imports (e.g. `prelude`).\n\n**Affected lints:** [`wildcard_imports`](https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "arithmetic-side-effects-allowed": {
       "description": "Types to allow arithmetic operations on without linting. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`arithmetic_side_effects`](https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "arithmetic-side-effects-allowed-binary": {
@@ -156,7 +180,9 @@
       "type": "array",
       "items": {
         "type": "array",
-        "items": { "type": "string" },
+        "items": {
+          "type": "string"
+        },
         "minItems": 2,
         "maxItems": 2
       },
@@ -165,7 +191,9 @@
     "arithmetic-side-effects-allowed-unary": {
       "description": "Types for which unary arithmetic operations (negation, `!`) are allowed.\n\n**Affected lints:** [`arithmetic_side_effects`](https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "array-size-threshold": {
@@ -184,8 +212,13 @@
       "type": "array",
       "items": {
         "oneOf": [
-          { "type": "string", "description": "Fully qualified type path." },
-          { "$ref": "#/$defs/DisallowedPath" }
+          {
+            "type": "string",
+            "description": "Fully qualified type path."
+          },
+          {
+            "$ref": "#/$defs/DisallowedPath"
+          }
         ]
       },
       "default": []
@@ -231,7 +264,9 @@
             "type": "string",
             "description": "Fully qualified macro path (e.g. `std::println`)."
           },
-          { "$ref": "#/$defs/DisallowedItem" }
+          {
+            "$ref": "#/$defs/DisallowedItem"
+          }
         ]
       },
       "default": []
@@ -245,7 +280,9 @@
             "type": "string",
             "description": "Fully qualified method path (e.g. `std::vec::Vec::leak`)."
           },
-          { "$ref": "#/$defs/DisallowedItem" }
+          {
+            "$ref": "#/$defs/DisallowedItem"
+          }
         ]
       },
       "default": []
@@ -253,7 +290,9 @@
     "disallowed-names": {
       "description": "List of disallowed variable names (e.g. placeholder names). Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`disallowed_names`](https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_names)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": ["foo", "baz", "quux"]
     },
     "disallowed-types": {
@@ -265,7 +304,9 @@
             "type": "string",
             "description": "Fully qualified type path (e.g. `std::collections::BTreeMap`)."
           },
-          { "$ref": "#/$defs/DisallowedItem" }
+          {
+            "$ref": "#/$defs/DisallowedItem"
+          }
         ]
       },
       "default": []
@@ -273,7 +314,9 @@
     "doc-valid-idents": {
       "description": "List of identifiers that are valid in documentation without backtick quoting. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`doc_markdown`](https://rust-lang.github.io/rust-clippy/master/index.html#doc_markdown)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": [
         "KiB",
         "MiB",
@@ -364,7 +407,9 @@
     "enforced-import-renames": {
       "description": "List of imports that must always be renamed. Each entry specifies a path and its required rename.\n\n**Affected lints:** [`missing_enforced_import_renames`](https://rust-lang.github.io/rust-clippy/master/index.html#missing_enforced_import_renames)",
       "type": "array",
-      "items": { "$ref": "#/$defs/ImportRename" },
+      "items": {
+        "$ref": "#/$defs/ImportRename"
+      },
       "default": []
     },
     "enum-variant-name-threshold": {
@@ -394,7 +439,9 @@
     "ignore-interior-mutability": {
       "description": "Types to treat as if they have no interior mutability. Supports the `\"..\"` element to extend the default list.\n\n**Affected lints:** [`borrow_interior_mutable_const`](https://rust-lang.github.io/rust-clippy/master/index.html#borrow_interior_mutable_const), [`declare_interior_mutable_const`](https://rust-lang.github.io/rust-clippy/master/index.html#declare_interior_mutable_const), [`ifs_same_cond`](https://rust-lang.github.io/rust-clippy/master/index.html#ifs_same_cond), [`mutable_key_type`](https://rust-lang.github.io/rust-clippy/master/index.html#mutable_key_type)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": ["bytes::Bytes"]
     },
     "inherent-impl-lint-scope": {
@@ -406,7 +453,9 @@
     "large-error-ignored": {
       "description": "Error types to ignore for the `result_large_err` lint.\n\n**Affected lints:** [`result_large_err`](https://rust-lang.github.io/rust-clippy/master/index.html#result_large_err)",
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "default": []
     },
     "large-error-threshold": {
@@ -481,13 +530,30 @@
     "module-item-order-groupings": {
       "description": "Named groupings of source item kinds for the `arbitrary_source_item_ordering` lint. Each entry defines a group name and the item kinds it contains.\n\n**Affected lints:** [`arbitrary_source_item_ordering`](https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering)",
       "type": "array",
-      "items": { "$ref": "#/$defs/ModuleItemOrderGrouping" },
+      "items": {
+        "$ref": "#/$defs/ModuleItemOrderGrouping"
+      },
       "default": [
-        { "name": "modules", "items": ["extern_crate", "mod", "foreign_mod"] },
-        { "name": "use", "items": ["use"] },
-        { "name": "macros", "items": ["macro"] },
-        { "name": "global_asm", "items": ["global_asm"] },
-        { "name": "UPPER_SNAKE_CASE", "items": ["static", "const"] },
+        {
+          "name": "modules",
+          "items": ["extern_crate", "mod", "foreign_mod"]
+        },
+        {
+          "name": "use",
+          "items": ["use"]
+        },
+        {
+          "name": "macros",
+          "items": ["macro"]
+        },
+        {
+          "name": "global_asm",
+          "items": ["global_asm"]
+        },
+        {
+          "name": "UPPER_SNAKE_CASE",
+          "items": ["static", "const"]
+        },
         {
           "name": "PascalCase",
           "items": [
@@ -500,7 +566,10 @@
             "impl"
           ]
         },
-        { "name": "lower_snake_case", "items": ["fn"] }
+        {
+          "name": "lower_snake_case",
+          "items": ["fn"]
+        }
       ]
     },
     "module-items-ordered-within-groupings": {
@@ -564,7 +633,9 @@
     "standard-macro-braces": {
       "description": "Enforce specific brace styles for macro invocations. Each entry specifies a macro name and the brace character to enforce.\n\n**Affected lints:** [`nonstandard_macro_braces`](https://rust-lang.github.io/rust-clippy/master/index.html#nonstandard_macro_braces)",
       "type": "array",
-      "items": { "$ref": "#/$defs/MacroBrace" },
+      "items": {
+        "$ref": "#/$defs/MacroBrace"
+      },
       "default": []
     },
     "struct-field-name-threshold": {

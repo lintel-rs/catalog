@@ -3,7 +3,8 @@
   "title": "Claude Code Subagent",
   "description": "Frontmatter schema for [Claude Code subagent](https://code.claude.com/docs/en/sub-agents) definitions (`.claude/agents/*.md`). Subagents are specialized AI assistants that run in their own context window with a custom system prompt, specific tool access, and independent permissions. The markdown body after the `---` frontmatter becomes the subagent's **system prompt** (not the full Claude Code system prompt — only the body plus basic environment details). Subagents are stored at `~/.claude/agents/` (personal), `.claude/agents/` (project), `<plugin>/agents/` (plugin), or passed via `--agents` CLI flag (session-only). When multiple subagents share the same name, higher-priority locations win: CLI > project > personal > plugin. Subagents cannot spawn other subagents.",
   "x-lintel": {
-    "catalogDescription": "Frontmatter for Claude Code subagent definitions."
+    "catalogDescription": "Frontmatter for Claude Code subagent definitions.",
+    "fileMatch": ["**/.claude/agents/*.md", ".claude/agents/*.md"]
   },
   "type": "object",
   "properties": {
@@ -32,7 +33,9 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of tool names.",
           "examples": [["Read", "Grep", "Glob", "Bash"]]
         }
@@ -48,7 +51,9 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of tool names to deny.",
           "examples": [["Write", "Edit"]]
         }
@@ -88,7 +93,9 @@
         },
         {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Array of skill names."
         }
       ],
@@ -107,24 +114,29 @@
             "description": "Reference to an already-configured MCP server by name."
           },
           {
-            "$ref": "#/$defs/McpServerConfig",
+            "$ref": "./mcp-server-config.json",
             "description": "Inline MCP server definition."
           }
         ]
       },
       "examples": [
-        { "github": "github", "slack": "slack" },
+        {
+          "github": "github",
+          "slack": "slack"
+        },
         {
           "custom-db": {
             "command": "python",
             "args": ["/path/to/mcp-server.py"],
-            "env": { "DB_URL": "postgresql://localhost:5432" }
+            "env": {
+              "DB_URL": "postgresql://localhost:5432"
+            }
           }
         }
       ]
     },
     "hooks": {
-      "$ref": "#/$defs/Hooks",
+      "$ref": "./hooks.json",
       "description": "Lifecycle [hooks](https://code.claude.com/docs/en/hooks) scoped to this subagent. Hooks defined here only fire while this subagent is active and are cleaned up when it finishes. `Stop` hooks in frontmatter are automatically converted to `SubagentStop` events at runtime. See [hooks in skills and agents](https://code.claude.com/docs/en/hooks#hooks-in-skills-and-agents)."
     },
     "memory": {
@@ -147,251 +159,5 @@
     }
   },
   "required": ["name", "description"],
-  "additionalProperties": false,
-  "$defs": {
-    "McpServerConfig": {
-      "type": "object",
-      "description": "[MCP server](https://code.claude.com/docs/en/mcp) configuration for a stdio-based server process. Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-      "properties": {
-        "command": {
-          "type": "string",
-          "description": "Executable to run (must be in `PATH` or an absolute/relative path).",
-          "examples": [
-            "node",
-            "python",
-            "npx",
-            "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
-          ]
-        },
-        "args": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Command-line arguments for the server process.",
-          "examples": [["./servers/db-server.js", "--config", "./config.json"]]
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": { "type": "string" },
-          "description": "Environment variables set when starting the server. Values support `${CLAUDE_PLUGIN_ROOT}`.",
-          "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
-        },
-        "cwd": {
-          "type": "string",
-          "description": "Working directory for the server process.",
-          "examples": ["${CLAUDE_PLUGIN_ROOT}"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Connection timeout in milliseconds.",
-          "examples": [30000]
-        }
-      },
-      "required": ["command"]
-    },
-    "Hooks": {
-      "type": "object",
-      "description": "Map of [hook event](https://code.claude.com/docs/en/hooks#hook-events) names to arrays of matcher groups. Each matcher group optionally filters by a regex pattern and contains an array of hook handlers that execute when the event fires.",
-      "properties": {
-        "SessionStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session starts. Matcher filters by source: `startup`, `resume`, `clear`, `compact`. Command hooks have access to `$CLAUDE_ENV_FILE` for [persisting environment variables](https://code.claude.com/docs/en/hooks#persist-environment-variables)."
-        },
-        "UserPromptSubmit": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when the user submits a prompt, before Claude processes it. **No matcher support** — always fires."
-        },
-        "PreToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before a tool is executed. Matcher filters by tool name (e.g. `Bash`, `Edit|Write`, `mcp__.*`). See [PreToolUse decision control](https://code.claude.com/docs/en/hooks#pretooluse-decision-control)."
-        },
-        "PermissionRequest": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a tool requests user permission. Matcher filters by tool name. See [PermissionRequest decision control](https://code.claude.com/docs/en/hooks#permissionrequest-decision-control)."
-        },
-        "PostToolUse": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool executes successfully. Matcher filters by tool name. Supports [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background)."
-        },
-        "PostToolUseFailure": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires after a tool execution fails. Matcher filters by tool name. Supports [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background)."
-        },
-        "Notification": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires on notifications. Matcher filters by type: `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`."
-        },
-        "SubagentStart": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a [subagent](https://code.claude.com/docs/en/sub-agents) is spawned. Matcher filters by agent type name."
-        },
-        "SubagentStop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a [subagent](https://code.claude.com/docs/en/sub-agents) stops. Matcher filters by agent type name."
-        },
-        "Stop": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when Claude's turn ends. **No matcher support** — always fires. In subagent frontmatter, `Stop` hooks are automatically converted to `SubagentStop` events at runtime. Hooks can force Claude to continue working by returning `{decision: \"block\", reason: \"...\"}`. Does not fire on user interrupt."
-        },
-        "TeammateIdle": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when an [agent team](https://code.claude.com/docs/en/agent-teams) teammate is about to go idle. **No matcher support**."
-        },
-        "TaskCompleted": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a task is being marked as completed. **No matcher support**. Exit code 2 prevents the task from being marked completed."
-        },
-        "ConfigChange": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a configuration file changes during a session. Matcher filters by source: `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`. Can block configuration changes from taking effect (except `policy_settings`)."
-        },
-        "PreCompact": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires before context compaction. Matcher filters by trigger: `manual`, `auto`."
-        },
-        "SessionEnd": {
-          "$ref": "#/$defs/MatcherGroupArray",
-          "description": "Fires when a session ends. Matcher filters by exit reason: `clear`, `logout`, `prompt_input_exit`, `bypass_permissions_disabled`, `other`. Cannot block session termination."
-        }
-      },
-      "additionalProperties": false
-    },
-    "MatcherGroupArray": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/MatcherGroup" }
-    },
-    "MatcherGroup": {
-      "type": "object",
-      "description": "A matcher group pairs an optional regex filter with an array of hook handlers. If `matcher` is omitted, hooks fire on every occurrence. See [matcher patterns](https://code.claude.com/docs/en/hooks#matcher-patterns).",
-      "properties": {
-        "matcher": {
-          "type": "string",
-          "description": "Regex pattern to filter when hooks fire. Use `|` for OR (e.g. `Edit|Write`), `.*` for wildcards (e.g. `mcp__.*`). MCP tools follow the pattern `mcp__<server>__<tool>`. Omit to match all.",
-          "examples": ["Bash", "Edit|Write", "mcp__.*"]
-        },
-        "hooks": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/HookHandler" }
-        }
-      },
-      "required": ["hooks"]
-    },
-    "HookHandler": {
-      "oneOf": [
-        { "$ref": "#/$defs/CommandHook" },
-        { "$ref": "#/$defs/PromptHook" },
-        { "$ref": "#/$defs/AgentHook" }
-      ]
-    },
-    "CommandHook": {
-      "type": "object",
-      "description": "Runs a shell command or script. Receives [hook context as JSON on stdin](https://code.claude.com/docs/en/hooks#common-input-fields). **Exit 0**: success — stdout parsed as JSON for [decision control](https://code.claude.com/docs/en/hooks#json-output). **Exit 2**: blocking error — stderr fed to Claude. **Other**: non-blocking error.",
-      "properties": {
-        "type": { "const": "command" },
-        "command": {
-          "type": "string",
-          "description": "Shell command or script path. Use `$CLAUDE_PROJECT_DIR` for the project root (always quote it: `\"$CLAUDE_PROJECT_DIR\"/path`) and `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
-          "examples": [
-            "${CLAUDE_PLUGIN_ROOT}/scripts/format-code.sh",
-            "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/validate.sh"
-          ]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 600,
-          "examples": [10, 30, 120]
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs.",
-          "examples": ["Validating command...", "Running lint check..."]
-        },
-        "async": {
-          "type": "boolean",
-          "description": "Run in background without blocking. Only for `PostToolUse`/`PostToolUseFailure`. See [async hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background).",
-          "default": false
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove. Primarily useful in skill-scoped hooks.",
-          "default": false
-        }
-      },
-      "required": ["type", "command"],
-      "additionalProperties": false
-    },
-    "PromptHook": {
-      "type": "object",
-      "description": "Evaluates a single-turn LLM [prompt-based hook](https://code.claude.com/docs/en/hooks#prompt-based-hooks). Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Cannot use tools — decides based solely on prompt content.",
-      "properties": {
-        "type": { "const": "prompt" },
-        "prompt": {
-          "type": "string",
-          "description": "Evaluation prompt. Use `$ARGUMENTS` to interpolate the hook's full input context as JSON.",
-          "examples": [
-            "Is this Bash command safe to run? Review for destructive operations: $ARGUMENTS",
-            "Does this file edit follow our coding standards? $ARGUMENTS"
-          ]
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for evaluation. Defaults to a fast model for low latency.",
-          "examples": ["haiku"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 30
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs.",
-          "examples": ["Evaluating safety..."]
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    },
-    "AgentHook": {
-      "type": "object",
-      "description": "Runs a multi-turn LLM [agent-based hook](https://code.claude.com/docs/en/hooks#agent-based-hooks) with tool access (`Read`, `Grep`, `Glob`, `Bash`, etc.). Can explore the codebase and run commands to verify conditions. Must respond `{ok: true}` or `{ok: false, reason: \"...\"}`. Best for complex validations requiring file reads or external checks.",
-      "properties": {
-        "type": { "const": "agent" },
-        "prompt": {
-          "type": "string",
-          "description": "Verification prompt. Use `$ARGUMENTS` to interpolate the hook's full input context as JSON. The agent can then use tools to investigate further before deciding.",
-          "examples": [
-            "Verify this operation is safe and won't cause data loss: $ARGUMENTS"
-          ]
-        },
-        "model": {
-          "type": "string",
-          "description": "Model for the agent. Defaults to a fast model.",
-          "examples": ["sonnet"]
-        },
-        "timeout": {
-          "type": "number",
-          "description": "Max execution time in seconds.",
-          "default": 60
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Custom spinner message displayed while the hook runs.",
-          "examples": ["Verifying operation..."]
-        },
-        "once": {
-          "type": "boolean",
-          "description": "Run once per session then remove.",
-          "default": false
-        }
-      },
-      "required": ["type", "prompt"],
-      "additionalProperties": false
-    }
-  }
+  "additionalProperties": false
 }

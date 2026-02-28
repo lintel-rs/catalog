@@ -3,7 +3,8 @@
   "title": "LSP Server Configuration",
   "description": "[LSP server](https://code.claude.com/docs/en/plugins-reference#lsp-servers) configuration for a language. The language server binary must be installed separately on the user's machine. See [available LSP plugins](https://code.claude.com/docs/en/plugins-reference#lsp-servers) for pre-built options.",
   "x-lintel": {
-    "catalogDescription": "LSP server configuration for a Claude Code plugin."
+    "catalogDescription": "LSP server configuration for a Claude Code plugin.",
+    "fileMatch": []
   },
   "type": "object",
   "properties": {
@@ -19,16 +20,25 @@
     },
     "extensionToLanguage": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
+      "additionalProperties": {
+        "type": "string"
+      },
       "description": "Maps file extensions to [language identifiers](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentItem).",
       "examples": [
-        { ".go": "go" },
-        { ".ts": "typescript", ".tsx": "typescriptreact" }
+        {
+          ".go": "go"
+        },
+        {
+          ".ts": "typescript",
+          ".tsx": "typescriptreact"
+        }
       ]
     },
     "args": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Command-line arguments for the LSP server.",
       "examples": [["serve"], ["--stdio"]]
     },
@@ -40,7 +50,9 @@
     },
     "env": {
       "type": "object",
-      "additionalProperties": { "type": "string" },
+      "additionalProperties": {
+        "type": "string"
+      },
       "description": "Environment variables to set when starting the server."
     },
     "initializationOptions": {

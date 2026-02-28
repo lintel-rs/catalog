@@ -3,7 +3,8 @@
   "title": "Plugin Author",
   "description": "Author information for the plugin.",
   "x-lintel": {
-    "catalogDescription": "Author information for a Claude Code plugin."
+    "catalogDescription": "Author information for a Claude Code plugin.",
+    "fileMatch": []
   },
   "type": "object",
   "properties": {
