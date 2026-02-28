@@ -48,7 +48,7 @@
         {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "./permission.json"
           },
           "description": "Array of tool names."
         }

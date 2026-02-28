@@ -34,7 +34,7 @@
         {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "./permission.json"
           },
           "description": "Array of tool names.",
           "examples": [["Read", "Grep", "Glob", "Bash"]]
@@ -52,7 +52,7 @@
         {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "./permission.json"
           },
           "description": "Array of tool names to deny.",
           "examples": [["Write", "Edit"]]
