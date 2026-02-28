@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Plugin",
   "description": "Schema for [Claude Code plugin](https://code.claude.com/docs/en/plugins) manifest (`.claude-plugin/plugin.json`). Plugins extend Claude Code with reusable skills, agents, hooks, MCP servers, and LSP servers that can be shared across projects and teams via [marketplaces](https://code.claude.com/docs/en/plugin-marketplaces). The manifest defines plugin metadata and optionally declares custom component paths. Components in default locations (`commands/`, `agents/`, `skills/`, `hooks/hooks.json`, `.mcp.json`, `.lsp.json`) are auto-discovered even without a manifest. The manifest is optional — if omitted, the directory name becomes the plugin name. See [plugin manifest schema](https://code.claude.com/docs/en/plugins-reference#plugin-manifest-schema) for the complete reference.",
+  "x-lintel": {
+    "catalogDescription": "Claude Code plugin manifest."
+  },
   "type": "object",
   "properties": {
     "name": {

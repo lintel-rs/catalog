@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Path or Paths",
+  "description": "A single relative path or an array of relative paths for Claude Code plugin component locations.",
+  "x-lintel": {
+    "catalogDescription": "Path or array of paths for Claude Code plugin components."
+  },
+  "oneOf": [
+    {
+      "type": "string",
+      "description": "A single relative path starting with `./`."
+    },
+    {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of relative paths, each starting with `./`."
+    }
+  ]
+}

@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Command",
   "description": "Frontmatter schema for Claude Code custom slash commands (`.claude/commands/*.md`). Commands are the **legacy format** for [skills](https://code.claude.com/docs/en/skills) — they support identical frontmatter fields and behavior. New projects should prefer the skill format (`.claude/skills/*/SKILL.md`) for better organization and support for companion files. A file at `.claude/commands/review.md` and a skill at `.claude/skills/review/SKILL.md` both create `/review` and work the same way. If a skill and a command share the same name, the skill takes precedence. Use `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` for argument substitution in the body.",
+  "x-lintel": {
+    "catalogDescription": "Frontmatter for Claude Code custom slash commands."
+  },
   "type": "object",
   "properties": {
     "name": {

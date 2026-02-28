@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Subagent",
   "description": "Frontmatter schema for [Claude Code subagent](https://code.claude.com/docs/en/sub-agents) definitions (`.claude/agents/*.md`). Subagents are specialized AI assistants that run in their own context window with a custom system prompt, specific tool access, and independent permissions. The markdown body after the `---` frontmatter becomes the subagent's **system prompt** (not the full Claude Code system prompt — only the body plus basic environment details). Subagents are stored at `~/.claude/agents/` (personal), `.claude/agents/` (project), `<plugin>/agents/` (plugin), or passed via `--agents` CLI flag (session-only). When multiple subagents share the same name, higher-priority locations win: CLI > project > personal > plugin. Subagents cannot spawn other subagents.",
+  "x-lintel": {
+    "catalogDescription": "Frontmatter for Claude Code subagent definitions."
+  },
   "type": "object",
   "properties": {
     "name": {

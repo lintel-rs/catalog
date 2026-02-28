@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Skill",
   "description": "Frontmatter schema for [Claude Code skill](https://code.claude.com/docs/en/skills) definitions (`.claude/skills/*/SKILL.md` or `.claude/skills/*.md`). Skills extend Claude with reusable knowledge, workflows, and slash commands following the [Agent Skills](https://agentskills.io) open standard. The markdown body after the `---` frontmatter becomes the skill's content, injected into Claude's context when triggered. Use `$ARGUMENTS`, `$ARGUMENTS[N]`, or `$N` for argument substitution, and `` !`command` `` for [dynamic context injection](https://code.claude.com/docs/en/skills#inject-dynamic-context). Skills are stored at `~/.claude/skills/` (personal), `.claude/skills/` (project), or `<plugin>/skills/` (plugin). When skills share the same name across levels, higher-priority locations win: enterprise > personal > project. Plugin skills use a `plugin-name:skill-name` namespace.",
+  "x-lintel": {
+    "catalogDescription": "Frontmatter for Claude Code skill definitions."
+  },
   "type": "object",
   "properties": {
     "name": {

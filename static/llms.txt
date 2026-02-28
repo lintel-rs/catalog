@@ -1,0 +1,122 @@
+# Lintel Catalog
+
+> A curated catalog of JSON Schemas for validating configuration files, hosted at https://catalog.lintel.tools/
+
+Lintel Catalog maps over 1,000 JSON Schemas to the filenames they validate. Given a filename like `tsconfig.json` or `.github/workflows/ci.yml`, the catalog tells you which schema to use for validation and editor autocompletion.
+
+## How to find the schema for a file
+
+### Option 1: Search catalog.json directly
+
+Fetch the full catalog index:
+
+    GET https://catalog.lintel.tools/catalog.json
+
+This returns a JSON object with a `schemas` array. Each entry has:
+
+- `name` — human-readable schema name
+- `description` — what the schema validates
+- `url` — the schema URL (fetch this to get the full JSON Schema)
+- `fileMatch` — glob patterns for filenames this schema applies to
+- `versions` — (optional) map of version identifiers to versioned schema URLs
+
+To find the schema for a file, match its path against the `fileMatch` globs. Patterns without a `/` match at any directory depth (i.e., `tsconfig.json` matches `project/tsconfig.json`). Patterns with `**` match any number of path segments.
+
+Example: to find the schema for `biome.json`, look for an entry whose `fileMatch` contains `biome.json`. The result's `url` field gives you the schema to fetch.
+
+### Option 2: Fetch a schema directly by URL convention
+
+Schemas are hosted at predictable URLs:
+
+    https://catalog.lintel.tools/schemas/{group}/{schema}/latest.json
+
+For a specific version:
+
+    https://catalog.lintel.tools/schemas/{group}/{schema}/versions/{version}.json
+
+Example:
+
+    https://catalog.lintel.tools/schemas/biome/biome/latest.json
+    https://catalog.lintel.tools/schemas/biome/biome/versions/2.1.0.json
+
+### Option 3: Browse the site
+
+Visit https://catalog.lintel.tools/ to browse schemas by group, search by name, and view rendered documentation for each schema.
+
+## Catalog format
+
+The catalog follows the SchemaStore catalog format (compatible with VS Code, IntelliJ, and other editors). The structure:
+
+```json
+{
+  "$schema": "https://catalog.lintel.tools/schemas/lintel/catalog/latest.json",
+  "version": 1,
+  "title": "Lintel Catalog",
+  "schemas": [
+    {
+      "name": "Configuration",
+      "description": "Biome configuration file",
+      "url": "https://catalog.lintel.tools/schemas/biome/biome/latest.json",
+      "sourceUrl": "https://biomejs.dev/schemas/latest/schema.json",
+      "fileMatch": ["biome.json", "biome.jsonc"],
+      "versions": {
+        "2.1.0": "https://catalog.lintel.tools/schemas/biome/biome/versions/2.1.0.json"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Biome",
+      "description": "Biome configuration schemas",
+      "schemas": ["Configuration"]
+    }
+  ]
+}
+```
+
+## Lintel CLI
+
+Lintel is a multi-format JSON Schema linter. Install and run it via npx:
+
+    npx @lintel/lintel <command>
+
+### explain — Schema documentation
+
+Show rendered documentation for a schema, navigable by JSON Pointer or JSONPath:
+
+    npx @lintel/lintel explain tsconfig.json
+    npx @lintel/lintel explain --schema https://catalog.lintel.tools/schemas/biome/biome/latest.json
+    npx @lintel/lintel explain tsconfig.json /properties/compilerOptions
+    npx @lintel/lintel explain biome.json '$.linter'
+
+When given a data file, `explain` also validates it and shows errors inline in the documentation. Use `--path` to resolve a schema by filename without requiring the file to exist:
+
+    npx @lintel/lintel explain --path .github/workflows/ci.yml
+
+### identify — Schema resolution
+
+Show which schema a file resolves to without validating:
+
+    npx @lintel/lintel identify package.json
+
+### check — Validate files
+
+Validate files against their matched schemas with pretty terminal output:
+
+    npx @lintel/lintel check *.json
+    npx @lintel/lintel check biome.json tsconfig.json
+
+### Other commands
+
+- `ci` — Validate with machine-readable one-error-per-line output
+- `convert` — Convert between JSON, YAML, and TOML formats
+- `format` — Format JSON, YAML, TOML, and Markdown files
+- `annotate` — Add schema URL annotations (modelines) to files
+- `init` — Create a lintel.toml configuration file
+
+## Key URLs
+
+- Catalog index: https://catalog.lintel.tools/catalog.json
+- Site: https://catalog.lintel.tools/
+- Source: https://github.com/lintel-rs/catalog
+- Lintel linter: https://github.com/lintel-rs/lintel

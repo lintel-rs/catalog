@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Plugin Author",
+  "description": "Author information for the plugin.",
+  "x-lintel": {
+    "catalogDescription": "Author information for a Claude Code plugin."
+  },
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Author's display name.",
+      "examples": ["Dev Team", "Jane Doe"]
+    },
+    "email": {
+      "type": "string",
+      "description": "Author's email address.",
+      "examples": ["dev@company.com"]
+    },
+    "url": {
+      "type": "string",
+      "description": "Author's website or profile URL.",
+      "examples": ["https://github.com/author"]
+    }
+  },
+  "additionalProperties": false
+}

@@ -3,6 +3,7 @@
   "title": "Lintel Configuration",
   "description": "Configuration file for the Lintel JSON/YAML schema validator.\n\nLintel walks up the directory tree from the validated file looking for\n`lintel.toml` files and merges them together. Settings in child directories\ntake priority over parent directories. Set `root = true` to stop the upward\nsearch.\n\nPlace `lintel.toml` at your project root (or any subdirectory that needs\ndifferent settings).",
   "x-lintel": {
+    "catalogDescription": "Configuration for the Lintel JSON/YAML schema validator.",
     "fileMatch": ["lintel.toml", "**/lintel.toml"]
   },
   "type": "object",

@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Clippy Configuration",
   "description": "Configuration file for [Clippy](https://doc.rust-lang.org/clippy/), the Rust linter. Placed at `clippy.toml` or `.clippy.toml` in the project root.\n\nSee the [lint configuration reference](https://doc.rust-lang.org/stable/clippy/lint_configuration.html) for full documentation.\n\nArray options support the special `\"..\"` element to extend the default list rather than replacing it.",
+  "x-lintel": {
+    "catalogDescription": "Configuration for Clippy, the Rust linter."
+  },
   "type": "object",
   "properties": {
     "absolute-paths-allowed-crates": {

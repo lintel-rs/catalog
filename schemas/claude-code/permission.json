@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude Code Permission Rule",
+  "description": "A [permission rule](https://code.claude.com/docs/en/permissions#permission-rule-syntax) string that controls tool access in Claude Code. Rules follow the format `Tool` or `Tool(specifier)` and appear in:\n\n- `allow`, `deny`, and `ask` arrays in [settings files](https://code.claude.com/docs/en/settings#settings-files)\n- `allowed-tools` fields in [skills](https://code.claude.com/docs/en/skills) and [commands](https://code.claude.com/docs/en/skills)\n- `tools` and `disallowedTools` fields in [subagents](https://code.claude.com/docs/en/sub-agents)\n\nRules are evaluated in order: **deny → ask → allow**. The first matching rule wins, so deny rules always take precedence. See [manage permissions](https://code.claude.com/docs/en/permissions#manage-permissions).",
+  "x-lintel": {
+    "catalogDescription": "Claude Code permission rule for tool access control."
+  },
+  "anyOf": [
+    {
+      "type": "string",
+      "title": "Bash Permission",
+      "description": "Matches [Bash tool](https://code.claude.com/docs/en/permissions#bash) commands. Supports [wildcard patterns](https://code.claude.com/docs/en/permissions#wildcard-patterns) with `*` at any position in the specifier.\n\n- `Bash` — matches **all** Bash commands (equivalent to `Bash(*)`)\n- `Bash(npm run build)` — matches the **exact** command `npm run build`\n- `Bash(npm run *)` — prefix match **with word boundary** (matches `npm run test` but not `npm runtime`)\n- `Bash(npm*)` — prefix match **without word boundary** (matches both `npm run` and `npmrc`)\n- `Bash(* --version)` — suffix match\n- `Bash(git * main)` — middle wildcard (matches `git checkout main`, `git merge main`)\n\nThe space before `*` matters: `Bash(ls *)` enforces a word boundary requiring a space, while `Bash(ls*)` does not. The legacy `:*` suffix syntax (e.g. `Bash(npm:*)`) is equivalent to ` *` but is **deprecated** — use `Bash(npm *)` instead. Claude Code is shell-operator aware — a rule like `Bash(safe-cmd *)` won't match `safe-cmd && dangerous-cmd`. See [Bash permission caveats](https://code.claude.com/docs/en/permissions#bash).",
+      "pattern": "^Bash(\\(.*\\))?$",
+      "examples": [
+        "Bash",
+        "Bash(npm run build)",
+        "Bash(npm run *)",
+        "Bash(git commit *)",
+        "Bash(* --version)",
+        "Bash(* --help *)",
+        "Bash(git * main)",
+        "Bash(ls*)"
+      ]
+    },
+    {
+      "type": "string",
+      "title": "Read Permission",
+      "description": "Matches [Read tool](https://code.claude.com/docs/en/permissions#read-and-edit) operations. Read rules also apply best-effort to other built-in tools that read files, including `Grep` and `Glob`.\n\nSpecifiers use [gitignore](https://git-scm.com/docs/gitignore) pattern syntax with four path types:\n\n| Pattern | Meaning | Example |\n|---|---|---|\n| `Read` | All file reads | |\n| `Read(./path)` or `Read(path)` | Relative to **current directory** | `Read(*.env)` |\n| `Read(/path)` | Relative to **project root** | `Read(/src/**/*.ts)` |\n| `Read(~/path)` | Relative to **home directory** | `Read(~/.zshrc)` |\n| `Read(//path)` | **Absolute** filesystem path | `Read(//Users/alice/secrets/**)` |\n\n`*` matches files in a single directory; `**` matches recursively across directories. Note: `/Users/alice/file` is relative to the project root — use `//Users/alice/file` for absolute paths. See [Read and Edit rules](https://code.claude.com/docs/en/permissions#read-and-edit).",
+      "pattern": "^Read(\\(.*\\))?$",
+      "examples": [
+        "Read",
+        "Read(./.env)",
+        "Read(./.env.*)",
+        "Read(*.env)",
+        "Read(src/**)",
+        "Read(/src/**)",
+        "Read(~/Documents/*.pdf)",
+        "Read(~/.zshrc)",
+        "Read(//Users/alice/secrets/**)",
+        "Read(./secrets/**)"
+      ]
+    },
+    {
+      "type": "string",
+      "title": "Edit Permission",
+      "description": "Matches [Edit tool](https://code.claude.com/docs/en/permissions#read-and-edit) operations. Edit rules apply to **all** built-in tools that modify files, including `Write`. Uses the same [gitignore](https://git-scm.com/docs/gitignore) pattern syntax as [Read](#read-permission) with four path types (`./`, `/`, `~/`, `//`).\n\n- `Edit` — all file edits\n- `Edit(/src/**/*.ts)` — TypeScript files under project `src/`\n- `Edit(/docs/**)` — files in `<project>/docs/` (NOT the filesystem `/docs/` and NOT `<project>/.claude/docs/`)\n- `Edit(~/.config/**)` — files in home config directory\n- `Edit(//tmp/scratch.txt)` — absolute path\n\n`*` matches files in a single directory; `**` matches recursively across directories. See [Read and Edit rules](https://code.claude.com/docs/en/permissions#read-and-edit).",
+      "pattern": "^Edit(\\(.*\\))?$",
+      "examples": [
+        "Edit",
+        "Edit(/src/**/*.ts)",
+        "Edit(/docs/**)",
+        "Edit(~/.config/**)",
+        "Edit(//tmp/scratch.txt)"
+      ]
+    },
+    {
+      "type": "string",
+      "title": "Write Permission",
+      "description": "Matches [Write tool](https://code.claude.com/docs/en/permissions#read-and-edit) operations. `Edit` rules also apply to `Write` since Edit covers all built-in tools that modify files. Uses the same [gitignore](https://git-scm.com/docs/gitignore) pattern syntax as Read and Edit with four path types (`./`, `/`, `~/`, `//`).\n\n`*` matches files in a single directory; `**` matches recursively across directories. See [Read and Edit rules](https://code.claude.com/docs/en/permissions#read-and-edit).",
+      "pattern": "^Write(\\(.*\\))?$",
+      "examples": ["Write", "Write(/src/**)", "Write(~/.config/**)"]
+    },
+    {
+      "type": "string",
+      "title": "WebFetch Permission",
+      "description": "Matches [WebFetch tool](https://code.claude.com/docs/en/permissions#webfetch) requests. Supports domain-based filtering with the `domain:` specifier prefix.\n\n- `WebFetch` — all web fetch requests\n- `WebFetch(domain:example.com)` — only requests to `example.com`\n\n**Note:** Using WebFetch alone does not prevent network access. If `Bash` is allowed, Claude can still use `curl`, `wget`, or other tools to reach any URL. For reliable URL filtering, consider combining Bash deny rules with WebFetch domain rules. See [WebFetch rules](https://code.claude.com/docs/en/permissions#webfetch).",
+      "pattern": "^WebFetch(\\(.*\\))?$",
+      "examples": [
+        "WebFetch",
+        "WebFetch(domain:example.com)",
+        "WebFetch(domain:api.github.com)"
+      ]
+    },
+    {
+      "type": "string",
+      "title": "WebSearch Permission",
+      "description": "Matches [WebSearch tool](https://code.claude.com/docs/en/permissions) operations. No specifier support — applies to all web searches. See [permission system](https://code.claude.com/docs/en/permissions#permission-system).",
+      "pattern": "^WebSearch$",
+      "examples": ["WebSearch"]
+    },
+    {
+      "type": "string",
+      "title": "Glob Permission",
+      "description": "Matches [Glob tool](https://code.claude.com/docs/en/permissions) operations for file pattern matching. Glob is a read-only tool — [Read permission rules](https://code.claude.com/docs/en/permissions#read-and-edit) also apply to Glob on a best-effort basis. See [permission system](https://code.claude.com/docs/en/permissions#permission-system).",
+      "pattern": "^Glob$",
+      "examples": ["Glob"]
+    },
+    {
+      "type": "string",
+      "title": "Grep Permission",
+      "description": "Matches [Grep tool](https://code.claude.com/docs/en/permissions) operations for content searching. Grep is a read-only tool — [Read permission rules](https://code.claude.com/docs/en/permissions#read-and-edit) also apply to Grep on a best-effort basis. See [permission system](https://code.claude.com/docs/en/permissions#permission-system).",
+      "pattern": "^Grep$",
+      "examples": ["Grep"]
+    },
+    {
+      "type": "string",
+      "title": "Task Permission",
+      "description": "Matches [Task (subagent)](https://code.claude.com/docs/en/permissions#task-subagents) operations. Controls which [subagents](https://code.claude.com/docs/en/sub-agents) Claude can spawn.\n\n- `Task` — all subagents\n- `Task(Explore)` — the [Explore](https://code.claude.com/docs/en/sub-agents#built-in-subagents) subagent (read-only codebase exploration)\n- `Task(Plan)` — the [Plan](https://code.claude.com/docs/en/sub-agents#built-in-subagents) subagent (implementation planning)\n- `Task(general-purpose)` — the general-purpose subagent\n- `Task(my-custom-agent)` — a custom subagent defined in `.claude/agents/`\n\nAdd to `deny` rules or use the `--disallowedTools` CLI flag to disable specific agents. See [Task permission rules](https://code.claude.com/docs/en/permissions#task-subagents).",
+      "pattern": "^Task(\\(.*\\))?$",
+      "examples": [
+        "Task",
+        "Task(Explore)",
+        "Task(Plan)",
+        "Task(general-purpose)",
+        "Task(my-custom-agent)",
+        "Task(worker, researcher)"
+      ]
+    },
+    {
+      "type": "string",
+      "title": "NotebookEdit Permission",
+      "description": "Matches [NotebookEdit tool](https://code.claude.com/docs/en/permissions) operations for editing Jupyter notebook (`.ipynb`) cells. See [permission system](https://code.claude.com/docs/en/permissions#permission-system).",
+      "pattern": "^NotebookEdit$",
+      "examples": ["NotebookEdit"]
+    },
+    {
+      "type": "string",
+      "title": "MCP Tool Permission",
+      "description": "Matches [MCP (Model Context Protocol)](https://code.claude.com/docs/en/permissions#mcp) tool operations. MCP tools follow the naming pattern `mcp__<server>__<tool>` where `<server>` is the server name configured in Claude Code.\n\n- `mcp__puppeteer` — **all tools** from the `puppeteer` server\n- `mcp__puppeteer__*` — wildcard matching all tools from the `puppeteer` server\n- `mcp__puppeteer__puppeteer_navigate` — the specific `puppeteer_navigate` tool\n\nServer names come from [MCP server configuration](https://code.claude.com/docs/en/mcp#configure-mcp-servers) in `.mcp.json`, settings files, or plugin manifests. See [MCP permission rules](https://code.claude.com/docs/en/permissions#mcp).",
+      "pattern": "^mcp__[a-zA-Z0-9_-]+(__[a-zA-Z0-9_*.-]+)?$",
+      "examples": [
+        "mcp__puppeteer",
+        "mcp__puppeteer__*",
+        "mcp__puppeteer__puppeteer_navigate",
+        "mcp__github__create_issue",
+        "mcp__slack__send_message"
+      ]
+    }
+  ]
+}

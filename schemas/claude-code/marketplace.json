@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Marketplace",
   "description": "Schema for [Claude Code marketplace](https://code.claude.com/docs/en/plugin-marketplaces) catalog (`.claude-plugin/marketplace.json`). Marketplaces distribute plugins to teams and communities, providing centralized discovery, version tracking, and automatic updates. Each marketplace lists plugins with their sources (local paths, GitHub repos, git URLs, npm packages, or pip packages). Users add marketplaces via `/plugin marketplace add` and install individual plugins with `/plugin install plugin-name@marketplace-name`.",
+  "x-lintel": {
+    "catalogDescription": "Claude Code plugin marketplace catalog."
+  },
   "type": "object",
   "properties": {
     "name": {

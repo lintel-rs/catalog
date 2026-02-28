@@ -3,6 +3,7 @@
   "title": "Lintel Catalog Builder",
   "description": "Configuration file for the Lintel catalog builder.\n\nDefines how to build a JSON Schema catalog from local schema definitions and\nexternal sources. The catalog builder reads this file, fetches schemas,\norganizes them into groups, and writes the output to one or more targets.\n\nPlace this file at the root of your catalog repository.",
   "x-lintel": {
+    "catalogDescription": "Configuration for the Lintel catalog builder.",
     "fileMatch": ["lintel-catalog.toml", "**/lintel-catalog.toml"]
   },
   "type": "object",

@@ -3,6 +3,7 @@
   "title": "Schema Catalog",
   "description": "Schema catalog index that maps file patterns to JSON Schema URLs.\n\nA catalog is a collection of schema entries used by editors and tools to\nautomatically associate files with the correct schema for validation and\ncompletion. Follows the `SchemaStore` catalog format.\n\nSee: <https://json.schemastore.org/schema-catalog.json>",
   "x-lintel": {
+    "catalogDescription": "Schema catalog index mapping file patterns to JSON Schema URLs.",
     "fileMatch": ["catalog.json", "**/catalog.json"]
   },
   "type": "object",

@@ -2,6 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Clippy Configuration",
   "description": "Configuration file for [Clippy](https://doc.rust-lang.org/clippy/), the Rust linter.\n\n## Overview\n\nClippy can be configured using a `clippy.toml` or `.clippy.toml` file at the project root. The configuration file is searched for in this order:\n\n1. The directory specified by `CLIPPY_CONF_DIR`\n2. The directory specified by `CARGO_MANIFEST_DIR`\n3. The current directory\n\nConfiguration uses simple `variable = value` mapping:\n\n```toml\navoid-breaking-exported-api = false\ndisallowed-names = [\"toto\", \"tata\", \"titi\"]\nmsrv = \"1.70.0\"\n```\n\nFor array options with defaults, use `\"..\"` to extend the default list rather than replacing it:\n\n```toml\n# default of disallowed-names is [\"foo\", \"baz\", \"quux\"]\ndisallowed-names = [\"bar\", \"..\"] # -> [\"bar\", \"foo\", \"baz\", \"quux\"]\n```\n\nSee the [Clippy Configuration guide](https://doc.rust-lang.org/clippy/configuration.html) for full details on configuring Clippy.\n\nAll lint configuration options listed here are sourced from the [Lint Configuration reference](https://doc.rust-lang.org/clippy/lint_configuration.html). This schema will be updated as that source page is updated.",
+  "x-lintel": {
+    "catalogDescription": "Configuration for Clippy, the Rust linter (detailed reference)."
+  },
   "type": "object",
   "properties": {
     "absolute-paths-allowed-crates": {
