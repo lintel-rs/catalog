@@ -23,9 +23,6 @@ jobs:
         with:
           name: lintel
 
-      - name: Build lintel-catalog-builder
-        run: nix build github:lintel-rs/lintel/v0.0.13#lintel-catalog-builder
-
       - name: Cache schema downloads
         uses: actions/cache@v4
         with:
@@ -34,7 +31,7 @@ jobs:
           restore-keys: schema-cache-
 
       - name: Generate catalog
-        run: ./result/bin/lintel-catalog-builder generate --config lintel-catalog.toml --target default
+        run: nix run github:lintel-rs/lintel#lintel-catalog-builder -- generate --config lintel-catalog.toml --target default
 
       - name: Clone catalog-generated
         run: git clone https://x-access-token:${{ secrets.CATALOG_PUSH_GITHUB_PAT }}@github.com/lintel-rs/catalog-generated.git /tmp/catalog-generated
