@@ -125,6 +125,7 @@ description = "Schemas for Claude Code agent, skill, command, and plugin configu
 [groups.claude-code.schemas.agent]
 [groups.claude-code.schemas.command]
 [groups.claude-code.schemas.marketplace]
+[groups.claude-code.schemas.mcp-json]
 [groups.claude-code.schemas.plugin]
 [groups.claude-code.schemas.skill]
 

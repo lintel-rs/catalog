@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude Code MCP Configuration",
+  "description": "Configuration file for [MCP servers](https://code.claude.com/docs/en/mcp) in Claude Code (`.mcp.json`).\n\nThis file defines which MCP servers Claude Code should connect to. Place it at the project root and check it into version control so all team members share the same MCP tools.\n\nAdd servers via the CLI (`claude mcp add --scope project ...`) or edit this file directly.\n\n**Scopes**: Claude Code resolves MCP servers from multiple locations with this precedence:\n1. **Local** — `~/.claude.json` under the project path (private, default)\n2. **Project** — `.mcp.json` at the project root (shared via version control)\n3. **User** — `~/.claude.json` global section (available across all projects)\n\nWhen servers with the same name exist at multiple scopes, higher-precedence scopes win.\n\nAll string values in server configs support [environment variable expansion](https://code.claude.com/docs/en/mcp#environment-variable-expansion-in-mcpjson): `${VAR}` and `${VAR:-default}`.",
+  "x-lintel": {
+    "catalogDescription": "MCP server configuration file for Claude Code projects.",
+    "fileMatch": [".mcp.json", "**/.mcp.json"]
+  },
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema URI for editor validation and autocompletion."
+    },
+    "mcpServers": {
+      "type": "object",
+      "description": "Map of server names to their transport configuration.\n\nEach key is a unique server name (used in Claude Code to identify the server). Each value is an [MCP server configuration](https://code.claude.com/docs/en/mcp) specifying the transport type and connection details.\n\nFor security, Claude Code prompts for approval before using project-scoped servers from `.mcp.json` files. Use `claude mcp reset-project-choices` to reset approval choices.",
+      "additionalProperties": {
+        "$ref": "./mcp-server-config.json"
+      }
+    }
+  },
+  "required": ["mcpServers"],
+  "additionalProperties": false
+}

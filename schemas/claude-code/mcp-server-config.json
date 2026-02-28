@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "MCP Server Configuration",
-  "description": "Configuration for a single [MCP server](https://code.claude.com/docs/en/mcp) in Claude Code. Supports stdio (local process), HTTP (streamable HTTP transport), and SSE (server-sent events) server types.",
+  "description": "Configuration for a single [MCP server](https://code.claude.com/docs/en/mcp) in Claude Code.\n\nSupports three transport types:\n\n- **stdio** — Runs a local child process; Claude Code communicates over stdin/stdout\n- **http** — Connects to a remote server using [streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http) (recommended for remote servers)\n- **sse** — Connects to a remote server using [server-sent events](https://modelcontextprotocol.io/docs/concepts/transports#http-with-sse) (deprecated; prefer HTTP)\n\nAll string fields support [environment variable expansion](https://code.claude.com/docs/en/mcp#environment-variable-expansion-in-mcpjson):\n- `${VAR}` — expands to the value of `VAR`\n- `${VAR:-default}` — expands to `VAR` if set, otherwise uses `default`\n\nExpansion is supported in `command`, `args`, `env`, `url`, and `headers` fields.",
   "x-lintel": {
     "catalogDescription": "MCP server configuration for Claude Code.",
     "fileMatch": []
@@ -14,93 +14,140 @@
   "$defs": {
     "StdioServer": {
       "type": "object",
-      "description": "A stdio-based MCP server that runs as a local child process. Claude Code launches the command and communicates over stdin/stdout using the [MCP stdio transport](https://modelcontextprotocol.io/docs/concepts/transports#stdio). Use `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+      "description": "A stdio-based MCP server that runs as a local child process.\n\nClaude Code launches the specified `command` and communicates over stdin/stdout using the [MCP stdio transport](https://modelcontextprotocol.io/docs/concepts/transports#stdio).\n\nIf `type` is omitted and `command` is present, stdio transport is assumed.\n\nUse `${CLAUDE_PLUGIN_ROOT}` in `command`, `args`, `env`, and `cwd` for plugin-relative paths. All string values support `${VAR}` and `${VAR:-default}` environment variable expansion.\n\n**Windows note**: On native Windows (not WSL), servers that use `npx` require a `cmd /c` wrapper (e.g. `\"command\": \"cmd\"`, `\"args\": [\"/c\", \"npx\", \"-y\", \"@some/package\"]`).",
       "properties": {
         "type": {
           "const": "stdio",
-          "description": "Transport type. Optional for stdio servers — if `type` is omitted and `command` is present, stdio is assumed."
+          "description": "Transport type.\n\nOptional for stdio servers — if `type` is omitted and `command` is present, stdio is assumed."
         },
         "command": {
           "type": "string",
-          "description": "Executable to run (must be in `PATH` or an absolute/relative path).",
+          "description": "Executable to run.\n\nMust be in `PATH` or specified as an absolute or relative path. Supports `${VAR}` expansion and `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
           "examples": [
             "node",
             "python",
             "npx",
+            "/usr/local/bin/company-mcp-server",
             "${CLAUDE_PLUGIN_ROOT}/servers/db-server"
           ]
         },
         "args": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Command-line arguments for the server process.",
-          "examples": [["./servers/db-server.js", "--config", "./config.json"]]
+          "description": "Command-line arguments passed to the server process.\n\nSupports `${VAR}` expansion and `${CLAUDE_PLUGIN_ROOT}`.",
+          "examples": [
+            ["serve"],
+            ["--config", "/etc/company/mcp-config.json"],
+            ["--port", "8080"],
+            ["-y", "@modelcontextprotocol/server-filesystem"]
+          ]
         },
         "env": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "Environment variables set when starting the server. Values support `${CLAUDE_PLUGIN_ROOT}`.",
-          "examples": [{ "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" }]
+          "description": "Environment variables set when starting the server process.\n\nThese are merged with the parent environment. Values support `${VAR}` and `${VAR:-default}` expansion, as well as `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+          "examples": [
+            { "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data" },
+            { "COMPANY_API_URL": "https://internal.company.com" },
+            { "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}" }
+          ]
         },
         "cwd": {
           "type": "string",
-          "description": "Working directory for the server process.",
-          "examples": ["${CLAUDE_PLUGIN_ROOT}"]
+          "description": "Working directory for the server process.\n\nIf omitted, inherits the current working directory. Supports `${CLAUDE_PLUGIN_ROOT}` for plugin-relative paths.",
+          "examples": ["${CLAUDE_PLUGIN_ROOT}", "/opt/mcp-servers"]
         },
         "timeout": {
           "type": "number",
-          "description": "Connection timeout in milliseconds.",
-          "examples": [30000]
+          "description": "Connection timeout in milliseconds.\n\nHow long Claude Code waits for the server to start and respond to the initial handshake. Can also be configured globally via the `MCP_TIMEOUT` environment variable (e.g. `MCP_TIMEOUT=10000 claude`).",
+          "examples": [10000, 30000]
         }
       },
       "required": ["command"]
     },
     "HttpServer": {
       "type": "object",
-      "description": "A remote MCP server using the [streamable HTTP transport](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http). Claude Code connects to the server over HTTP/HTTPS.",
+      "description": "A remote MCP server using the [streamable HTTP transport](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http).\n\nThis is the **recommended transport** for remote/cloud-based MCP servers. Claude Code connects to the server over HTTP/HTTPS.\n\nUse `headers` for static authentication (e.g. API keys). For OAuth 2.0 authentication, configure the `oauth` field and use `/mcp` in Claude Code to complete the browser login flow.\n\nAll string values support `${VAR}` and `${VAR:-default}` environment variable expansion.",
       "properties": {
         "type": {
           "const": "http",
-          "description": "Transport type."
+          "description": "Transport type. Required for HTTP servers."
         },
         "url": {
           "type": "string",
-          "description": "URL of the remote MCP server endpoint.",
+          "description": "URL of the remote MCP server endpoint.\n\nSupports `${VAR}` and `${VAR:-default}` environment variable expansion.",
           "examples": [
-            "https://mcp.deepwiki.com/mcp",
-            "https://mcp.example.com/api"
+            "https://api.githubcopilot.com/mcp/",
+            "https://mcp.sentry.dev/mcp",
+            "https://mcp.notion.com/mcp",
+            "https://mcp.paypal.com/mcp",
+            "${API_BASE_URL:-https://api.example.com}/mcp"
           ]
         },
         "headers": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "HTTP headers to include with requests (e.g. for authentication).",
-          "examples": [{ "Authorization": "Bearer ${MCP_API_KEY}" }]
+          "description": "HTTP headers to include with every request.\n\nCommonly used for static authentication (API keys, bearer tokens). Supports `${VAR}` and `${VAR:-default}` environment variable expansion in values.",
+          "examples": [
+            { "Authorization": "Bearer ${MCP_API_KEY}" },
+            { "X-API-Key": "${API_KEY}" }
+          ]
+        },
+        "oauth": {
+          "$ref": "#/$defs/OAuthConfig",
+          "description": "OAuth 2.0 client credentials for servers that require browser-based authentication.\n\nUse this when the server doesn't support dynamic client registration (you'll see an error like *\"Incompatible auth server: does not support dynamic client registration\"*). Register an OAuth app through the server's developer portal first, then provide the `clientId` here.\n\nAfter configuring, run `/mcp` in Claude Code to complete the browser login flow. The client secret is stored securely in your system keychain (macOS) or credentials file — it is **not** stored in this config."
         }
       },
       "required": ["type", "url"]
     },
     "SseServer": {
       "type": "object",
-      "description": "A remote MCP server using the [SSE (server-sent events) transport](https://modelcontextprotocol.io/docs/concepts/transports#http-with-sse). Claude Code connects to the server over HTTP/HTTPS with SSE for server-to-client messages.",
+      "description": "A remote MCP server using the [SSE (server-sent events) transport](https://modelcontextprotocol.io/docs/concepts/transports#http-with-sse).\n\n> **Deprecated**: The SSE transport is deprecated. Use [HTTP servers](#/$defs/HttpServer) instead, where available.\n\nClaude Code connects to the server over HTTP/HTTPS with SSE for server-to-client messages. Configuration is identical to HTTP servers.\n\nAll string values support `${VAR}` and `${VAR:-default}` environment variable expansion.",
       "properties": {
         "type": {
           "const": "sse",
-          "description": "Transport type."
+          "description": "Transport type. Required for SSE servers."
         },
         "url": {
           "type": "string",
-          "description": "URL of the remote MCP server SSE endpoint.",
-          "examples": ["https://mcp.example.com/sse"]
+          "description": "URL of the remote MCP server SSE endpoint.\n\nSupports `${VAR}` and `${VAR:-default}` environment variable expansion.",
+          "examples": [
+            "https://mcp.asana.com/sse",
+            "https://mcp.example.com/sse"
+          ]
         },
         "headers": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "HTTP headers to include with requests (e.g. for authentication).",
-          "examples": [{ "Authorization": "Bearer ${MCP_API_KEY}" }]
+          "description": "HTTP headers to include with every request.\n\nCommonly used for static authentication (API keys, bearer tokens). Supports `${VAR}` and `${VAR:-default}` environment variable expansion in values.",
+          "examples": [
+            { "Authorization": "Bearer ${MCP_API_KEY}" },
+            { "X-API-Key": "${API_KEY}" }
+          ]
+        },
+        "oauth": {
+          "$ref": "#/$defs/OAuthConfig",
+          "description": "OAuth 2.0 client credentials for servers that require browser-based authentication.\n\nSee [HttpServer](#/$defs/HttpServer) `oauth` for details."
         }
       },
       "required": ["type", "url"]
+    },
+    "OAuthConfig": {
+      "type": "object",
+      "description": "Pre-configured [OAuth 2.0](https://oauth.net/2/) client credentials.\n\nRequired when the remote MCP server does not support [dynamic client registration](https://datatracker.ietf.org/doc/html/rfc7591). Register an OAuth app through the server's developer portal and provide the `clientId` here. The client secret is passed separately via `claude mcp add-json --client-secret` and stored securely in your system keychain — it is **never** written to config files.\n\nAfter configuring, run `/mcp` in Claude Code to complete the browser authentication flow. Tokens are stored securely and refreshed automatically.",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "OAuth client ID obtained from the server's developer portal.\n\nIf the server uses a public OAuth client with no secret, provide only `clientId` without a corresponding `--client-secret` flag.",
+          "examples": ["your-client-id", "abc123def456"]
+        },
+        "callbackPort": {
+          "type": "integer",
+          "description": "Local port for the OAuth callback redirect.\n\nClaude Code starts a temporary HTTP server on this port to receive the OAuth redirect. The redirect URI registered in the server's developer portal must match `http://localhost:<callbackPort>/callback`.\n\nChoose any available port; it just needs to match the redirect URI you registered.",
+          "examples": [8080, 3000, 9090]
+        }
+      },
+      "required": ["clientId"]
     }
   }
 }

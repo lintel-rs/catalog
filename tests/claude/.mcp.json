@@ -1,0 +1,74 @@
+{
+  "$schema": "../../schemas/claude-code/mcp-json.json",
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "company-internal": {
+      "type": "stdio",
+      "command": "/usr/local/bin/company-mcp-server",
+      "args": ["--config", "/etc/company/mcp-config.json"],
+      "env": {
+        "COMPANY_API_URL": "https://internal.company.com"
+      }
+    },
+    "database": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bytebase/dbhub",
+        "--dsn",
+        "postgresql://readonly:pass@localhost:5432/analytics"
+      ],
+      "env": {}
+    },
+    "airtable": {
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    },
+    "private-api": {
+      "type": "http",
+      "url": "${API_BASE_URL:-https://api.example.com}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${API_KEY}"
+      }
+    },
+    "oauth-server": {
+      "type": "http",
+      "url": "https://mcp.example.com/mcp",
+      "oauth": {
+        "clientId": "my-client-id",
+        "callbackPort": 8080
+      }
+    },
+    "legacy-sse": {
+      "type": "sse",
+      "url": "https://mcp.asana.com/sse",
+      "headers": {
+        "X-API-Key": "${ASANA_API_KEY}"
+      }
+    },
+    "plugin-server": {
+      "type": "stdio",
+      "command": "${CLAUDE_PLUGIN_ROOT}/servers/db-server",
+      "args": ["--config", "${CLAUDE_PLUGIN_ROOT}/config.json"],
+      "env": {
+        "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data"
+      },
+      "cwd": "${CLAUDE_PLUGIN_ROOT}",
+      "timeout": 30000
+    }
+  }
+}
