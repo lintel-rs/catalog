@@ -123,10 +123,15 @@ name = "Claude Code"
 description = "Schemas for Claude Code agent, skill, command, and plugin configuration files"
 
 [groups.claude-code.schemas.agent]
+
 [groups.claude-code.schemas.command]
+
 [groups.claude-code.schemas.marketplace]
+
 [groups.claude-code.schemas.mcp-json]
+
 [groups.claude-code.schemas.plugin]
+
 [groups.claude-code.schemas.skill]
 
 [groups.devenv]
@@ -154,7 +159,9 @@ name = "Lintel"
 description = "Lintel configuration files"
 
 [groups.lintel.schemas.catalog]
+
 [groups.lintel.schemas.lintel-catalog-toml]
+
 [groups.lintel.schemas.lintel-toml]
 
 [groups.rust]
