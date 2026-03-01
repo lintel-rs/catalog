@@ -17,6 +17,7 @@
     { "$ref": "#/$defs/GrepPermission" },
     { "$ref": "#/$defs/TaskPermission" },
     { "$ref": "#/$defs/NotebookEditPermission" },
+    { "$ref": "#/$defs/SkillPermission" },
     { "$ref": "#/$defs/McpToolPermission" }
   ],
   "$defs": {
@@ -126,6 +127,18 @@
       "description": "Matches [NotebookEdit tool](https://code.claude.com/docs/en/permissions) operations for editing Jupyter notebook (`.ipynb`) cells. See [permission system](https://code.claude.com/docs/en/permissions#permission-system).",
       "pattern": "^NotebookEdit$",
       "examples": ["NotebookEdit"]
+    },
+    "SkillPermission": {
+      "type": "string",
+      "title": "Skill Permission",
+      "description": "Matches [Skill tool](https://code.claude.com/docs/en/skills) invocations. Controls which skills Claude can trigger via the `Skill` tool.\n\n- `Skill` — all skills\n- `Skill(commit)` — the specific `commit` skill\n- `Skill(my-plugin:my-skill)` — a namespaced plugin skill\n\nSkills are invoked as `/slash-commands` by users or programmatically by other skills. See [skills](https://code.claude.com/docs/en/skills).",
+      "pattern": "^Skill(\\(.*\\))?$",
+      "examples": [
+        "Skill",
+        "Skill(commit)",
+        "Skill(deploy)",
+        "Skill(my-plugin:my-skill)"
+      ]
     },
     "McpToolPermission": {
       "type": "string",

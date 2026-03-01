@@ -39,7 +39,7 @@
       "examples": ["sonnet", "opus", "haiku"]
     },
     "allowed-tools": {
-      "description": "Tools Claude can use **without asking permission** when this command is active. Built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`. Supports patterns like `Bash(git *)` to allow only specific subcommands. MCP tools use the pattern `mcp__<server>__<tool>`. If omitted, all tools are available with normal [permission prompts](https://code.claude.com/docs/en/permissions). This field only grants auto-approval — it does **not** override denials.",
+      "description": "Tools Claude can use **without asking permission** when this command is active. Built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `Skill`. Supports patterns like `Bash(git *)` to allow only specific subcommands, or `Skill(commit)` to allow invoking a specific skill. MCP tools use the pattern `mcp__<server>__<tool>`. If omitted, all tools are available with normal [permission prompts](https://code.claude.com/docs/en/permissions). This field only grants auto-approval — it does **not** override denials.",
       "oneOf": [
         {
           "type": "string",

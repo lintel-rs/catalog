@@ -24,7 +24,7 @@
       ]
     },
     "tools": {
-      "description": "[Tools](https://code.claude.com/docs/en/settings#tools-available-to-claude) the subagent can use. If omitted, inherits **all** tools from the main conversation (including MCP tools). Specify a subset to restrict access. Built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `NotebookEdit`. Supports patterns: `Bash(git *)` allows only `git` subcommands, `Task(worker, researcher)` restricts spawnable subagent types (only meaningful for agents run as main thread via `claude --agent`). MCP tools follow the pattern `mcp__<server>__<tool>`.",
+      "description": "[Tools](https://code.claude.com/docs/en/settings#tools-available-to-claude) the subagent can use. If omitted, inherits **all** tools from the main conversation (including MCP tools). Specify a subset to restrict access. Built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Task`, `Skill`, `NotebookEdit`. Supports patterns: `Bash(git *)` allows only `git` subcommands, `Skill(commit)` allows invoking a specific skill, `Task(worker, researcher)` restricts spawnable subagent types (only meaningful for agents run as main thread via `claude --agent`). MCP tools follow the pattern `mcp__<server>__<tool>`.",
       "oneOf": [
         {
           "type": "string",
