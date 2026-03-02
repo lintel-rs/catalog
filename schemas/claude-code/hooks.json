@@ -2,10 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Claude Code Hooks",
   "description": "Map of [hook event](https://code.claude.com/docs/en/hooks#hook-events) names to arrays of matcher groups. Each matcher group optionally filters by a regex pattern and contains an array of hook handlers that execute when the event fires.",
-  "x-lintel": {
-    "catalogDescription": "Claude Code hook event handlers.",
-    "fileMatch": ["**/hooks/hooks.json"]
-  },
   "type": "object",
   "properties": {
     "SessionStart": {
@@ -60,6 +56,14 @@
       "$ref": "#/$defs/MatcherGroupArray",
       "description": "Fires when a configuration file changes during a session. Matcher filters by source: `user_settings`, `project_settings`, `local_settings`, `policy_settings`, `skills`. Can block configuration changes from taking effect (except `policy_settings`)."
     },
+    "WorktreeCreate": {
+      "$ref": "#/$defs/MatcherGroupArray",
+      "description": "Fires when a worktree is being created via `--worktree` or `isolation: \"worktree\"`. Replaces default git behavior — the hook must print the absolute path to the created worktree on stdout. **No matcher support** — always fires. Any non-zero exit code causes worktree creation to fail."
+    },
+    "WorktreeRemove": {
+      "$ref": "#/$defs/MatcherGroupArray",
+      "description": "Fires when a worktree is being removed, either at session exit or when a subagent finishes. **No matcher support** — always fires. Failures are logged in debug mode only and cannot block removal."
+    },
     "PreCompact": {
       "$ref": "#/$defs/MatcherGroupArray",
       "description": "Fires before context compaction. Matcher filters by trigger type: `manual`, `auto`."
@@ -99,6 +103,9 @@
       "oneOf": [
         {
           "$ref": "#/$defs/CommandHook"
+        },
+        {
+          "$ref": "#/$defs/HttpHook"
         },
         {
           "$ref": "#/$defs/PromptHook"
@@ -146,6 +153,63 @@
         }
       },
       "required": ["type", "command"],
+      "additionalProperties": false
+    },
+    "HttpHook": {
+      "type": "object",
+      "description": "Sends the event's [JSON input](https://code.claude.com/docs/en/hooks#hook-input-and-output) as an HTTP POST request to a URL. The endpoint communicates results back through the response body using the same [JSON output format](https://code.claude.com/docs/en/hooks#json-output) as command hooks. Non-2xx responses, connection failures, and timeouts produce non-blocking errors. To block a tool call or deny a permission, return a 2xx response with a JSON body containing the appropriate decision fields. HTTP hooks must be configured by editing settings JSON directly — the `/hooks` interactive menu only supports command hooks.",
+      "properties": {
+        "type": {
+          "const": "http"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to send the POST request to. Must match an entry in `allowedHttpHookUrls` if that setting is configured.",
+          "examples": [
+            "http://localhost:8080/hooks/pre-tool-use",
+            "https://hooks.example.com/validate"
+          ]
+        },
+        "headers": {
+          "type": "object",
+          "description": "Additional HTTP headers as key-value pairs. Values support environment variable interpolation using `$VAR_NAME` or `${VAR_NAME}` syntax. Only variables listed in `allowedEnvVars` are resolved; references to unlisted variables are replaced with empty strings.",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "examples": [
+            {
+              "Authorization": "Bearer $MY_TOKEN",
+              "X-Custom-Header": "value"
+            }
+          ]
+        },
+        "allowedEnvVars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of environment variable names that may be interpolated into header values. References to unlisted variables are replaced with empty strings. Required for any env var interpolation to work.",
+          "examples": [["MY_TOKEN", "HOOK_SECRET"]]
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Max execution time in seconds.",
+          "default": 30,
+          "examples": [10, 30, 60]
+        },
+        "statusMessage": {
+          "type": "string",
+          "description": "Custom spinner message displayed while the hook runs.",
+          "examples": ["Validating with remote service..."]
+        },
+        "once": {
+          "type": "boolean",
+          "description": "Run once per session then remove. Primarily useful in skill-scoped hooks.",
+          "default": false
+        }
+      },
+      "required": ["type", "url"],
       "additionalProperties": false
     },
     "PromptHook": {

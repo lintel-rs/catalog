@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude Code Plugin Hooks",
+  "description": "Schema for a Claude Code [plugin](https://code.claude.com/docs/en/plugins) hooks file (`hooks/hooks.json`). Plugin hooks merge with user and project hooks when the plugin is enabled. The file wraps hook event definitions with an optional `description` field. See [hooks reference](https://code.claude.com/docs/en/hooks) and [plugin hooks](https://code.claude.com/docs/en/plugins-reference#hooks).",
+  "x-lintel": {
+    "catalogDescription": "Claude Code plugin hooks file.",
+    "fileMatch": ["**/hooks/hooks.json"]
+  },
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what this set of hooks does. Shown in the `/hooks` menu.",
+      "examples": ["Automatic code formatting", "Security validation hooks"]
+    },
+    "hooks": {
+      "$ref": "./hooks.json",
+      "description": "Hook event definitions. Maps event names to arrays of matcher groups."
+    }
+  },
+  "required": ["hooks"],
+  "additionalProperties": false
+}
